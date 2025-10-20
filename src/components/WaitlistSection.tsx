@@ -27,10 +27,33 @@ export const WaitlistSection = () => {
     }
 
     setIsSubmitting(true);
-    // TODO: Connect to backend
-    toast.success("Welcome to the future! We'll be in touch soon.");
-    setFormData({ name: "", email: "", role: "" });
-    setIsSubmitting(false);
+
+    try {
+      const response = await fetch(
+        `https://yzjlnnvwufdydxrjvdtm.supabase.co/functions/v1/waitlist-signup`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(formData),
+        }
+      );
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.error || "Failed to join waitlist");
+      }
+
+      toast.success("Welcome to the future! Check your email for confirmation.");
+      setFormData({ name: "", email: "", role: "" });
+    } catch (error: any) {
+      console.error("Waitlist signup error:", error);
+      toast.error(error.message || "Something went wrong. Please try again.");
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
