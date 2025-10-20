@@ -119,19 +119,6 @@ export const Hero = () => {
             </Button>
           </motion.div>
 
-          {/* Waitlist form */}
-          <motion.div id="waitlist-form" initial={{
-          opacity: 0,
-          y: 20
-        }} animate={{
-          opacity: 1,
-          y: 0
-        }} transition={{
-          delay: 0.9,
-          duration: 0.8
-        }} className="max-w-2xl mx-auto">
-            
-          </motion.div>
         </motion.div>
       </div>
 

@@ -34,7 +34,7 @@ export const WaitlistSection = () => {
   };
 
   return (
-    <section className="py-24 relative overflow-hidden" ref={ref}>
+    <section id="waitlist-form" className="py-24 relative overflow-hidden" ref={ref}>
       {/* Background effects */}
       <div className="absolute inset-0">
         <div className="absolute inset-0 bg-gradient-to-b from-background via-background to-background" />
