@@ -49,8 +49,10 @@ const handler = async (req: Request): Promise<Response> => {
       );
     }
 
-    // Create Supabase client with service role key
-    const supabase = createClient(supabaseUrl, supabaseServiceKey);
+    // Create Supabase client with service role key, defaulting to api schema
+    const supabase = createClient(supabaseUrl, supabaseServiceKey, {
+      db: { schema: 'api' }
+    });
 
     // Insert into waitlist table
     const { data: waitlistEntry, error: dbError } = await supabase
