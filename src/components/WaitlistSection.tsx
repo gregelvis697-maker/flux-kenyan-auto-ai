@@ -14,6 +14,7 @@ export const WaitlistSection = () => {
   const [formData, setFormData] = useState({
     name: "",
     email: "",
+    phone_number: "",
     role: "",
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -21,7 +22,7 @@ export const WaitlistSection = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    if (!formData.name || !formData.email || !formData.role) {
+    if (!formData.name || !formData.email || !formData.phone_number || !formData.role) {
       toast.error("Please fill in all fields");
       return;
     }
@@ -47,7 +48,7 @@ export const WaitlistSection = () => {
       }
 
       toast.success("Welcome to the future! Check your email for confirmation.");
-      setFormData({ name: "", email: "", role: "" });
+      setFormData({ name: "", email: "", phone_number: "", role: "" });
     } catch (error: any) {
       console.error("Waitlist signup error:", error);
       toast.error(error.message || "Something went wrong. Please try again.");
@@ -118,6 +119,19 @@ export const WaitlistSection = () => {
                     placeholder="john@example.com"
                     value={formData.email}
                     onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                    className="bg-background/50 border-border focus:border-primary h-12"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium mb-2 text-foreground">
+                    Phone Number
+                  </label>
+                  <Input
+                    type="tel"
+                    placeholder="+254 712 345 678"
+                    value={formData.phone_number}
+                    onChange={(e) => setFormData({ ...formData, phone_number: e.target.value })}
                     className="bg-background/50 border-border focus:border-primary h-12"
                   />
                 </div>
