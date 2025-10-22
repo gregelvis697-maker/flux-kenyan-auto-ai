@@ -106,11 +106,11 @@ export const Hero = () => {
           delay: 0.7,
           duration: 0.8
         }}>
-            <Button size="lg" className="text-lg px-8 py-6 bg-gradient-primary hover:shadow-glow-primary transition-all duration-300 group" onClick={() => document.getElementById('waitlist-form')?.scrollIntoView({
-            behavior: 'smooth'
-          })}>
-              Join Waitlist
-              <ArrowRight className="ml-2 w-5 h-5 group-hover:translate-x-1 transition-transform" />
+            <Button size="lg" className="text-lg px-8 py-6 bg-gradient-primary hover:shadow-glow-primary transition-all duration-300 group" asChild>
+              <a href="/waitlist">
+                Join Waitlist
+                <ArrowRight className="ml-2 w-5 h-5 group-hover:translate-x-1 transition-transform" />
+              </a>
             </Button>
             <Button size="lg" variant="outline" className="text-lg px-8 py-6 border-primary/30 hover:border-primary hover:bg-primary/10 transition-all duration-300" onClick={() => document.getElementById('solution')?.scrollIntoView({
             behavior: 'smooth'
