@@ -31,7 +31,7 @@ export const WaitlistSection = () => {
 
     try {
       const response = await fetch(
-        `https://yzjlnnvwufdydxrjvdtm.supabase.co/functions/v1/waitlist-signup`,
+        `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/waitlist-signup`,
         {
           method: "POST",
           headers: {

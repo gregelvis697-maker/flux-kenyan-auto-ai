@@ -81,9 +81,7 @@ const handler = async (req: Request): Promise<Response> => {
     console.log("Processing waitlist signup", { role: validatedData.role });
 
     // Create Supabase client with service role key
-    const supabase = createClient(supabaseUrl, supabaseServiceKey, {
-      db: { schema: 'api' }
-    });
+    const supabase = createClient(supabaseUrl, supabaseServiceKey);
 
     // Insert into waitlist table
     const { data: waitlistEntry, error: dbError } = await supabase
@@ -155,7 +153,7 @@ const handler = async (req: Request): Promise<Response> => {
     try {
       await resend.emails.send({
         from: "Flux Waitlist <onboarding@resend.dev>",
-        to: ["gregelivs697@gmail.com"],
+        to: ["hello@flux.co.ke"],
         subject: "New Waitlist Signup",
         html: `
           <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">

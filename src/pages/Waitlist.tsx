@@ -11,7 +11,7 @@ const Waitlist = () => {
   const [formData, setFormData] = useState({
     name: "",
     email: "",
-    phone: "",
+    phone_number: "",
     role: "",
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -19,7 +19,7 @@ const Waitlist = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    if (!formData.name || !formData.email || !formData.phone || !formData.role) {
+    if (!formData.name || !formData.email || !formData.phone_number || !formData.role) {
       toast.error("Please fill in all fields");
       return;
     }
@@ -28,7 +28,7 @@ const Waitlist = () => {
 
     try {
       const response = await fetch(
-        `https://yzjlnnvwufdydxrjvdtm.supabase.co/functions/v1/send-waitlist-email`,
+        `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/waitlist-signup`,
         {
           method: "POST",
           headers: {
@@ -44,8 +44,8 @@ const Waitlist = () => {
         throw new Error(data.error || "Failed to submit");
       }
 
-      toast.success("Thank you! Your submission has been received.");
-      setFormData({ name: "", email: "", phone: "", role: "" });
+      toast.success("Welcome to the future! Check your email for confirmation.");
+      setFormData({ name: "", email: "", phone_number: "", role: "" });
     } catch (error: any) {
       console.error("Waitlist submission error:", error);
       toast.error(error.message || "Something went wrong. Please try again.");
@@ -124,8 +124,8 @@ const Waitlist = () => {
                 <Input
                   type="tel"
                   placeholder="+254 712 345 678"
-                  value={formData.phone}
-                  onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
+                  value={formData.phone_number}
+                  onChange={(e) => setFormData({ ...formData, phone_number: e.target.value })}
                   className="bg-background/50 border-border focus:border-primary h-12"
                   required
                 />
