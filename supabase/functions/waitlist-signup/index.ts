@@ -153,7 +153,7 @@ const handler = async (req: Request): Promise<Response> => {
     try {
       await resend.emails.send({
         from: "Flux Waitlist <onboarding@resend.dev>",
-        to: ["hello@flux.co.ke"],
+        to: ["gregelvis697@gmail.com"],
         subject: "New Waitlist Signup",
         html: `
           <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
