@@ -6,6 +6,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { toast } from "sonner";
 import { Rocket, ArrowLeft } from "lucide-react";
 import { Link } from "react-router-dom";
+import { supabase } from "@/integrations/supabase/client";
 
 const Waitlist = () => {
   const [formData, setFormData] = useState({
@@ -27,21 +28,12 @@ const Waitlist = () => {
     setIsSubmitting(true);
 
     try {
-      const response = await fetch(
-        `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/waitlist-signup`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(formData),
-        }
-      );
+      const { data, error } = await supabase.functions.invoke('waitlist-signup', {
+        body: formData,
+      });
 
-      const data = await response.json();
-
-      if (!response.ok) {
-        throw new Error(data.error || "Failed to submit");
+      if (error) {
+        throw new Error(error.message || "Failed to submit");
       }
 
       toast.success("Welcome to the future! Check your email for confirmation.");

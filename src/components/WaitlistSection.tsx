@@ -6,6 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { toast } from "sonner";
 import { Rocket } from "lucide-react";
+import { supabase } from "@/integrations/supabase/client";
 
 export const WaitlistSection = () => {
   const ref = useRef(null);
@@ -30,21 +31,12 @@ export const WaitlistSection = () => {
     setIsSubmitting(true);
 
     try {
-      const response = await fetch(
-        `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/waitlist-signup`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(formData),
-        }
-      );
+      const { data, error } = await supabase.functions.invoke('waitlist-signup', {
+        body: formData,
+      });
 
-      const data = await response.json();
-
-      if (!response.ok) {
-        throw new Error(data.error || "Failed to join waitlist");
+      if (error) {
+        throw new Error(error.message || "Failed to join waitlist");
       }
 
       toast.success("Welcome to the future! Check your email for confirmation.");
