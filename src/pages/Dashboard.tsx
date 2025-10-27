@@ -1,28 +1,10 @@
 import React from 'react';
-import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
-import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { LogOut, User } from 'lucide-react';
-import { useToast } from '@/hooks/use-toast';
+import { Navigation } from '@/components/Navigation';
 
 const Dashboard = () => {
-  const { user, userRole, signOut } = useAuth();
-  const navigate = useNavigate();
-  const { toast } = useToast();
-
-  const handleSignOut = async () => {
-    const { error } = await signOut();
-    if (error) {
-      toast({
-        title: 'Error',
-        description: error.message,
-        variant: 'destructive',
-      });
-    } else {
-      navigate('/auth');
-    }
-  };
+  const { userRole } = useAuth();
 
   const getRoleInfo = () => {
     switch (userRole) {
@@ -62,27 +44,10 @@ const Dashboard = () => {
   const roleInfo = getRoleInfo();
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-background to-secondary/20">
-      <header className="border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-        <div className="container flex h-16 items-center justify-between">
-          <div className="flex items-center gap-2">
-            <div className={`h-8 w-8 rounded-lg bg-gradient-to-br ${roleInfo.color}`} />
-            <span className="text-xl font-bold">Flux</span>
-          </div>
-          <div className="flex items-center gap-4">
-            <div className="flex items-center gap-2 text-sm">
-              <User className="h-4 w-4" />
-              <span className="text-muted-foreground">{user?.email}</span>
-            </div>
-            <Button variant="ghost" size="sm" onClick={handleSignOut}>
-              <LogOut className="h-4 w-4 mr-2" />
-              Sign Out
-            </Button>
-          </div>
-        </div>
-      </header>
-
-      <main className="container py-8">
+    <div className="min-h-screen bg-background">
+      <Navigation />
+      
+      <main className="container py-8 pt-24">
         <div className="max-w-4xl mx-auto space-y-6">
           <Card className="border-none shadow-lg">
             <CardHeader className={`bg-gradient-to-br ${roleInfo.color} text-white rounded-t-lg`}>

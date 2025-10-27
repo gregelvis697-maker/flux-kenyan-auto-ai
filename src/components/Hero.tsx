@@ -22,7 +22,7 @@ export const Hero = () => {
     setPhone("");
     setIsSubmitting(false);
   };
-  return <section className="relative min-h-screen flex items-center justify-center overflow-hidden">
+  return <section className="relative min-h-screen flex items-center justify-center overflow-hidden pt-16">
       {/* Animated background */}
       <div className="absolute inset-0 bg-gradient-hero">
         <div className="absolute inset-0 opacity-30" style={{

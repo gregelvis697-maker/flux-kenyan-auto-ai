@@ -4,9 +4,9 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { toast } from "sonner";
-import { Rocket, ArrowLeft } from "lucide-react";
-import { Link } from "react-router-dom";
+import { Rocket } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
+import { Navigation } from "@/components/Navigation";
 
 const Waitlist = () => {
   const [formData, setFormData] = useState({
@@ -47,17 +47,16 @@ const Waitlist = () => {
   };
 
   return (
-    <div className="min-h-screen bg-background flex items-center justify-center py-12 px-4">
-      <div className="absolute inset-0">
-        <div className="absolute inset-0 bg-gradient-to-b from-background via-background to-background" />
-        <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-primary/20 rounded-full blur-[150px] animate-glow-pulse" />
-      </div>
+    <div className="min-h-screen bg-background">
+      <Navigation />
+      
+      <div className="flex items-center justify-center py-12 px-4 pt-24">
+        <div className="absolute inset-0">
+          <div className="absolute inset-0 bg-gradient-to-b from-background via-background to-background" />
+          <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-primary/20 rounded-full blur-[150px] animate-glow-pulse" />
+        </div>
 
-      <div className="container mx-auto max-w-2xl relative z-10">
-        <Link to="/" className="inline-flex items-center gap-2 text-muted-foreground hover:text-foreground mb-8 transition-colors">
-          <ArrowLeft className="w-4 h-4" />
-          Back to home
-        </Link>
+        <div className="container mx-auto max-w-2xl relative z-10">
 
         <motion.div
           initial={{ opacity: 0, y: 30 }}
@@ -154,6 +153,7 @@ const Waitlist = () => {
             </p>
           </form>
         </motion.div>
+        </div>
       </div>
     </div>
   );
