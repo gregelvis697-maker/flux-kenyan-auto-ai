@@ -107,8 +107,8 @@ export const Hero = () => {
           duration: 0.8
         }}>
             <Button size="lg" className="text-lg px-8 py-6 bg-gradient-primary hover:shadow-glow-primary transition-all duration-300 group" asChild>
-              <a href="/waitlist">
-                Join Waitlist
+              <a href="/auth">
+                Get Started
                 <ArrowRight className="ml-2 w-5 h-5 group-hover:translate-x-1 transition-transform" />
               </a>
             </Button>
