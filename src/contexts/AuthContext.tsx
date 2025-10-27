@@ -1,7 +1,6 @@
-import { createContext, useContext, useEffect, useState } from 'react';
+import React, { createContext, useContext, useEffect, useState } from 'react';
 import { User, Session } from '@supabase/supabase-js';
 import { supabase } from '@/integrations/supabase/client';
-import { useNavigate } from 'react-router-dom';
 
 type UserRole = 'buyer' | 'dealer' | 'importer' | 'admin' | null;
 
@@ -12,7 +11,7 @@ interface AuthContextType {
   loading: boolean;
   signUp: (email: string, password: string, role: UserRole) => Promise<{ error: Error | null }>;
   signIn: (email: string, password: string) => Promise<{ error: Error | null }>;
-  signOut: () => Promise<void>;
+  signOut: () => Promise<{ error: Error | null }>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -22,7 +21,6 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [session, setSession] = useState<Session | null>(null);
   const [userRole, setUserRole] = useState<UserRole>(null);
   const [loading, setLoading] = useState(true);
-  const navigate = useNavigate();
 
   const fetchUserRole = async (userId: string) => {
     try {
@@ -126,9 +124,13 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   };
 
   const signOut = async () => {
-    await supabase.auth.signOut();
-    setUserRole(null);
-    navigate('/auth');
+    try {
+      const { error } = await supabase.auth.signOut();
+      setUserRole(null);
+      return { error };
+    } catch (error) {
+      return { error: error as Error };
+    }
   };
 
   return (
