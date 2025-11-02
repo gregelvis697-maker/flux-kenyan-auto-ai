@@ -11,7 +11,13 @@ import { z } from 'zod';
 
 const authSchema = z.object({
   email: z.string().email('Invalid email address').max(255),
-  password: z.string().min(6, 'Password must be at least 6 characters').max(128),
+  password: z.string()
+    .min(12, 'Password must be at least 12 characters')
+    .max(128)
+    .regex(/[A-Z]/, 'Password must contain at least one uppercase letter')
+    .regex(/[a-z]/, 'Password must contain at least one lowercase letter')
+    .regex(/[0-9]/, 'Password must contain at least one number')
+    .regex(/[^A-Za-z0-9]/, 'Password must contain at least one special character'),
 });
 
 type UserRole = 'buyer' | 'dealer' | 'importer';
@@ -114,12 +120,12 @@ const Auth = () => {
               <Input
                 id="password"
                 type="password"
-                placeholder="••••••••"
+                placeholder="Min 12 chars with uppercase, lowercase, number & special char"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 required
                 disabled={isLoading}
-                minLength={6}
+                minLength={12}
               />
             </div>
             {!isLogin && (

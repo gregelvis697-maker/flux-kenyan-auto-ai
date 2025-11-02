@@ -38,7 +38,6 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       setApprovalStatus(data?.status as ApprovalStatus);
       return data?.role as UserRole;
     } catch (error) {
-      console.error('Error fetching user role:', error);
       setUserRole(null);
       setApprovalStatus(null);
       return null;

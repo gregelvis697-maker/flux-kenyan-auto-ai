@@ -64,7 +64,6 @@ const handler = async (req: Request): Promise<Response> => {
                'unknown';
     
     if (!checkRateLimit(ip)) {
-      console.log("Rate limit exceeded", { ip });
       return new Response(
         JSON.stringify({ error: "Too many requests. Please try again later." }),
         {
@@ -77,8 +76,6 @@ const handler = async (req: Request): Promise<Response> => {
     // Parse and validate input
     const rawData = await req.json();
     const validatedData = waitlistSchema.parse(rawData);
-
-    console.log("Processing waitlist signup", { role: validatedData.role });
 
     // Create Supabase client with service role key
     const supabase = createClient(supabaseUrl, supabaseServiceKey);
@@ -96,8 +93,6 @@ const handler = async (req: Request): Promise<Response> => {
       .single();
 
     if (dbError) {
-      console.error("Database error code:", dbError.code);
-      
       // Check if it's a duplicate email error
       if (dbError.code === "23505") {
         return new Response(
@@ -118,8 +113,6 @@ const handler = async (req: Request): Promise<Response> => {
         }
       );
     }
-
-    console.log("Waitlist entry created with ID:", waitlistEntry.id);
 
     // Sanitize data for email HTML
     const safeName = escapeHtml(validatedData.name);
@@ -143,9 +136,7 @@ const handler = async (req: Request): Promise<Response> => {
           </div>
         `,
       });
-      console.log("Confirmation email sent successfully");
     } catch (emailError) {
-      console.error("Error sending confirmation email");
       // Don't fail the whole request if email fails
     }
 
@@ -166,9 +157,7 @@ const handler = async (req: Request): Promise<Response> => {
           </div>
         `,
       });
-      console.log("Notification email sent to team successfully");
     } catch (emailError) {
-      console.error("Error sending notification email");
       // Don't fail the whole request if email fails
     }
 
@@ -185,7 +174,6 @@ const handler = async (req: Request): Promise<Response> => {
   } catch (error: any) {
     // Handle validation errors
     if (error instanceof z.ZodError) {
-      console.log("Validation error occurred");
       return new Response(
         JSON.stringify({ 
           error: error.errors[0]?.message || "Invalid input data"
@@ -197,7 +185,6 @@ const handler = async (req: Request): Promise<Response> => {
       );
     }
 
-    console.error("Unexpected error occurred");
     return new Response(
       JSON.stringify({ error: "An unexpected error occurred. Please try again." }),
       {
