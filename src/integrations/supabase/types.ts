@@ -14,12 +14,45 @@ export type Database = {
   }
   public: {
     Tables: {
+      approval_audit: {
+        Row: {
+          action: string
+          id: string
+          performed_at: string
+          performed_by: string
+          rejection_reason: string | null
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Insert: {
+          action: string
+          id?: string
+          performed_at?: string
+          performed_by: string
+          rejection_reason?: string | null
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Update: {
+          action?: string
+          id?: string
+          performed_at?: string
+          performed_by?: string
+          rejection_reason?: string | null
+          role?: Database["public"]["Enums"]["app_role"]
+          user_id?: string
+        }
+        Relationships: []
+      }
       user_roles: {
         Row: {
           approved_at: string | null
           approved_by: string | null
           created_at: string
           id: string
+          rejected_at: string | null
+          rejected_by: string | null
+          rejection_reason: string | null
           role: Database["public"]["Enums"]["app_role"]
           status: Database["public"]["Enums"]["approval_status"]
           user_id: string
@@ -29,6 +62,9 @@ export type Database = {
           approved_by?: string | null
           created_at?: string
           id?: string
+          rejected_at?: string | null
+          rejected_by?: string | null
+          rejection_reason?: string | null
           role: Database["public"]["Enums"]["app_role"]
           status?: Database["public"]["Enums"]["approval_status"]
           user_id: string
@@ -38,6 +74,9 @@ export type Database = {
           approved_by?: string | null
           created_at?: string
           id?: string
+          rejected_at?: string | null
+          rejected_by?: string | null
+          rejection_reason?: string | null
           role?: Database["public"]["Enums"]["app_role"]
           status?: Database["public"]["Enums"]["approval_status"]
           user_id?: string

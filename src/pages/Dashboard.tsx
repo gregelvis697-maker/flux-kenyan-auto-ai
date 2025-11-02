@@ -2,6 +2,9 @@ import React from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Navigation } from '@/components/Navigation';
+import { Button } from '@/components/ui/button';
+import { Link } from 'react-router-dom';
+import { UserCheck } from 'lucide-react';
 
 const Dashboard = () => {
   const { userRole } = useAuth();
@@ -61,6 +64,18 @@ const Dashboard = () => {
                 <p className="text-muted-foreground">
                   Welcome to your dashboard. This is a secure area based on your role permissions.
                 </p>
+                
+                {userRole === 'admin' && (
+                  <div className="mb-6">
+                    <Button asChild size="lg" className="w-full sm:w-auto">
+                      <Link to="/admin/approvals" className="gap-2">
+                        <UserCheck className="h-5 w-5" />
+                        Manage Pending Approvals
+                      </Link>
+                    </Button>
+                  </div>
+                )}
+
                 <div className="grid gap-4 md:grid-cols-2">
                   <Card>
                     <CardHeader>
