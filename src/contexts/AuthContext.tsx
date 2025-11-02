@@ -3,11 +3,13 @@ import { User, Session } from '@supabase/supabase-js';
 import { supabase } from '@/integrations/supabase/client';
 
 type UserRole = 'buyer' | 'dealer' | 'importer' | 'admin' | null;
+type ApprovalStatus = 'pending' | 'approved' | 'rejected' | null;
 
 interface AuthContextType {
   user: User | null;
   session: Session | null;
   userRole: UserRole;
+  approvalStatus: ApprovalStatus;
   loading: boolean;
   signUp: (email: string, password: string, role: UserRole) => Promise<{ error: Error | null }>;
   signIn: (email: string, password: string) => Promise<{ error: Error | null }>;
@@ -20,22 +22,25 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [user, setUser] = useState<User | null>(null);
   const [session, setSession] = useState<Session | null>(null);
   const [userRole, setUserRole] = useState<UserRole>(null);
+  const [approvalStatus, setApprovalStatus] = useState<ApprovalStatus>(null);
   const [loading, setLoading] = useState(true);
 
   const fetchUserRole = async (userId: string) => {
     try {
       const { data, error } = await supabase
         .from('user_roles')
-        .select('role')
+        .select('role, status')
         .eq('user_id', userId)
         .single();
 
       if (error) throw error;
       setUserRole(data?.role as UserRole);
+      setApprovalStatus(data?.status as ApprovalStatus);
       return data?.role as UserRole;
     } catch (error) {
       console.error('Error fetching user role:', error);
       setUserRole(null);
+      setApprovalStatus(null);
       return null;
     }
   };
@@ -96,9 +101,17 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       if (error) throw error;
 
       if (data.user && role) {
+        // Auto-approve buyers, pending for dealers and importers
+        const status = role === 'buyer' ? 'approved' : 'pending';
+        
         const { error: roleError } = await supabase
           .from('user_roles')
-          .insert({ user_id: data.user.id, role });
+          .insert({ 
+            user_id: data.user.id, 
+            role,
+            status,
+            ...(status === 'approved' && { approved_at: new Date().toISOString() })
+          });
 
         if (roleError) throw roleError;
       }
@@ -127,6 +140,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     try {
       const { error } = await supabase.auth.signOut();
       setUserRole(null);
+      setApprovalStatus(null);
       return { error };
     } catch (error) {
       return { error: error as Error };
@@ -134,7 +148,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   };
 
   return (
-    <AuthContext.Provider value={{ user, session, userRole, loading, signUp, signIn, signOut }}>
+    <AuthContext.Provider value={{ user, session, userRole, approvalStatus, loading, signUp, signIn, signOut }}>
       {children}
     </AuthContext.Provider>
   );

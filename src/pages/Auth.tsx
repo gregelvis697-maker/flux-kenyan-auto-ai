@@ -22,15 +22,17 @@ const Auth = () => {
   const [password, setPassword] = useState('');
   const [role, setRole] = useState<UserRole>('buyer');
   const [isLoading, setIsLoading] = useState(false);
-  const { signIn, signUp, user, userRole } = useAuth();
+  const { signIn, signUp, user, userRole, approvalStatus } = useAuth();
   const { toast } = useToast();
   const navigate = useNavigate();
 
   useEffect(() => {
-    if (user && userRole) {
+    if (user && approvalStatus === 'pending') {
+      navigate('/pending-approval', { replace: true });
+    } else if (user && userRole && approvalStatus === 'approved') {
       navigate(`/dashboard/${userRole}`, { replace: true });
     }
-  }, [user, userRole, navigate]);
+  }, [user, userRole, approvalStatus, navigate]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -57,9 +59,13 @@ const Auth = () => {
             variant: 'destructive',
           });
         } else {
+          const successMessage = role === 'buyer' 
+            ? 'Account created successfully! Redirecting to your dashboard...'
+            : 'Account created! Your request is pending admin approval. You will be notified via email.';
+          
           toast({
             title: 'Success',
-            description: 'Account created successfully!',
+            description: successMessage,
           });
         }
       }

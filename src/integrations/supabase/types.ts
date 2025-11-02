@@ -16,21 +16,30 @@ export type Database = {
     Tables: {
       user_roles: {
         Row: {
+          approved_at: string | null
+          approved_by: string | null
           created_at: string
           id: string
           role: Database["public"]["Enums"]["app_role"]
+          status: Database["public"]["Enums"]["approval_status"]
           user_id: string
         }
         Insert: {
+          approved_at?: string | null
+          approved_by?: string | null
           created_at?: string
           id?: string
           role: Database["public"]["Enums"]["app_role"]
+          status?: Database["public"]["Enums"]["approval_status"]
           user_id: string
         }
         Update: {
+          approved_at?: string | null
+          approved_by?: string | null
           created_at?: string
           id?: string
           role?: Database["public"]["Enums"]["app_role"]
+          status?: Database["public"]["Enums"]["approval_status"]
           user_id?: string
         }
         Relationships: []
@@ -67,6 +76,10 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      get_role_status: {
+        Args: { _user_id: string }
+        Returns: Database["public"]["Enums"]["approval_status"]
+      }
       get_user_role: {
         Args: { _user_id: string }
         Returns: Database["public"]["Enums"]["app_role"]
@@ -81,6 +94,7 @@ export type Database = {
     }
     Enums: {
       app_role: "buyer" | "dealer" | "importer" | "admin"
+      approval_status: "pending" | "approved" | "rejected"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -209,6 +223,7 @@ export const Constants = {
   public: {
     Enums: {
       app_role: ["buyer", "dealer", "importer", "admin"],
+      approval_status: ["pending", "approved", "rejected"],
     },
   },
 } as const
