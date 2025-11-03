@@ -114,7 +114,7 @@ export const Navigation = () => {
                   variant="ghost"
                   size="sm"
                   onClick={() => navigate("/auth")}
-                  className="hover:text-primary"
+                  className="text-foreground hover:text-primary hover:bg-accent/50"
                 >
                   Sign In
                 </Button>
@@ -198,7 +198,7 @@ export const Navigation = () => {
                         navigate("/auth");
                         setMobileMenuOpen(false);
                       }}
-                      className="w-full hover:text-primary"
+                      className="w-full text-foreground hover:text-primary hover:bg-accent/50"
                     >
                       Sign In
                     </Button>
