@@ -92,7 +92,8 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         options: {
           emailRedirectTo: redirectUrl,
           data: {
-            role: role
+            role: role,
+            full_name: '' // Can be extended to collect name during signup
           }
         }
       });
@@ -100,6 +101,8 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       if (error) throw error;
 
       if (data.user && role) {
+        // Profile will be auto-created by database trigger
+        
         // Auto-approve buyers, pending for dealers and importers
         const status = role === 'buyer' ? 'approved' : 'pending';
         

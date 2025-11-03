@@ -37,6 +37,7 @@ interface PendingUser {
   status: ApprovalStatus;
   created_at: string;
   email: string;
+  full_name?: string;
 }
 
 export default function AdminApprovals() {
@@ -90,31 +91,32 @@ export default function AdminApprovals() {
   const fetchPendingUsers = async () => {
     setLoading(true);
     try {
+      // Fetch pending users with profiles joined
       const { data, error } = await supabase
         .from('user_roles')
-        .select('id, user_id, role, status, created_at')
+        .select(`
+          id,
+          user_id,
+          role,
+          status,
+          created_at,
+          profiles!inner(email, full_name)
+        `)
         .eq('status', 'pending')
         .in('role', ['dealer', 'importer'])
         .order('created_at', { ascending: false });
 
       if (error) throw error;
 
-      // Fetch email addresses from auth.users
-      const userIds = data?.map((u) => u.user_id) || [];
-      const emails: Record<string, string> = {};
-
-      if (userIds.length > 0) {
-        for (const userId of userIds) {
-          const { data: userData } = await supabase.auth.admin.getUserById(userId);
-          if (userData?.user?.email) {
-            emails[userId] = userData.user.email;
-          }
-        }
-      }
-
-      const usersWithEmails = (data || []).map((user) => ({
-        ...user,
-        email: emails[user.user_id] || 'Unknown',
+      // Map to PendingUser structure
+      const usersWithEmails = (data || []).map((user: any) => ({
+        id: user.id,
+        user_id: user.user_id,
+        role: user.role,
+        status: user.status,
+        created_at: user.created_at,
+        email: user.profiles?.email || 'Unknown',
+        full_name: user.profiles?.full_name,
       }));
 
       setPendingUsers(usersWithEmails);
@@ -186,6 +188,25 @@ export default function AdminApprovals() {
       toast({
         title: 'Error',
         description: 'Rejection reason is required',
+        variant: 'destructive',
+      });
+      return;
+    }
+
+    // Validate rejection reason length
+    const trimmedReason = rejectionReason.trim();
+    if (trimmedReason.length < 10) {
+      toast({
+        title: 'Error',
+        description: 'Rejection reason must be at least 10 characters',
+        variant: 'destructive',
+      });
+      return;
+    }
+    if (trimmedReason.length > 500) {
+      toast({
+        title: 'Error',
+        description: 'Rejection reason must not exceed 500 characters',
         variant: 'destructive',
       });
       return;
@@ -299,8 +320,15 @@ export default function AdminApprovals() {
                     <CardContent className="p-6">
                       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                         <div className="flex-1 space-y-2">
-                          <div className="flex items-center gap-3">
-                            <h3 className="font-semibold text-lg">{pendingUser.email}</h3>
+                           <div className="flex items-center gap-3">
+                            <h3 className="font-semibold text-lg">
+                              {pendingUser.email}
+                              {pendingUser.full_name && (
+                                <span className="text-sm text-muted-foreground ml-2">
+                                  ({pendingUser.full_name})
+                                </span>
+                              )}
+                            </h3>
                             <Badge variant="secondary" className="capitalize">
                               {pendingUser.role}
                             </Badge>
@@ -358,8 +386,12 @@ export default function AdminApprovals() {
                 value={rejectionReason}
                 onChange={(e) => setRejectionReason(e.target.value)}
                 rows={4}
+                maxLength={500}
                 required
               />
+              <p className="text-xs text-muted-foreground mt-1">
+                {rejectionReason.length}/500 characters (minimum 10 required)
+              </p>
             </div>
           </div>
           <DialogFooter>
