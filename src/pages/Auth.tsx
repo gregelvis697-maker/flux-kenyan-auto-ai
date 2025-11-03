@@ -120,13 +120,18 @@ const Auth = () => {
               <Input
                 id="password"
                 type="password"
-                placeholder="Min 12 chars with uppercase, lowercase, number & special char"
+                placeholder={isLogin ? "Enter your password" : "Create a strong password"}
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 required
                 disabled={isLoading}
                 minLength={12}
               />
+              {!isLogin && (
+                <p className="text-xs text-muted-foreground">
+                  Min 12 characters with uppercase, lowercase, number & special character
+                </p>
+              )}
             </div>
             {!isLogin && (
               <div className="space-y-2">
