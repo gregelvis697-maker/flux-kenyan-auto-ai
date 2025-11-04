@@ -10,7 +10,6 @@ import Waitlist from "./pages/Waitlist";
 import Auth from "./pages/Auth";
 import Dashboard from "./pages/Dashboard";
 import PendingApproval from "./pages/PendingApproval";
-import AdminApprovals from "./pages/AdminApprovals";
 import AdminDashboard from "./pages/AdminDashboard";
 import NotFound from "./pages/NotFound";
 
@@ -38,14 +37,6 @@ const App = () => (
             element={
               <ProtectedRoute allowedRoles={['admin']}>
                 <AdminDashboard />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/admin/approvals"
-            element={
-              <ProtectedRoute allowedRoles={['admin']}>
-                <AdminApprovals />
               </ProtectedRoute>
             }
           />

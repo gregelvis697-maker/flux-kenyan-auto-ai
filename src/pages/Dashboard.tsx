@@ -4,7 +4,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Navigation } from '@/components/Navigation';
 import { Button } from '@/components/ui/button';
 import { Link } from 'react-router-dom';
-import { UserCheck, BarChart3 } from 'lucide-react';
+import { BarChart3 } from 'lucide-react';
 
 const Dashboard = () => {
   const { userRole } = useAuth();
@@ -66,17 +66,11 @@ const Dashboard = () => {
                 </p>
                 
                 {userRole === 'admin' && (
-                  <div className="mb-6 flex flex-col sm:flex-row gap-3">
+                  <div className="mb-6">
                     <Button asChild size="lg" className="w-full sm:w-auto gap-2">
                       <Link to="/admin/dashboard">
                         <BarChart3 className="h-5 w-5" />
                         Admin Dashboard
-                      </Link>
-                    </Button>
-                    <Button asChild size="lg" variant="outline" className="w-full sm:w-auto gap-2">
-                      <Link to="/admin/approvals">
-                        <UserCheck className="h-5 w-5" />
-                        Manage Approvals
                       </Link>
                     </Button>
                   </div>
