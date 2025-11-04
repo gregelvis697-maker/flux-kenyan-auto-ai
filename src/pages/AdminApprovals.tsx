@@ -160,8 +160,8 @@ export default function AdminApprovals() {
       if (auditError) throw auditError;
 
       toast({
-        title: 'Success',
-        description: `${pendingUser.role} account approved successfully`,
+        title: '✅ Account Approved',
+        description: `${pendingUser.email} has been approved as ${pendingUser.role}`,
       });
 
       // Refresh list
@@ -239,8 +239,8 @@ export default function AdminApprovals() {
       if (auditError) throw auditError;
 
       toast({
-        title: 'Success',
-        description: `${selectedUser.role} account rejected`,
+        title: '❌ Account Rejected',
+        description: `${selectedUser.email} has been rejected`,
       });
 
       setRejectDialogOpen(false);
