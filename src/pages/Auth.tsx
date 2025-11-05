@@ -45,9 +45,9 @@ const Auth = () => {
     setIsLoading(true);
 
     try {
-      // For login, skip password validation to allow admin login
-      // Admins may have been created manually without strict password requirements
       if (isLogin) {
+        // Supabase Auth handles password verification server-side
+        // No need for client-side validation on login
         const { error } = await signIn(email, password);
         if (error) {
           toast({
@@ -57,7 +57,7 @@ const Auth = () => {
           });
         }
       } else {
-        // For signup, validate password requirements
+        // For signup, validate password requirements for better UX
         const validatedData = authSchema.parse({ email, password });
         const { error } = await signUp(validatedData.email, validatedData.password, role);
         if (error) {

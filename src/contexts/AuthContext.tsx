@@ -133,8 +133,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
       if (error) throw error;
 
-      // After successful login, check if user has a role assigned
-      // If not (e.g., manually created admin), create admin role
+      // Verify user has a valid role assigned
       if (data.user) {
         const { data: roleData, error: roleError } = await supabase
           .from('user_roles')
@@ -142,13 +141,11 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
           .eq('user_id', data.user.id)
           .maybeSingle();
 
-        // If no role exists, this might be a manually created admin
+        // If no role exists, account is not properly configured
+        // Admins must be created manually via backend dashboard
         if (!roleData && !roleError) {
-          // Create admin role using the function
-          await supabase.rpc('create_admin_user', {
-            admin_email: data.user.email || '',
-            admin_user_id: data.user.id
-          });
+          await supabase.auth.signOut();
+          throw new Error('Account not properly configured. Please contact an administrator.');
         }
       }
 
