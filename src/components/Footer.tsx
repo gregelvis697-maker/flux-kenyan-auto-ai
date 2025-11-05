@@ -1,5 +1,6 @@
 import { motion } from "framer-motion";
 import { Twitter, Instagram } from "lucide-react";
+import { Link } from "react-router-dom";
 
 export const Footer = () => {
   const currentYear = new Date().getFullYear();
@@ -48,6 +49,11 @@ export const Footer = () => {
                 <a href="#" className="text-muted-foreground hover:text-primary transition-colors text-sm">
                   Privacy Policy
                 </a>
+              </li>
+              <li>
+                <Link to="/auth" className="text-muted-foreground hover:text-primary transition-colors text-sm">
+                  Admin
+                </Link>
               </li>
             </ul>
           </motion.div>
