@@ -45,10 +45,10 @@ const Auth = () => {
     setIsLoading(true);
 
     try {
-      const validatedData = authSchema.parse({ email, password });
-
+      // For login, skip password validation to allow admin login
+      // Admins may have been created manually without strict password requirements
       if (isLogin) {
-        const { error } = await signIn(validatedData.email, validatedData.password);
+        const { error } = await signIn(email, password);
         if (error) {
           toast({
             title: 'Error',
@@ -57,6 +57,8 @@ const Auth = () => {
           });
         }
       } else {
+        // For signup, validate password requirements
+        const validatedData = authSchema.parse({ email, password });
         const { error } = await signUp(validatedData.email, validatedData.password, role);
         if (error) {
           toast({
@@ -125,7 +127,7 @@ const Auth = () => {
                 onChange={(e) => setPassword(e.target.value)}
                 required
                 disabled={isLoading}
-                minLength={12}
+                minLength={isLogin ? undefined : 12}
               />
               {!isLogin && (
                 <p className="text-xs text-muted-foreground">

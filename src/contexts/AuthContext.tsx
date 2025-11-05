@@ -1,6 +1,6 @@
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import { User, Session } from '@supabase/supabase-js';
-import { supabase } from '@/integrations/supabase/client';
+import { supabase } from '@/lib/supabase';
 
 type UserRole = 'buyer' | 'dealer' | 'importer' | 'admin' | null;
 type ApprovalStatus = 'pending' | 'approved' | 'rejected' | null;
@@ -93,7 +93,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
           emailRedirectTo: redirectUrl,
           data: {
             role: role,
-            full_name: '' // Can be extended to collect name during signup
+            full_name: ''
           }
         }
       });
@@ -126,12 +126,32 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
   const signIn = async (email: string, password: string) => {
     try {
-      const { error } = await supabase.auth.signInWithPassword({
+      const { data, error } = await supabase.auth.signInWithPassword({
         email,
         password,
       });
 
       if (error) throw error;
+
+      // After successful login, check if user has a role assigned
+      // If not (e.g., manually created admin), create admin role
+      if (data.user) {
+        const { data: roleData, error: roleError } = await supabase
+          .from('user_roles')
+          .select('role, status')
+          .eq('user_id', data.user.id)
+          .maybeSingle();
+
+        // If no role exists, this might be a manually created admin
+        if (!roleData && !roleError) {
+          // Create admin role using the function
+          await supabase.rpc('create_admin_user', {
+            admin_email: data.user.email || '',
+            admin_user_id: data.user.id
+          });
+        }
+      }
+
       return { error: null };
     } catch (error) {
       return { error: error as Error };
