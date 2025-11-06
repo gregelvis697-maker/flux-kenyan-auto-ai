@@ -1,7 +1,9 @@
 import { motion } from "framer-motion";
 import { useInView } from "framer-motion";
-import { useRef } from "react";
-import { Shield, Zap, Brain } from "lucide-react";
+import { useRef, useState } from "react";
+import { Shield, Zap, Brain, ArrowRight } from "lucide-react";
+import { useNavigate } from "react-router-dom";
+import { useAuth } from "@/contexts/AuthContext";
 
 const features = [
   {
@@ -24,9 +26,51 @@ const features = [
   },
 ];
 
+const roleCards = [
+  { 
+    label: "Importers", 
+    role: "importer", 
+    route: "/dashboard/importer",
+    borderClass: "border-primary shadow-glow-primary",
+    bgClass: "bg-primary/10",
+    iconClass: "bg-primary/20 border-primary text-primary",
+    textClass: "text-primary"
+  },
+  { 
+    label: "Dealers", 
+    role: "dealer", 
+    route: "/dashboard/dealer",
+    borderClass: "border-secondary shadow-glow-secondary",
+    bgClass: "bg-secondary/10",
+    iconClass: "bg-secondary/20 border-secondary text-secondary",
+    textClass: "text-secondary"
+  },
+  { 
+    label: "Buyers", 
+    role: "buyer", 
+    route: "/dashboard/buyer",
+    borderClass: "border-primary shadow-glow-primary",
+    bgClass: "bg-primary/10",
+    iconClass: "bg-primary/20 border-primary text-primary",
+    textClass: "text-primary"
+  },
+  { 
+    label: "Admin", 
+    role: "admin", 
+    route: "/admin/dashboard",
+    borderClass: "border-accent shadow-glow-primary",
+    bgClass: "bg-accent/10",
+    iconClass: "bg-accent/20 border-accent text-accent-foreground",
+    textClass: "text-accent-foreground"
+  },
+];
+
 export const SolutionSection = () => {
   const ref = useRef(null);
   const isInView = useInView(ref, { once: true, margin: "-100px" });
+  const [hoveredRole, setHoveredRole] = useState<string | null>(null);
+  const navigate = useNavigate();
+  const { user } = useAuth();
 
   return (
     <section id="solution" className="py-24 relative overflow-hidden" ref={ref}>
@@ -87,50 +131,67 @@ export const SolutionSection = () => {
           ))}
         </div>
 
-        {/* Visual representation */}
+        {/* Role Cards with Dashboard Links */}
         <motion.div
-          initial={{ opacity: 0, scale: 0.9 }}
-          animate={isInView ? { opacity: 1, scale: 1 } : {}}
+          initial={{ opacity: 0, y: 30 }}
+          animate={isInView ? { opacity: 1, y: 0 } : {}}
           transition={{ duration: 0.8, delay: 0.6 }}
-          className="relative max-w-4xl mx-auto"
+          className="max-w-6xl mx-auto"
         >
-          <div className="relative p-12 bg-gradient-card rounded-3xl border border-border shadow-elevated">
-            {/* Pipeline visualization */}
-            <div className="flex items-center justify-between gap-4 flex-wrap md:flex-nowrap">
-              <div className="flex-1 text-center">
-                <div className="inline-flex items-center justify-center w-20 h-20 rounded-full bg-primary/20 border-2 border-primary mb-4 shadow-glow-primary">
-                  <span className="text-2xl font-bold text-primary">I</span>
+          <h3 className="text-2xl font-bold text-center mb-8 text-foreground">
+            Choose Your <span className="bg-gradient-primary bg-clip-text text-transparent">Role</span>
+          </h3>
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-6">
+            {roleCards.map((card, index) => (
+              <motion.div
+                key={card.role}
+                initial={{ opacity: 0, y: 20 }}
+                animate={isInView ? { opacity: 1, y: 0 } : {}}
+                transition={{ duration: 0.6, delay: 0.7 + index * 0.1 }}
+                onMouseEnter={() => setHoveredRole(card.role)}
+                onMouseLeave={() => setHoveredRole(null)}
+                onClick={() => navigate(user ? card.route : "/auth")}
+                className="relative cursor-pointer group"
+              >
+                <div className={`relative h-full p-6 bg-gradient-card rounded-2xl border transition-all duration-300 ${
+                  hoveredRole === card.role
+                    ? `${card.borderClass} scale-105`
+                    : "border-border hover:border-primary/30"
+                }`}>
+                  {/* Background glow on hover */}
+                  <div className={`absolute inset-0 ${card.bgClass} rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-300`} />
+                  
+                  <div className="relative z-10 text-center">
+                    {/* Icon/Initial */}
+                    <div className={`inline-flex items-center justify-center w-16 h-16 rounded-full ${card.iconClass} border-2 mb-4 transition-all duration-300 group-hover:scale-110`}>
+                      <span className="text-xl font-bold">
+                        {card.label.charAt(0)}
+                      </span>
+                    </div>
+                    
+                    {/* Role label */}
+                    <p className="text-sm font-semibold text-foreground mb-2">
+                      {card.label}
+                    </p>
+                    
+                    {/* Hover CTA */}
+                    <motion.div
+                      initial={{ opacity: 0, y: 10 }}
+                      animate={
+                        hoveredRole === card.role
+                          ? { opacity: 1, y: 0 }
+                          : { opacity: 0, y: 10 }
+                      }
+                      transition={{ duration: 0.2 }}
+                      className={`flex items-center justify-center gap-2 text-xs font-medium ${card.textClass}`}
+                    >
+                      <span>{user ? "Go to Dashboard" : "Sign Up"}</span>
+                      <ArrowRight className="w-3 h-3" />
+                    </motion.div>
+                  </div>
                 </div>
-                <p className="text-sm font-medium text-foreground">Importers</p>
-              </div>
-
-              <div className="flex-shrink-0">
-                <div className="h-1 w-16 bg-gradient-primary" />
-              </div>
-
-              <div className="flex-1 text-center">
-                <div className="inline-flex items-center justify-center w-20 h-20 rounded-full bg-secondary/20 border-2 border-secondary mb-4 shadow-glow-secondary">
-                  <span className="text-2xl font-bold text-secondary">D</span>
-                </div>
-                <p className="text-sm font-medium text-foreground">Dealers</p>
-              </div>
-
-              <div className="flex-shrink-0">
-                <div className="h-1 w-16 bg-gradient-primary" />
-              </div>
-
-              <div className="flex-1 text-center">
-                <div className="inline-flex items-center justify-center w-20 h-20 rounded-full bg-primary/20 border-2 border-primary mb-4 shadow-glow-primary">
-                  <span className="text-2xl font-bold text-primary">B</span>
-                </div>
-                <p className="text-sm font-medium text-foreground">Buyers</p>
-              </div>
-            </div>
-
-            {/* Center AI label */}
-            <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-background/90 backdrop-blur-sm px-6 py-3 rounded-full border border-primary shadow-glow-primary">
-              <p className="text-sm font-bold bg-gradient-primary bg-clip-text text-transparent">AI-Powered</p>
-            </div>
+              </motion.div>
+            ))}
           </div>
         </motion.div>
       </div>
