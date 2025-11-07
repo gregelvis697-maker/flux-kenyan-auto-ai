@@ -44,6 +44,54 @@ export type Database = {
         }
         Relationships: []
       }
+      dealer_import_requests: {
+        Row: {
+          accepted_at: string | null
+          budget: number
+          created_at: string
+          dealer_id: string
+          delivered_at: string | null
+          id: string
+          importer_id: string | null
+          make: string
+          model: string
+          specs: string | null
+          status: Database["public"]["Enums"]["import_status"]
+          updated_at: string
+          year: number
+        }
+        Insert: {
+          accepted_at?: string | null
+          budget: number
+          created_at?: string
+          dealer_id: string
+          delivered_at?: string | null
+          id?: string
+          importer_id?: string | null
+          make: string
+          model: string
+          specs?: string | null
+          status?: Database["public"]["Enums"]["import_status"]
+          updated_at?: string
+          year: number
+        }
+        Update: {
+          accepted_at?: string | null
+          budget?: number
+          created_at?: string
+          dealer_id?: string
+          delivered_at?: string | null
+          id?: string
+          importer_id?: string | null
+          make?: string
+          model?: string
+          specs?: string | null
+          status?: Database["public"]["Enums"]["import_status"]
+          updated_at?: string
+          year?: number
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           created_at: string
@@ -107,6 +155,80 @@ export type Database = {
         }
         Relationships: []
       }
+      vehicles: {
+        Row: {
+          color: string | null
+          condition: Database["public"]["Enums"]["vehicle_condition"]
+          created_at: string
+          dealer_id: string
+          description: string | null
+          engine_capacity: string
+          fuel_type: Database["public"]["Enums"]["fuel_type"]
+          id: string
+          import_request_id: string | null
+          is_sold: boolean
+          make: string
+          mileage: number | null
+          model: string
+          negotiable: boolean
+          photos: string[] | null
+          price: number
+          transmission: string | null
+          updated_at: string
+          year: number
+        }
+        Insert: {
+          color?: string | null
+          condition?: Database["public"]["Enums"]["vehicle_condition"]
+          created_at?: string
+          dealer_id: string
+          description?: string | null
+          engine_capacity: string
+          fuel_type: Database["public"]["Enums"]["fuel_type"]
+          id?: string
+          import_request_id?: string | null
+          is_sold?: boolean
+          make: string
+          mileage?: number | null
+          model: string
+          negotiable?: boolean
+          photos?: string[] | null
+          price: number
+          transmission?: string | null
+          updated_at?: string
+          year: number
+        }
+        Update: {
+          color?: string | null
+          condition?: Database["public"]["Enums"]["vehicle_condition"]
+          created_at?: string
+          dealer_id?: string
+          description?: string | null
+          engine_capacity?: string
+          fuel_type?: Database["public"]["Enums"]["fuel_type"]
+          id?: string
+          import_request_id?: string | null
+          is_sold?: boolean
+          make?: string
+          mileage?: number | null
+          model?: string
+          negotiable?: boolean
+          photos?: string[] | null
+          price?: number
+          transmission?: string | null
+          updated_at?: string
+          year?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "vehicles_import_request_id_fkey"
+            columns: ["import_request_id"]
+            isOneToOne: false
+            referencedRelation: "dealer_import_requests"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       waitlist: {
         Row: {
           created_at: string
@@ -162,6 +284,15 @@ export type Database = {
     Enums: {
       app_role: "buyer" | "dealer" | "importer" | "admin"
       approval_status: "pending" | "approved" | "rejected"
+      fuel_type: "petrol" | "diesel" | "electric" | "hybrid" | "plug_in_hybrid"
+      import_status:
+        | "requested"
+        | "accepted"
+        | "in_transit"
+        | "cleared"
+        | "delivered"
+        | "received"
+      vehicle_condition: "new" | "used" | "certified_pre_owned"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -291,6 +422,16 @@ export const Constants = {
     Enums: {
       app_role: ["buyer", "dealer", "importer", "admin"],
       approval_status: ["pending", "approved", "rejected"],
+      fuel_type: ["petrol", "diesel", "electric", "hybrid", "plug_in_hybrid"],
+      import_status: [
+        "requested",
+        "accepted",
+        "in_transit",
+        "cleared",
+        "delivered",
+        "received",
+      ],
+      vehicle_condition: ["new", "used", "certified_pre_owned"],
     },
   },
 } as const
