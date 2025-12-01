@@ -12,6 +12,7 @@ import Dashboard from "./pages/Dashboard";
 import PendingApproval from "./pages/PendingApproval";
 import AdminDashboard from "./pages/AdminDashboard";
 import DealerDashboard from "./pages/DealerDashboard";
+import ImporterDashboard from "./pages/ImporterDashboard";
 import NotFound from "./pages/NotFound";
 
 const App = () => (
@@ -30,6 +31,14 @@ const App = () => (
             element={
               <ProtectedRoute allowedRoles={['dealer']}>
                 <DealerDashboard />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/dashboard/importer"
+            element={
+              <ProtectedRoute allowedRoles={['importer']}>
+                <ImporterDashboard />
               </ProtectedRoute>
             }
           />
