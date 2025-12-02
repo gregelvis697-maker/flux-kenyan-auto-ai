@@ -11,6 +11,7 @@ import { AdminSidebar } from '@/components/admin/AdminSidebar';
 import { UserTable } from '@/components/admin/UserTable';
 import { InsightsPanel } from '@/components/admin/InsightsPanel';
 import { EmailLogsPanel } from '@/components/admin/EmailLogsPanel';
+import { NotificationBell } from '@/components/admin/NotificationBell';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { cn } from '@/lib/utils';
@@ -21,6 +22,7 @@ import {
   Clock,
   BarChart3,
   Search,
+  CheckCircle2,
 } from 'lucide-react';
 import {
   Dialog,
@@ -30,6 +32,16 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '@/components/ui/alert-dialog';
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
 
@@ -99,6 +111,10 @@ export default function AdminDashboard() {
   
   const [activeTab, setActiveTab] = useState('overview');
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
+  
+  // Bulk actions state
+  const [selectedUsers, setSelectedUsers] = useState<string[]>([]);
+  const [bulkApproveDialogOpen, setBulkApproveDialogOpen] = useState(false);
 
   // Redirect non-admins
   useEffect(() => {
@@ -451,6 +467,78 @@ export default function AdminDashboard() {
     }
   };
 
+  // Bulk approval handler
+  const handleBulkApprove = async () => {
+    if (!user || selectedUsers.length === 0) return;
+
+    setActionLoading(true);
+    setBulkApproveDialogOpen(false);
+
+    try {
+      // Get full user records for selected users
+      const usersToApprove = [...pendingDealers, ...pendingImporters].filter(u => 
+        selectedUsers.includes(u.user_id)
+      );
+
+      let successCount = 0;
+      let failCount = 0;
+
+      // Process each approval
+      for (const pendingUser of usersToApprove) {
+        try {
+          const { error: updateError } = await supabase
+            .from('user_roles')
+            .update({
+              status: 'approved',
+              approved_by: user.id,
+              approved_at: new Date().toISOString(),
+            })
+            .eq('user_id', pendingUser.user_id);
+
+          if (updateError) throw updateError;
+
+          await supabase.from('approval_audit').insert({
+            user_id: pendingUser.user_id,
+            action: 'approved',
+            performed_by: user.id,
+            role: pendingUser.role,
+          });
+
+          // Send verification email
+          await sendVerificationEmail(
+            pendingUser.email,
+            pendingUser.full_name || '',
+            pendingUser.user_id,
+            pendingUser.role,
+            'approved'
+          );
+
+          successCount++;
+        } catch (error) {
+          console.error(`Failed to approve ${pendingUser.email}:`, error);
+          failCount++;
+        }
+      }
+
+      toast({
+        title: '✅ Bulk Approval Complete',
+        description: `Successfully approved ${successCount} user${successCount !== 1 ? 's' : ''}${failCount > 0 ? `, ${failCount} failed` : ''}`,
+      });
+
+      setSelectedUsers([]);
+      fetchAllData();
+    } catch (error: any) {
+      console.error('Bulk approval error:', error);
+      toast({
+        title: 'Error',
+        description: 'Failed to complete bulk approval',
+        variant: 'destructive',
+      });
+    } finally {
+      setActionLoading(false);
+    }
+  };
+
   // Filter users based on search
   const filterUsers = (users: UserRecord[]) => {
     if (!searchTerm) return users;
@@ -516,6 +604,16 @@ export default function AdminDashboard() {
                   className="pl-10"
                 />
               </div>
+              {selectedUsers.length > 0 && (
+                <Button
+                  onClick={() => setBulkApproveDialogOpen(true)}
+                  disabled={actionLoading}
+                  className="gap-2"
+                >
+                  <CheckCircle2 className="h-4 w-4" />
+                  Approve Selected ({selectedUsers.length})
+                </Button>
+              )}
             </div>
             <UserTable
               users={filterUsers(pendingDealers)}
@@ -523,6 +621,9 @@ export default function AdminDashboard() {
               onApprove={handleApprove}
               onReject={handleRejectClick}
               actionLoading={actionLoading}
+              selectedUsers={selectedUsers}
+              onSelectionChange={setSelectedUsers}
+              enableBulkActions={true}
             />
           </div>
         );
@@ -540,6 +641,16 @@ export default function AdminDashboard() {
                   className="pl-10"
                 />
               </div>
+              {selectedUsers.length > 0 && (
+                <Button
+                  onClick={() => setBulkApproveDialogOpen(true)}
+                  disabled={actionLoading}
+                  className="gap-2"
+                >
+                  <CheckCircle2 className="h-4 w-4" />
+                  Approve Selected ({selectedUsers.length})
+                </Button>
+              )}
             </div>
             <UserTable
               users={filterUsers(pendingImporters)}
@@ -547,6 +658,9 @@ export default function AdminDashboard() {
               onApprove={handleApprove}
               onReject={handleRejectClick}
               actionLoading={actionLoading}
+              selectedUsers={selectedUsers}
+              onSelectionChange={setSelectedUsers}
+              enableBulkActions={true}
             />
           </div>
         );
@@ -617,10 +731,15 @@ export default function AdminDashboard() {
 
   return (
     <div className="min-h-screen bg-background">
-      <Navigation />
+      <Navigation>
+        <NotificationBell onNavigate={setActiveTab} />
+      </Navigation>
       <AdminSidebar
         activeTab={activeTab}
-        onTabChange={setActiveTab}
+        onTabChange={(tab) => {
+          setActiveTab(tab);
+          setSelectedUsers([]);
+        }}
         collapsed={sidebarCollapsed}
         onCollapsedChange={setSidebarCollapsed}
       />
@@ -691,6 +810,30 @@ export default function AdminDashboard() {
           </DialogFooter>
         </DialogContent>
       </Dialog>
+
+      {/* Bulk Approve Dialog */}
+      <AlertDialog open={bulkApproveDialogOpen} onOpenChange={setBulkApproveDialogOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Bulk Approve Applications</AlertDialogTitle>
+            <AlertDialogDescription>
+              You are about to approve {selectedUsers.length} application{selectedUsers.length !== 1 ? 's' : ''}. 
+              All selected users will receive verification emails and gain access to their respective dashboards.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel disabled={actionLoading}>Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={handleBulkApprove}
+              disabled={actionLoading}
+              className="bg-primary hover:bg-primary/90"
+            >
+              {actionLoading && <div className="mr-2 h-4 w-4 animate-spin rounded-full border-2 border-current border-t-transparent" />}
+              Approve {selectedUsers.length} User{selectedUsers.length !== 1 ? 's' : ''}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }

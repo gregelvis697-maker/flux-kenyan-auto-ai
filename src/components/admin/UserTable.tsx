@@ -1,5 +1,6 @@
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
+import { Checkbox } from '@/components/ui/checkbox';
 import { CheckCircle, XCircle, Clock, Mail } from 'lucide-react';
 import {
   Table,
@@ -29,9 +30,40 @@ interface UserTableProps {
   onApprove?: (user: User) => void;
   onReject?: (user: User) => void;
   actionLoading?: boolean;
+  selectedUsers?: string[];
+  onSelectionChange?: (userIds: string[]) => void;
+  enableBulkActions?: boolean;
 }
 
-export function UserTable({ users, type, onApprove, onReject, actionLoading }: UserTableProps) {
+export function UserTable({ 
+  users, 
+  type, 
+  onApprove, 
+  onReject, 
+  actionLoading,
+  selectedUsers = [],
+  onSelectionChange,
+  enableBulkActions = false,
+}: UserTableProps) {
+  const allSelected = users.length > 0 && users.every(u => selectedUsers.includes(u.user_id));
+  const someSelected = selectedUsers.length > 0 && !allSelected;
+
+  const handleSelectAll = () => {
+    if (allSelected) {
+      onSelectionChange?.([]);
+    } else {
+      onSelectionChange?.(users.map(u => u.user_id));
+    }
+  };
+
+  const handleSelectUser = (userId: string) => {
+    if (selectedUsers.includes(userId)) {
+      onSelectionChange?.(selectedUsers.filter(id => id !== userId));
+    } else {
+      onSelectionChange?.([...selectedUsers, userId]);
+    }
+  };
+
   if (users.length === 0) {
     const messages = {
       pending: { icon: Clock, text: 'No pending applications', sub: 'New applications will appear here' },
@@ -54,18 +86,36 @@ export function UserTable({ users, type, onApprove, onReject, actionLoading }: U
       <Table>
         <TableHeader>
           <TableRow>
+            {enableBulkActions && type === 'pending' && (
+              <TableHead className="w-12">
+                <Checkbox
+                  checked={allSelected}
+                  onCheckedChange={handleSelectAll}
+                  aria-label="Select all"
+                />
+              </TableHead>
+            )}
             <TableHead>Email</TableHead>
             <TableHead>Name</TableHead>
             <TableHead>Role</TableHead>
             <TableHead>Signup Date</TableHead>
             {type === 'verified' && <TableHead>Approved Date</TableHead>}
             {type === 'rejected' && <TableHead>Rejection Reason</TableHead>}
-            {type === 'pending' && <TableHead>Actions</TableHead>}
+            {type === 'pending' && !enableBulkActions && <TableHead>Actions</TableHead>}
           </TableRow>
         </TableHeader>
         <TableBody>
           {users.map((user) => (
             <TableRow key={user.id}>
+              {enableBulkActions && type === 'pending' && (
+                <TableCell>
+                  <Checkbox
+                    checked={selectedUsers.includes(user.user_id)}
+                    onCheckedChange={() => handleSelectUser(user.user_id)}
+                    aria-label={`Select ${user.email}`}
+                  />
+                </TableCell>
+              )}
               <TableCell className="font-medium">
                 <div className="flex items-center gap-2">
                   <Mail className="h-4 w-4 text-muted-foreground" />
@@ -93,7 +143,7 @@ export function UserTable({ users, type, onApprove, onReject, actionLoading }: U
                   </span>
                 </TableCell>
               )}
-              {type === 'pending' && onApprove && onReject && (
+              {type === 'pending' && !enableBulkActions && onApprove && onReject && (
                 <TableCell>
                   <div className="flex gap-2">
                     <Button
