@@ -7,7 +7,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { ProfileDropdown } from "@/components/navbar/ProfileDropdown";
 import { NotificationBell } from "@/components/navbar/NotificationBell";
 
-export const Navigation = () => {
+export const Navigation = ({ children }: { children?: React.ReactNode }) => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
   const { user } = useAuth();
@@ -83,7 +83,7 @@ export const Navigation = () => {
           <div className="hidden md:flex items-center space-x-3">
             {user ? (
               <>
-                <NotificationBell />
+                {children || <NotificationBell />}
                 <ProfileDropdown />
               </>
             ) : (
@@ -156,7 +156,7 @@ export const Navigation = () => {
                       <p className="text-xs text-muted-foreground mb-1">Signed in as</p>
                       <p className="text-sm font-medium truncate">{user.email}</p>
                     </div>
-                    <NotificationBell />
+                    {children || <NotificationBell />}
                     <ProfileDropdown />
                   </>
                 ) : (
