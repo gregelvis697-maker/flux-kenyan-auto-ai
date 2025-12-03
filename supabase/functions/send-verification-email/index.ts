@@ -18,7 +18,25 @@ interface VerificationEmailRequest {
   rejectionReason?: string;
 }
 
-const getApprovalEmailHtml = (name: string, role: string) => `
+interface EmailTemplate {
+  template_type: string;
+  subject: string;
+  body_html: string;
+}
+
+// HTML escape function for security
+const escapeHtml = (str: string): string => {
+  if (!str) return '';
+  return str
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#039;');
+};
+
+// Fallback templates in case database is unavailable
+const getFallbackApprovalHtml = (name: string, role: string) => `
 <!DOCTYPE html>
 <html>
 <head>
@@ -43,9 +61,9 @@ const getApprovalEmailHtml = (name: string, role: string) => `
     <div class="content">
       <div class="title">🎉 Account Verified!</div>
       <p class="message">
-        Hello ${name || 'there'},<br><br>
-        Great news! Your Flux account has been verified as a <span class="role-badge">${role}</span>.<br><br>
-        You now have full access to all ${role} features on the Flux platform. Start exploring and make the most of your new capabilities!
+        Hello ${escapeHtml(name) || 'there'},<br><br>
+        Great news! Your Flux account has been verified as a <span class="role-badge">${escapeHtml(role)}</span>.<br><br>
+        You now have full access to all ${escapeHtml(role)} features on the Flux platform.
       </p>
       <a href="${Deno.env.get('SITE_URL') || 'https://flux-auto.lovable.app'}/auth" class="button">Login to Dashboard</a>
     </div>
@@ -57,7 +75,7 @@ const getApprovalEmailHtml = (name: string, role: string) => `
 </html>
 `;
 
-const getRejectionEmailHtml = (name: string, role: string, reason: string) => `
+const getFallbackRejectionHtml = (name: string, role: string, reason: string) => `
 <!DOCTYPE html>
 <html>
 <head>
@@ -73,7 +91,6 @@ const getRejectionEmailHtml = (name: string, role: string, reason: string) => `
     .reason-title { font-weight: 600; color: #ef4444; margin-bottom: 8px; }
     .reason-text { color: #a0aec0; }
     .footer { text-align: center; margin-top: 40px; color: #64748b; font-size: 14px; }
-    .role-badge { display: inline-block; background: rgba(239, 68, 68, 0.1); color: #ef4444; padding: 4px 12px; border-radius: 20px; font-size: 14px; text-transform: capitalize; }
   </style>
 </head>
 <body>
@@ -84,15 +101,15 @@ const getRejectionEmailHtml = (name: string, role: string, reason: string) => `
     <div class="content">
       <div class="title">Application Not Approved</div>
       <p class="message">
-        Hello ${name || 'there'},<br><br>
-        We regret to inform you that your application to join Flux as a <span class="role-badge">${role}</span> has not been approved at this time.
+        Hello ${escapeHtml(name) || 'there'},<br><br>
+        We regret to inform you that your application to join Flux as a ${escapeHtml(role)} has not been approved at this time.
       </p>
       <div class="reason-box">
         <div class="reason-title">Reason:</div>
-        <div class="reason-text">${reason}</div>
+        <div class="reason-text">${escapeHtml(reason)}</div>
       </div>
       <p class="message">
-        If you believe this was a mistake or have additional information to provide, please contact our support team.
+        If you believe this was a mistake, please contact our support team.
       </p>
     </div>
     <div class="footer">
@@ -102,6 +119,16 @@ const getRejectionEmailHtml = (name: string, role: string, reason: string) => `
 </body>
 </html>
 `;
+
+// Replace template variables with actual values
+const replaceTemplateVariables = (html: string, variables: Record<string, string>): string => {
+  let result = html;
+  for (const [key, value] of Object.entries(variables)) {
+    const regex = new RegExp(`\\{\\{${key}\\}\\}`, 'g');
+    result = result.replace(regex, escapeHtml(value));
+  }
+  return result;
+};
 
 const handler = async (req: Request): Promise<Response> => {
   if (req.method === "OPTIONS") {
@@ -116,13 +143,63 @@ const handler = async (req: Request): Promise<Response> => {
 
     const { recipientEmail, recipientName, recipientUserId, role, action, rejectionReason }: VerificationEmailRequest = await req.json();
 
-    const subject = action === 'approved' 
-      ? "🎉 Your Flux Account Has Been Verified!"
-      : "Flux Application Status Update";
+    console.log(`Processing ${action} email for ${recipientEmail} (${role})`);
 
-    const html = action === 'approved'
-      ? getApprovalEmailHtml(recipientName, role)
-      : getRejectionEmailHtml(recipientName, role, rejectionReason || 'No specific reason provided');
+    // Determine the template type to use (role-specific first, then fallback to generic)
+    const roleSpecificType = `${role}_${action}`;
+    const genericType = action;
+
+    // Try to fetch role-specific template first, then generic
+    let template: EmailTemplate | null = null;
+    
+    const { data: roleTemplate } = await supabaseClient
+      .from('email_templates')
+      .select('template_type, subject, body_html')
+      .eq('template_type', roleSpecificType)
+      .maybeSingle();
+
+    if (roleTemplate) {
+      template = roleTemplate;
+      console.log(`Using role-specific template: ${roleSpecificType}`);
+    } else {
+      const { data: genericTemplate } = await supabaseClient
+        .from('email_templates')
+        .select('template_type, subject, body_html')
+        .eq('template_type', genericType)
+        .maybeSingle();
+      
+      if (genericTemplate) {
+        template = genericTemplate;
+        console.log(`Using generic template: ${genericType}`);
+      }
+    }
+
+    // Prepare template variables
+    const siteUrl = Deno.env.get('SITE_URL') || 'https://flux-auto.lovable.app';
+    const variables: Record<string, string> = {
+      name: recipientName || 'there',
+      role: role,
+      login_url: `${siteUrl}/auth`,
+      reason: rejectionReason || 'No specific reason provided',
+    };
+
+    let subject: string;
+    let html: string;
+
+    if (template) {
+      // Use database template
+      subject = replaceTemplateVariables(template.subject, variables);
+      html = replaceTemplateVariables(template.body_html, variables);
+    } else {
+      // Use fallback templates
+      console.log('No template found in database, using fallback');
+      subject = action === 'approved' 
+        ? "🎉 Your Flux Account Has Been Verified!"
+        : "Flux Application Status Update";
+      html = action === 'approved'
+        ? getFallbackApprovalHtml(recipientName, role)
+        : getFallbackRejectionHtml(recipientName, role, rejectionReason || 'No specific reason provided');
+    }
 
     // Send email via Resend
     const emailResponse = await resend.emails.send({
@@ -140,7 +217,7 @@ const handler = async (req: Request): Promise<Response> => {
       .insert({
         recipient_email: recipientEmail,
         recipient_user_id: recipientUserId,
-        email_type: `verification_${action}`,
+        email_type: `verification_${action}_${role}`,
         status: 'sent',
         sent_at: new Date().toISOString(),
       });
