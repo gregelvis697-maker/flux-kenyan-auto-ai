@@ -8,12 +8,12 @@ import {
   Clock,
   BarChart3,
   Activity,
-  Car,
-  Truck,
   ChevronLeft,
   ChevronRight,
   LayoutDashboard,
   Mail,
+  FileText,
+  History,
 } from 'lucide-react';
 
 interface AdminSidebarProps {
@@ -67,9 +67,21 @@ const menuItems = [
     section: 'analytics',
   },
   {
+    id: 'audit-trail',
+    label: 'Audit Trail',
+    icon: History,
+    section: 'analytics',
+  },
+  {
     id: 'email-logs',
     label: 'Email Logs',
     icon: Mail,
+    section: 'system',
+  },
+  {
+    id: 'email-templates',
+    label: 'Email Templates',
+    icon: FileText,
     section: 'system',
   },
 ];
