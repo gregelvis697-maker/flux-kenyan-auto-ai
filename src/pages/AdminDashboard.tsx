@@ -11,6 +11,8 @@ import { AdminSidebar } from '@/components/admin/AdminSidebar';
 import { UserTable } from '@/components/admin/UserTable';
 import { InsightsPanel } from '@/components/admin/InsightsPanel';
 import { EmailLogsPanel } from '@/components/admin/EmailLogsPanel';
+import { EmailTemplatesPanel } from '@/components/admin/EmailTemplatesPanel';
+import { AuditTrailViewer } from '@/components/admin/AuditTrailViewer';
 import { NotificationBell } from '@/components/admin/NotificationBell';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -23,6 +25,7 @@ import {
   BarChart3,
   Search,
   CheckCircle2,
+  XCircle,
 } from 'lucide-react';
 import {
   Dialog,
@@ -115,6 +118,8 @@ export default function AdminDashboard() {
   // Bulk actions state
   const [selectedUsers, setSelectedUsers] = useState<string[]>([]);
   const [bulkApproveDialogOpen, setBulkApproveDialogOpen] = useState(false);
+  const [bulkRejectDialogOpen, setBulkRejectDialogOpen] = useState(false);
+  const [bulkRejectionReason, setBulkRejectionReason] = useState('');
 
   // Redirect non-admins
   useEffect(() => {
@@ -539,6 +544,96 @@ export default function AdminDashboard() {
     }
   };
 
+  // Bulk rejection handler
+  const handleBulkReject = async () => {
+    if (!user || selectedUsers.length === 0 || !bulkRejectionReason.trim()) {
+      toast({
+        title: 'Error',
+        description: 'Rejection reason is required',
+        variant: 'destructive',
+      });
+      return;
+    }
+
+    const trimmedReason = bulkRejectionReason.trim();
+    if (trimmedReason.length < 10) {
+      toast({
+        title: 'Error',
+        description: 'Rejection reason must be at least 10 characters',
+        variant: 'destructive',
+      });
+      return;
+    }
+
+    setActionLoading(true);
+    setBulkRejectDialogOpen(false);
+
+    try {
+      const usersToReject = [...pendingDealers, ...pendingImporters].filter(u => 
+        selectedUsers.includes(u.user_id)
+      );
+
+      let successCount = 0;
+      let failCount = 0;
+
+      for (const pendingUser of usersToReject) {
+        try {
+          const { error: updateError } = await supabase
+            .from('user_roles')
+            .update({
+              status: 'rejected',
+              rejected_by: user.id,
+              rejected_at: new Date().toISOString(),
+              rejection_reason: trimmedReason,
+            })
+            .eq('user_id', pendingUser.user_id);
+
+          if (updateError) throw updateError;
+
+          await supabase.from('approval_audit').insert({
+            user_id: pendingUser.user_id,
+            action: 'bulk_rejected',
+            performed_by: user.id,
+            role: pendingUser.role,
+            rejection_reason: trimmedReason,
+          });
+
+          await sendVerificationEmail(
+            pendingUser.email,
+            pendingUser.full_name || '',
+            pendingUser.user_id,
+            pendingUser.role,
+            'rejected',
+            trimmedReason
+          );
+
+          successCount++;
+        } catch (error) {
+          console.error(`Failed to reject ${pendingUser.email}:`, error);
+          failCount++;
+        }
+      }
+
+      toast({
+        title: '❌ Bulk Rejection Complete',
+        description: `Successfully rejected ${successCount} user${successCount !== 1 ? 's' : ''}${failCount > 0 ? `, ${failCount} failed` : ''}`,
+      });
+
+      setSelectedUsers([]);
+      setBulkRejectionReason('');
+      fetchAllData();
+    } catch (error: any) {
+      console.error('Bulk rejection error:', error);
+      toast({
+        title: 'Error',
+        description: 'Failed to complete bulk rejection',
+        variant: 'destructive',
+      });
+    } finally {
+      setActionLoading(false);
+    }
+  };
+
   // Filter users based on search
   const filterUsers = (users: UserRecord[]) => {
     if (!searchTerm) return users;
@@ -605,14 +700,25 @@ export default function AdminDashboard() {
                 />
               </div>
               {selectedUsers.length > 0 && (
-                <Button
-                  onClick={() => setBulkApproveDialogOpen(true)}
-                  disabled={actionLoading}
-                  className="gap-2"
-                >
-                  <CheckCircle2 className="h-4 w-4" />
-                  Approve Selected ({selectedUsers.length})
-                </Button>
+                <>
+                  <Button
+                    onClick={() => setBulkApproveDialogOpen(true)}
+                    disabled={actionLoading}
+                    className="gap-2"
+                  >
+                    <CheckCircle2 className="h-4 w-4" />
+                    Approve Selected ({selectedUsers.length})
+                  </Button>
+                  <Button
+                    variant="destructive"
+                    onClick={() => setBulkRejectDialogOpen(true)}
+                    disabled={actionLoading}
+                    className="gap-2"
+                  >
+                    <XCircle className="h-4 w-4" />
+                    Reject Selected ({selectedUsers.length})
+                  </Button>
+                </>
               )}
             </div>
             <UserTable
@@ -642,14 +748,25 @@ export default function AdminDashboard() {
                 />
               </div>
               {selectedUsers.length > 0 && (
-                <Button
-                  onClick={() => setBulkApproveDialogOpen(true)}
-                  disabled={actionLoading}
-                  className="gap-2"
-                >
-                  <CheckCircle2 className="h-4 w-4" />
-                  Approve Selected ({selectedUsers.length})
-                </Button>
+                <>
+                  <Button
+                    onClick={() => setBulkApproveDialogOpen(true)}
+                    disabled={actionLoading}
+                    className="gap-2"
+                  >
+                    <CheckCircle2 className="h-4 w-4" />
+                    Approve Selected ({selectedUsers.length})
+                  </Button>
+                  <Button
+                    variant="destructive"
+                    onClick={() => setBulkRejectDialogOpen(true)}
+                    disabled={actionLoading}
+                    className="gap-2"
+                  >
+                    <XCircle className="h-4 w-4" />
+                    Reject Selected ({selectedUsers.length})
+                  </Button>
+                </>
               )}
             </div>
             <UserTable
@@ -710,6 +827,12 @@ export default function AdminDashboard() {
       case 'email-logs':
         return <EmailLogsPanel />;
 
+      case 'email-templates':
+        return <EmailTemplatesPanel />;
+
+      case 'audit-trail':
+        return <AuditTrailViewer />;
+
       default:
         return null;
     }
@@ -725,6 +848,8 @@ export default function AdminDashboard() {
       'insights': 'Analytics & Insights',
       'activity': 'Activity Log',
       'email-logs': 'Email Logs',
+      'email-templates': 'Email Templates',
+      'audit-trail': 'Audit Trail',
     };
     return titles[activeTab] || 'Admin Dashboard';
   };
@@ -834,6 +959,53 @@ export default function AdminDashboard() {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+
+      {/* Bulk Reject Dialog */}
+      <Dialog open={bulkRejectDialogOpen} onOpenChange={setBulkRejectDialogOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Bulk Reject Applications</DialogTitle>
+            <DialogDescription>
+              You are about to reject {selectedUsers.length} application{selectedUsers.length !== 1 ? 's' : ''}.
+              Please provide a shared rejection reason that will be sent to all selected applicants.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4 py-4">
+            <div className="space-y-2">
+              <Label htmlFor="bulk-rejection-reason">Rejection Reason *</Label>
+              <Textarea
+                id="bulk-rejection-reason"
+                placeholder="Enter detailed reason for rejection..."
+                value={bulkRejectionReason}
+                onChange={(e) => setBulkRejectionReason(e.target.value)}
+                rows={4}
+                maxLength={500}
+                required
+              />
+              <p className="text-xs text-muted-foreground mt-1">
+                {bulkRejectionReason.length}/500 characters (minimum 10 required)
+              </p>
+            </div>
+          </div>
+          <DialogFooter>
+            <Button
+              variant="outline"
+              onClick={() => setBulkRejectDialogOpen(false)}
+              disabled={actionLoading}
+            >
+              Cancel
+            </Button>
+            <Button
+              variant="destructive"
+              onClick={handleBulkReject}
+              disabled={actionLoading || bulkRejectionReason.trim().length < 10}
+            >
+              {actionLoading && <div className="mr-2 h-4 w-4 animate-spin rounded-full border-2 border-current border-t-transparent" />}
+              Reject {selectedUsers.length} User{selectedUsers.length !== 1 ? 's' : ''}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
