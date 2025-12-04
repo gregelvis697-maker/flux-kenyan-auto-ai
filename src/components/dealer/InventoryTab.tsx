@@ -6,7 +6,7 @@ import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Plus, Edit, Trash2, X } from 'lucide-react';
+import { Plus, Edit, Trash2, X, Car, Fuel, Settings, DollarSign } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import {
   Select,
@@ -16,6 +16,12 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { Switch } from '@/components/ui/switch';
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog';
 
 interface Vehicle {
   id: string;
@@ -233,66 +239,82 @@ export function InventoryTab({ onUpdate }: InventoryTabProps) {
     setEditingVehicle(null);
   };
 
+  const getConditionLabel = (condition: string) => {
+    const labels: Record<string, string> = {
+      new: 'New',
+      used: 'Used',
+      certified_pre_owned: 'Certified Pre-Owned',
+    };
+    return labels[condition] || condition;
+  };
+
   return (
-    <div className="space-y-6">
-      <div className="flex justify-between items-center">
-        <h3 className="text-xl font-semibold text-foreground">Vehicle Inventory</h3>
+    <div className="space-y-4 sm:space-y-6">
+      {/* Header */}
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+        <div>
+          <h3 className="text-lg sm:text-xl font-semibold text-foreground">Vehicle Inventory</h3>
+          <p className="text-xs sm:text-sm text-muted-foreground mt-0.5">
+            Manage your listed vehicles
+          </p>
+        </div>
         <Button
-          onClick={() => setShowForm(!showForm)}
-          className="bg-primary hover:bg-primary/90"
+          onClick={() => setShowForm(true)}
+          className="w-full sm:w-auto bg-primary hover:bg-primary/90 shadow-[0_0_20px_hsl(var(--primary)/0.3)] hover:shadow-[0_0_30px_hsl(var(--primary)/0.4)] transition-all"
         >
           <Plus className="h-4 w-4 mr-2" />
           Add Vehicle
         </Button>
       </div>
 
-      {showForm && (
-        <Card className="p-6 bg-card/40 backdrop-blur-sm border-border/50">
-          <div className="flex justify-between items-center mb-4">
-            <h4 className="text-lg font-semibold">
+      {/* Form Dialog */}
+      <Dialog open={showForm} onOpenChange={(open) => !open && resetForm()}>
+        <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto bg-card border-border/50">
+          <DialogHeader>
+            <DialogTitle className="text-xl">
               {editingVehicle ? 'Edit Vehicle' : 'Add New Vehicle'}
-            </h4>
-            <Button variant="ghost" size="icon" onClick={resetForm}>
-              <X className="h-4 w-4" />
-            </Button>
-          </div>
-          <form onSubmit={handleSubmit} className="space-y-4">
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            </DialogTitle>
+          </DialogHeader>
+          <form onSubmit={handleSubmit} className="space-y-4 mt-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
               <div className="space-y-2">
-                <Label htmlFor="make">Make *</Label>
+                <Label htmlFor="make" className="text-sm">Make *</Label>
                 <Input
                   id="make"
                   value={formData.make}
                   onChange={(e) => setFormData({ ...formData, make: e.target.value })}
                   required
+                  className="bg-background/50"
                 />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="model">Model *</Label>
+                <Label htmlFor="model" className="text-sm">Model *</Label>
                 <Input
                   id="model"
                   value={formData.model}
                   onChange={(e) => setFormData({ ...formData, model: e.target.value })}
                   required
+                  className="bg-background/50"
                 />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="year">Year *</Label>
+                <Label htmlFor="year" className="text-sm">Year *</Label>
                 <Input
                   id="year"
                   type="number"
                   value={formData.year}
                   onChange={(e) => setFormData({ ...formData, year: parseInt(e.target.value) })}
                   required
+                  className="bg-background/50"
                 />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="condition">Condition *</Label>
+                <Label htmlFor="condition" className="text-sm">Condition *</Label>
                 <Select
                   value={formData.condition}
                   onValueChange={(value) => setFormData({ ...formData, condition: value })}
                 >
-                  <SelectTrigger>
+                  <SelectTrigger className="bg-background/50">
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
@@ -303,12 +325,12 @@ export function InventoryTab({ onUpdate }: InventoryTabProps) {
                 </Select>
               </div>
               <div className="space-y-2">
-                <Label htmlFor="fuel_type">Fuel Type *</Label>
+                <Label htmlFor="fuel_type" className="text-sm">Fuel Type *</Label>
                 <Select
                   value={formData.fuel_type}
                   onValueChange={(value) => setFormData({ ...formData, fuel_type: value })}
                 >
-                  <SelectTrigger>
+                  <SelectTrigger className="bg-background/50">
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
@@ -321,39 +343,42 @@ export function InventoryTab({ onUpdate }: InventoryTabProps) {
                 </Select>
               </div>
               <div className="space-y-2">
-                <Label htmlFor="engine_capacity">Engine Capacity *</Label>
+                <Label htmlFor="engine_capacity" className="text-sm">Engine Capacity *</Label>
                 <Input
                   id="engine_capacity"
                   value={formData.engine_capacity}
                   onChange={(e) => setFormData({ ...formData, engine_capacity: e.target.value })}
                   placeholder="e.g., 2.0L"
                   required
+                  className="bg-background/50"
                 />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="mileage">Mileage (km)</Label>
+                <Label htmlFor="mileage" className="text-sm">Mileage (km)</Label>
                 <Input
                   id="mileage"
                   type="number"
                   value={formData.mileage}
                   onChange={(e) => setFormData({ ...formData, mileage: e.target.value })}
+                  className="bg-background/50"
                 />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="color">Color</Label>
+                <Label htmlFor="color" className="text-sm">Color</Label>
                 <Input
                   id="color"
                   value={formData.color}
                   onChange={(e) => setFormData({ ...formData, color: e.target.value })}
+                  className="bg-background/50"
                 />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="transmission">Transmission</Label>
+                <Label htmlFor="transmission" className="text-sm">Transmission</Label>
                 <Select
                   value={formData.transmission}
                   onValueChange={(value) => setFormData({ ...formData, transmission: value })}
                 >
-                  <SelectTrigger>
+                  <SelectTrigger className="bg-background/50">
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
@@ -364,7 +389,7 @@ export function InventoryTab({ onUpdate }: InventoryTabProps) {
                 </Select>
               </div>
               <div className="space-y-2">
-                <Label htmlFor="price">Price ($) *</Label>
+                <Label htmlFor="price" className="text-sm">Price ($) *</Label>
                 <Input
                   id="price"
                   type="number"
@@ -372,126 +397,163 @@ export function InventoryTab({ onUpdate }: InventoryTabProps) {
                   onChange={(e) => setFormData({ ...formData, price: e.target.value })}
                   required
                   step="0.01"
+                  className="bg-background/50"
                 />
               </div>
-              <div className="flex items-center space-x-2 pt-8">
+              <div className="flex items-center space-x-2 pt-6">
                 <Switch
                   id="negotiable"
                   checked={formData.negotiable}
                   onCheckedChange={(checked) => setFormData({ ...formData, negotiable: checked })}
                 />
-                <Label htmlFor="negotiable">Negotiable</Label>
+                <Label htmlFor="negotiable" className="text-sm">Negotiable</Label>
               </div>
             </div>
             <div className="space-y-2">
-              <Label htmlFor="description">Description</Label>
+              <Label htmlFor="description" className="text-sm">Description</Label>
               <Textarea
                 id="description"
                 value={formData.description}
                 onChange={(e) => setFormData({ ...formData, description: e.target.value })}
                 rows={3}
+                className="bg-background/50 resize-none"
               />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="photos">Photo URLs (comma-separated)</Label>
+              <Label htmlFor="photos" className="text-sm">Photo URLs (comma-separated)</Label>
               <Input
                 id="photos"
                 value={formData.photos}
                 onChange={(e) => setFormData({ ...formData, photos: e.target.value })}
                 placeholder="https://example.com/photo1.jpg, https://example.com/photo2.jpg"
+                className="bg-background/50"
               />
             </div>
-            <div className="flex gap-2">
-              <Button type="submit" disabled={loading} className="bg-primary hover:bg-primary/90">
+            <div className="flex flex-col sm:flex-row gap-2 pt-2">
+              <Button type="submit" disabled={loading} className="w-full sm:w-auto bg-primary hover:bg-primary/90">
                 {loading ? 'Saving...' : editingVehicle ? 'Update Vehicle' : 'Add Vehicle'}
               </Button>
-              <Button type="button" variant="outline" onClick={resetForm}>
+              <Button type="button" variant="outline" onClick={resetForm} className="w-full sm:w-auto">
                 Cancel
               </Button>
             </div>
           </form>
-        </Card>
-      )}
+        </DialogContent>
+      </Dialog>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {vehicles.length === 0 ? (
-          <Card className="col-span-full p-12 bg-card/40 backdrop-blur-sm border-border/50">
-            <p className="text-center text-muted-foreground">
-              No vehicles in inventory. Add your first vehicle!
-            </p>
-          </Card>
-        ) : (
-          vehicles.map((vehicle) => (
+      {/* Vehicle Grid */}
+      {vehicles.length === 0 ? (
+        <Card className="p-8 sm:p-12 bg-card/20 backdrop-blur-sm border-border/30 text-center">
+          <Car className="h-12 w-12 mx-auto text-muted-foreground/50 mb-3" />
+          <p className="text-muted-foreground">No vehicles in inventory</p>
+          <p className="text-xs text-muted-foreground/70 mt-1">Add your first vehicle!</p>
+        </Card>
+      ) : (
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+          {vehicles.map((vehicle) => (
             <Card
               key={vehicle.id}
-              className="overflow-hidden bg-card/40 backdrop-blur-sm border-border/50 hover:shadow-elevated transition-all duration-300"
+              className="overflow-hidden bg-card/30 backdrop-blur-sm border-border/30 hover:border-primary/30 hover:shadow-[0_0_20px_hsl(var(--primary)/0.15)] transition-all duration-300 group"
             >
-              {vehicle.photos.length > 0 && (
-                <div className="h-48 bg-muted/20 overflow-hidden">
+              {/* Image */}
+              <div className="h-40 sm:h-48 bg-gradient-to-br from-muted/30 to-muted/10 relative overflow-hidden">
+                {vehicle.photos && vehicle.photos.length > 0 ? (
                   <img
                     src={vehicle.photos[0]}
                     alt={`${vehicle.make} ${vehicle.model}`}
-                    className="w-full h-full object-cover"
+                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                   />
-                </div>
-              )}
-              <div className="p-6 space-y-4">
+                ) : (
+                  <div className="w-full h-full flex items-center justify-center">
+                    <Car className="h-16 w-16 text-muted-foreground/30" />
+                  </div>
+                )}
+                <Badge 
+                  className={`absolute top-3 right-3 ${
+                    vehicle.is_sold 
+                      ? 'bg-destructive/90 text-destructive-foreground' 
+                      : 'bg-emerald-500/90 text-white'
+                  }`}
+                >
+                  {vehicle.is_sold ? 'Sold' : 'Available'}
+                </Badge>
+              </div>
+
+              {/* Content */}
+              <div className="p-4 space-y-3">
+                {/* Title */}
                 <div>
-                  <div className="flex justify-between items-start mb-2">
-                    <h4 className="text-lg font-bold text-foreground">
-                      {vehicle.year} {vehicle.make} {vehicle.model}
-                    </h4>
-                    <Badge variant={vehicle.is_sold ? 'destructive' : 'default'}>
-                      {vehicle.is_sold ? 'Sold' : 'Available'}
-                    </Badge>
-                  </div>
-                  <div className="space-y-1 text-sm text-muted-foreground">
-                    <p>{vehicle.fuel_type} • {vehicle.engine_capacity}</p>
-                    {vehicle.mileage && <p>{vehicle.mileage.toLocaleString()} km</p>}
-                    {vehicle.color && <p>Color: {vehicle.color}</p>}
-                  </div>
+                  <h4 className="font-semibold text-foreground text-base sm:text-lg leading-tight">
+                    {vehicle.year} {vehicle.make} {vehicle.model}
+                  </h4>
+                  <Badge variant="outline" className="mt-1.5 text-xs">
+                    {getConditionLabel(vehicle.condition)}
+                  </Badge>
                 </div>
-                <div className="flex justify-between items-center pt-2 border-t border-border/50">
-                  <div>
-                    <p className="text-2xl font-bold text-primary">
-                      ${vehicle.price.toLocaleString()}
-                    </p>
-                    {vehicle.negotiable && (
-                      <p className="text-xs text-muted-foreground">Negotiable</p>
-                    )}
+
+                {/* Specs */}
+                <div className="flex flex-wrap gap-x-4 gap-y-1 text-xs sm:text-sm text-muted-foreground">
+                  <div className="flex items-center gap-1">
+                    <Fuel className="h-3.5 w-3.5" />
+                    <span className="capitalize">{vehicle.fuel_type.replace('_', ' ')}</span>
                   </div>
+                  <div className="flex items-center gap-1">
+                    <Settings className="h-3.5 w-3.5" />
+                    <span>{vehicle.engine_capacity}</span>
+                  </div>
+                  {vehicle.mileage && (
+                    <span>{vehicle.mileage.toLocaleString()} km</span>
+                  )}
                 </div>
-                <div className="flex gap-2">
+
+                {/* Price */}
+                <div className="flex items-center justify-between pt-2 border-t border-border/30">
+                  <div className="flex items-center gap-1">
+                    <DollarSign className="h-4 w-4 text-primary" />
+                    <span className="text-lg sm:text-xl font-bold text-primary">
+                      {vehicle.price.toLocaleString()}
+                    </span>
+                  </div>
+                  {vehicle.negotiable && (
+                    <span className="text-xs text-muted-foreground bg-muted/30 px-2 py-0.5 rounded">
+                      Negotiable
+                    </span>
+                  )}
+                </div>
+
+                {/* Actions */}
+                <div className="flex gap-2 pt-2">
                   <Button
                     size="sm"
                     variant="outline"
                     onClick={() => handleEdit(vehicle)}
-                    className="flex-1"
+                    className="flex-1 text-xs sm:text-sm"
                   >
-                    <Edit className="h-4 w-4 mr-1" />
+                    <Edit className="h-3.5 w-3.5 mr-1" />
                     Edit
                   </Button>
                   <Button
                     size="sm"
                     variant={vehicle.is_sold ? 'default' : 'secondary'}
                     onClick={() => handleToggleSold(vehicle.id, vehicle.is_sold)}
-                    className="flex-1"
+                    className="flex-1 text-xs sm:text-sm"
                   >
-                    {vehicle.is_sold ? 'Mark Available' : 'Mark Sold'}
+                    {vehicle.is_sold ? 'Relist' : 'Mark Sold'}
                   </Button>
                   <Button
                     size="sm"
                     variant="destructive"
                     onClick={() => handleDelete(vehicle.id)}
+                    className="px-2.5"
                   >
-                    <Trash2 className="h-4 w-4" />
+                    <Trash2 className="h-3.5 w-3.5" />
                   </Button>
                 </div>
               </div>
             </Card>
-          ))
-        )}
-      </div>
+          ))}
+        </div>
+      )}
     </div>
   );
 }
