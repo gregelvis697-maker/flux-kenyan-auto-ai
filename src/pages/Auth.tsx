@@ -7,7 +7,7 @@ import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useToast } from '@/hooks/use-toast';
-import { ArrowLeft } from 'lucide-react';
+import { ArrowLeft, Mail, Lock, UserCircle } from 'lucide-react';
 import { z } from 'zod';
 
 const authSchema = z.object({
@@ -47,8 +47,6 @@ const Auth = () => {
 
     try {
       if (isLogin) {
-        // Supabase Auth handles password verification server-side
-        // No need for client-side validation on login
         const { error } = await signIn(email, password);
         if (error) {
           toast({
@@ -58,7 +56,6 @@ const Auth = () => {
           });
         }
       } else {
-        // For signup, validate password requirements for better UX
         const validatedData = authSchema.parse({ email, password });
         const { error } = await signUp(validatedData.email, validatedData.password, role);
         if (error) {
@@ -92,20 +89,21 @@ const Auth = () => {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-background to-secondary/20 p-4">
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-background via-background to-primary/5 p-4 sm:p-6">
       <Link 
         to="/" 
-        className="absolute top-6 left-6 inline-flex items-center gap-2 text-muted-foreground hover:text-foreground transition-colors"
+        className="absolute top-4 left-4 sm:top-6 sm:left-6 inline-flex items-center gap-1.5 sm:gap-2 text-muted-foreground hover:text-foreground transition-colors p-2 -m-2 rounded-lg active:bg-accent/50"
       >
         <ArrowLeft className="w-4 h-4" />
         <span className="text-sm font-medium">Back to Home</span>
       </Link>
-      <Card className="w-full max-w-md">
-        <CardHeader className="space-y-1">
-          <CardTitle className="text-2xl font-bold">
+      
+      <Card className="w-full max-w-md border-border/50 bg-card/80 backdrop-blur-sm shadow-card">
+        <CardHeader className="space-y-1 pb-4 sm:pb-6">
+          <CardTitle className="text-xl sm:text-2xl font-bold">
             {isLogin ? 'Sign In' : 'Create Account'}
           </CardTitle>
-          <CardDescription>
+          <CardDescription className="text-sm">
             {isLogin
               ? 'Enter your credentials to access your dashboard'
               : 'Choose your role and create your account'}
@@ -114,59 +112,74 @@ const Auth = () => {
         <CardContent>
           <form onSubmit={handleSubmit} className="space-y-4">
             <div className="space-y-2">
-              <Label htmlFor="email">Email</Label>
-              <Input
-                id="email"
-                type="email"
-                placeholder="your@email.com"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                required
-                disabled={isLoading}
-              />
+              <Label htmlFor="email" className="text-sm">Email</Label>
+              <div className="relative">
+                <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                <Input
+                  id="email"
+                  type="email"
+                  placeholder="your@email.com"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  required
+                  disabled={isLoading}
+                  className="pl-10 h-11 sm:h-10 text-base sm:text-sm"
+                />
+              </div>
             </div>
             <div className="space-y-2">
-              <Label htmlFor="password">Password</Label>
-              <Input
-                id="password"
-                type="password"
-                placeholder={isLogin ? "Enter your password" : "Create a strong password"}
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                required
-                disabled={isLoading}
-                minLength={isLogin ? undefined : 12}
-              />
+              <Label htmlFor="password" className="text-sm">Password</Label>
+              <div className="relative">
+                <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                <Input
+                  id="password"
+                  type="password"
+                  placeholder={isLogin ? "Enter your password" : "Create a strong password"}
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  required
+                  disabled={isLoading}
+                  minLength={isLogin ? undefined : 12}
+                  className="pl-10 h-11 sm:h-10 text-base sm:text-sm"
+                />
+              </div>
               {!isLogin && (
-                <p className="text-xs text-muted-foreground">
+                <p className="text-xs text-muted-foreground px-1">
                   Min 12 characters with uppercase, lowercase, number & special character
                 </p>
               )}
             </div>
             {!isLogin && (
               <div className="space-y-2">
-                <Label htmlFor="role">Role</Label>
-                <Select value={role} onValueChange={(value) => setRole(value as UserRole)}>
-                  <SelectTrigger id="role">
-                    <SelectValue placeholder="Select your role" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="buyer">Buyer</SelectItem>
-                    <SelectItem value="dealer">Dealer</SelectItem>
-                    <SelectItem value="importer">Importer</SelectItem>
-                  </SelectContent>
-                </Select>
+                <Label htmlFor="role" className="text-sm">Role</Label>
+                <div className="relative">
+                  <UserCircle className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground z-10" />
+                  <Select value={role} onValueChange={(value) => setRole(value as UserRole)}>
+                    <SelectTrigger id="role" className="pl-10 h-11 sm:h-10 text-base sm:text-sm bg-background">
+                      <SelectValue placeholder="Select your role" />
+                    </SelectTrigger>
+                    <SelectContent className="bg-popover border-border z-50">
+                      <SelectItem value="buyer" className="text-base sm:text-sm py-2.5 sm:py-2">Buyer</SelectItem>
+                      <SelectItem value="dealer" className="text-base sm:text-sm py-2.5 sm:py-2">Dealer</SelectItem>
+                      <SelectItem value="importer" className="text-base sm:text-sm py-2.5 sm:py-2">Importer</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
               </div>
             )}
-            <Button type="submit" className="w-full" disabled={isLoading}>
+            <Button 
+              type="submit" 
+              className="w-full h-11 sm:h-10 text-base sm:text-sm bg-gradient-primary hover:shadow-glow-primary transition-all" 
+              disabled={isLoading}
+            >
               {isLoading ? 'Loading...' : isLogin ? 'Sign In' : 'Sign Up'}
             </Button>
           </form>
-          <div className="mt-4 text-center text-sm">
+          <div className="mt-4 sm:mt-6 text-center">
             <button
               type="button"
               onClick={() => setIsLogin(!isLogin)}
-              className="text-primary hover:underline"
+              className="text-sm text-primary hover:underline py-2 px-4 -m-2 rounded-lg active:bg-accent/30 transition-colors"
               disabled={isLoading}
             >
               {isLogin ? "Don't have an account? Sign up" : 'Already have an account? Sign in'}

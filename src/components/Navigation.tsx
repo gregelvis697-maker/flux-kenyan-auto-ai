@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
-import { Menu, X } from "lucide-react";
+import { Menu, X, Home, Users, LogIn, UserPlus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/contexts/AuthContext";
 import { motion, AnimatePresence } from "framer-motion";
@@ -22,23 +22,40 @@ export const Navigation = ({ children }: { children?: React.ReactNode }) => {
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
+  // Close mobile menu on route change
+  useEffect(() => {
+    setMobileMenuOpen(false);
+  }, [location.pathname]);
+
+  // Prevent body scroll when mobile menu is open
+  useEffect(() => {
+    if (mobileMenuOpen) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = 'unset';
+    }
+    return () => {
+      document.body.style.overflow = 'unset';
+    };
+  }, [mobileMenuOpen]);
+
   const isActive = (path: string) => location.pathname === path;
 
   const navLinks = [
-    { name: "Home", path: "/" },
-    { name: "Waitlist", path: "/waitlist" },
+    { name: "Home", path: "/", icon: Home },
+    { name: "Waitlist", path: "/waitlist", icon: Users },
   ];
 
   return (
     <nav
       className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
         isScrolled
-          ? "bg-card/60 backdrop-blur-lg shadow-lg border-b border-border/50"
+          ? "bg-card/80 backdrop-blur-xl shadow-lg border-b border-border/50"
           : "bg-card/40 backdrop-blur-md border-b border-border/30"
       }`}
     >
-      <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex items-center justify-between h-16">
+      <div className="container mx-auto px-3 sm:px-4 lg:px-8">
+        <div className="flex items-center justify-between h-14 sm:h-16">
           {/* Logo */}
           <Link
             to="/"
@@ -46,7 +63,7 @@ export const Navigation = ({ children }: { children?: React.ReactNode }) => {
             onClick={() => setMobileMenuOpen(false)}
           >
             <motion.div
-              className="text-2xl font-bold bg-gradient-primary bg-clip-text text-transparent"
+              className="text-xl sm:text-2xl font-bold bg-gradient-primary bg-clip-text text-transparent"
               whileHover={{ scale: 1.05 }}
               transition={{ type: "spring", stiffness: 300 }}
             >
@@ -55,12 +72,12 @@ export const Navigation = ({ children }: { children?: React.ReactNode }) => {
           </Link>
 
           {/* Desktop Navigation */}
-          <div className="hidden md:flex items-center space-x-8">
+          <div className="hidden md:flex items-center space-x-6 lg:space-x-8">
             {navLinks.map((link) => (
               <Link
                 key={link.path}
                 to={link.path}
-                className={`text-sm font-medium transition-all duration-200 relative ${
+                className={`text-sm font-medium transition-all duration-200 relative py-2 ${
                   isActive(link.path)
                     ? "text-primary"
                     : "text-muted-foreground hover:text-foreground"
@@ -70,7 +87,7 @@ export const Navigation = ({ children }: { children?: React.ReactNode }) => {
                 {isActive(link.path) && (
                   <motion.div
                     layoutId="navbar-indicator"
-                    className="absolute -bottom-[21px] left-0 right-0 h-0.5 bg-gradient-primary"
+                    className="absolute -bottom-[17px] left-0 right-0 h-0.5 bg-gradient-primary"
                     initial={false}
                     transition={{ type: "spring", stiffness: 380, damping: 30 }}
                   />
@@ -80,7 +97,7 @@ export const Navigation = ({ children }: { children?: React.ReactNode }) => {
           </div>
 
           {/* Desktop Auth Actions */}
-          <div className="hidden md:flex items-center space-x-3">
+          <div className="hidden md:flex items-center space-x-2 lg:space-x-3">
             {user ? (
               <>
                 {children || <NotificationBell />}
@@ -110,83 +127,107 @@ export const Navigation = ({ children }: { children?: React.ReactNode }) => {
           {/* Mobile Menu Button */}
           <motion.button
             whileTap={{ scale: 0.95 }}
-            className="md:hidden p-2 rounded-lg hover:bg-accent/50 transition-colors"
+            className="md:hidden p-2.5 rounded-xl hover:bg-accent/50 transition-colors active:bg-accent/70"
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
             aria-label="Toggle menu"
           >
             {mobileMenuOpen ? (
-              <X className="h-6 w-6 text-foreground" />
+              <X className="h-5 w-5 sm:h-6 sm:w-6 text-foreground" />
             ) : (
-              <Menu className="h-6 w-6 text-foreground" />
+              <Menu className="h-5 w-5 sm:h-6 sm:w-6 text-foreground" />
             )}
           </motion.button>
         </div>
       </div>
 
-      {/* Mobile Menu */}
+      {/* Mobile Menu Overlay */}
       <AnimatePresence>
         {mobileMenuOpen && (
-          <motion.div
-            initial={{ opacity: 0, x: "100%" }}
-            animate={{ opacity: 1, x: 0 }}
-            exit={{ opacity: 0, x: "100%" }}
-            transition={{ type: "spring", damping: 25, stiffness: 200 }}
-            className="md:hidden fixed top-16 right-0 bottom-0 w-64 border-l border-border bg-card/95 backdrop-blur-lg shadow-2xl"
-          >
-            <div className="px-4 py-6 space-y-4 overflow-y-auto h-full">
-              {navLinks.map((link) => (
-                <Link
-                  key={link.path}
-                  to={link.path}
-                  onClick={() => setMobileMenuOpen(false)}
-                  className={`block px-4 py-3 rounded-lg text-sm font-medium transition-all ${
-                    isActive(link.path)
-                      ? "bg-primary/10 text-primary shadow-sm"
-                      : "text-muted-foreground hover:bg-accent/50 hover:text-foreground"
-                  }`}
-                >
-                  {link.name}
-                </Link>
-              ))}
+          <>
+            {/* Backdrop */}
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.2 }}
+              className="md:hidden fixed inset-0 top-14 sm:top-16 bg-background/80 backdrop-blur-sm z-40"
+              onClick={() => setMobileMenuOpen(false)}
+            />
+            
+            {/* Menu Panel */}
+            <motion.div
+              initial={{ opacity: 0, y: -10 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -10 }}
+              transition={{ type: "spring", damping: 25, stiffness: 300 }}
+              className="md:hidden fixed top-14 sm:top-16 left-0 right-0 bg-card/95 backdrop-blur-xl border-b border-border shadow-2xl z-50 max-h-[calc(100vh-3.5rem)] sm:max-h-[calc(100vh-4rem)] overflow-y-auto"
+            >
+              <div className="px-4 py-4 space-y-2">
+                {/* Navigation Links */}
+                {navLinks.map((link) => {
+                  const IconComponent = link.icon;
+                  return (
+                    <Link
+                      key={link.path}
+                      to={link.path}
+                      onClick={() => setMobileMenuOpen(false)}
+                      className={`flex items-center gap-3 px-4 py-3.5 rounded-xl text-base font-medium transition-all active:scale-[0.98] ${
+                        isActive(link.path)
+                          ? "bg-primary/10 text-primary shadow-sm border border-primary/20"
+                          : "text-foreground hover:bg-accent/50 active:bg-accent/70"
+                      }`}
+                    >
+                      <IconComponent className="h-5 w-5" />
+                      {link.name}
+                    </Link>
+                  );
+                })}
 
-              <div className="pt-4 border-t border-border space-y-3">
+                {/* Divider */}
+                <div className="h-px bg-border my-3" />
+
+                {/* Auth Section */}
                 {user ? (
-                  <>
-                    <div className="px-4 py-3 rounded-lg bg-accent/30">
-                      <p className="text-xs text-muted-foreground mb-1">Signed in as</p>
-                      <p className="text-sm font-medium truncate">{user.email}</p>
+                  <div className="space-y-3">
+                    <div className="px-4 py-3 rounded-xl bg-accent/30 border border-border/50">
+                      <p className="text-xs text-muted-foreground mb-0.5">Signed in as</p>
+                      <p className="text-sm font-medium truncate text-foreground">{user.email}</p>
                     </div>
-                    {children || <NotificationBell />}
-                    <ProfileDropdown />
-                  </>
+                    <div className="flex items-center gap-2 px-2">
+                      {children || <NotificationBell />}
+                      <div className="flex-1">
+                        <ProfileDropdown />
+                      </div>
+                    </div>
+                  </div>
                 ) : (
-                  <>
+                  <div className="space-y-2 pt-2">
                     <Button
-                      variant="ghost"
-                      size="sm"
+                      variant="outline"
                       onClick={() => {
                         navigate("/auth");
                         setMobileMenuOpen(false);
                       }}
-                      className="w-full text-foreground hover:text-primary hover:bg-accent/50"
+                      className="w-full h-12 text-base justify-start gap-3 px-4"
                     >
+                      <LogIn className="h-5 w-5" />
                       Login
                     </Button>
                     <Button
-                      size="sm"
                       onClick={() => {
                         navigate("/auth");
                         setMobileMenuOpen(false);
                       }}
-                      className="w-full bg-gradient-primary text-primary-foreground hover:shadow-glow-primary"
+                      className="w-full h-12 text-base justify-start gap-3 px-4 bg-gradient-primary text-primary-foreground hover:shadow-glow-primary"
                     >
-                      Register
+                      <UserPlus className="h-5 w-5" />
+                      Create Account
                     </Button>
-                  </>
+                  </div>
                 )}
               </div>
-            </div>
-          </motion.div>
+            </motion.div>
+          </>
         )}
       </AnimatePresence>
     </nav>
