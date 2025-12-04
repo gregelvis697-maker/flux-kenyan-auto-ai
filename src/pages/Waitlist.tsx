@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { toast } from "sonner";
-import { Rocket } from "lucide-react";
+import { Rocket, User, Mail, Phone, Briefcase } from "lucide-react";
 import { supabase } from "@/lib/supabase";
 import { Navigation } from "@/components/Navigation";
 
@@ -50,109 +50,120 @@ const Waitlist = () => {
     <div className="min-h-screen bg-background">
       <Navigation />
       
-      <div className="flex items-center justify-center py-12 px-4 pt-24">
+      <div className="flex items-center justify-center py-8 sm:py-12 px-4 pt-20 sm:pt-24">
         <div className="absolute inset-0">
           <div className="absolute inset-0 bg-gradient-to-b from-background via-background to-background" />
-          <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-primary/20 rounded-full blur-[150px] animate-glow-pulse" />
+          <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-[400px] sm:w-[600px] lg:w-[800px] h-[400px] sm:h-[600px] lg:h-[800px] bg-primary/20 rounded-full blur-[100px] sm:blur-[150px] animate-glow-pulse" />
         </div>
 
         <div className="container mx-auto max-w-2xl relative z-10">
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6 }}
+          >
+            <div className="text-center mb-8 sm:mb-12">
+              <div className="inline-flex items-center gap-1.5 sm:gap-2 px-3 sm:px-4 py-1.5 sm:py-2 rounded-full bg-primary/10 border border-primary/20 mb-4 sm:mb-6">
+                <Rocket className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-primary" />
+                <span className="text-xs sm:text-sm font-medium text-primary">Limited Early Access</span>
+              </div>
 
-        <motion.div
-          initial={{ opacity: 0, y: 30 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6 }}
-        >
-          <div className="text-center mb-12">
-            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 border border-primary/20 mb-6">
-              <Rocket className="w-4 h-4 text-primary" />
-              <span className="text-sm font-medium text-primary">Limited Early Access</span>
+              <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold mb-4 sm:mb-6 px-2">
+                <span className="text-foreground">Join the </span>
+                <span className="bg-gradient-primary bg-clip-text text-transparent">Waitlist</span>
+              </h1>
+              <p className="text-base sm:text-lg lg:text-xl text-muted-foreground px-4">
+                Be among the first to experience Flux and transform Kenya's automotive market.
+              </p>
             </div>
 
-            <h1 className="text-4xl md:text-5xl font-bold mb-6">
-              <span className="text-foreground">Join the </span>
-              <span className="bg-gradient-primary bg-clip-text text-transparent">Waitlist</span>
-            </h1>
-            <p className="text-xl text-muted-foreground">
-              Be among the first to experience Flux and transform Kenya's automotive market.
-            </p>
-          </div>
+            <form onSubmit={handleSubmit} className="p-5 sm:p-8 md:p-10 bg-gradient-card rounded-2xl sm:rounded-3xl border border-border shadow-elevated">
+              <div className="space-y-4 sm:space-y-6">
+                <div>
+                  <label className="block text-sm font-medium mb-1.5 sm:mb-2 text-foreground">
+                    Full Name *
+                  </label>
+                  <div className="relative">
+                    <User className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                    <Input
+                      type="text"
+                      placeholder="John Doe"
+                      value={formData.name}
+                      onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                      className="bg-background/50 border-border focus:border-primary h-11 sm:h-12 pl-10 text-base"
+                      required
+                    />
+                  </div>
+                </div>
 
-          <form onSubmit={handleSubmit} className="p-8 md:p-10 bg-gradient-card rounded-3xl border border-border shadow-elevated">
-            <div className="space-y-6">
-              <div>
-                <label className="block text-sm font-medium mb-2 text-foreground">
-                  Full Name *
-                </label>
-                <Input
-                  type="text"
-                  placeholder="John Doe"
-                  value={formData.name}
-                  onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                  className="bg-background/50 border-border focus:border-primary h-12"
-                  required
-                />
+                <div>
+                  <label className="block text-sm font-medium mb-1.5 sm:mb-2 text-foreground">
+                    Email Address *
+                  </label>
+                  <div className="relative">
+                    <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                    <Input
+                      type="email"
+                      placeholder="john@example.com"
+                      value={formData.email}
+                      onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                      className="bg-background/50 border-border focus:border-primary h-11 sm:h-12 pl-10 text-base"
+                      required
+                    />
+                  </div>
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium mb-1.5 sm:mb-2 text-foreground">
+                    Phone Number *
+                  </label>
+                  <div className="relative">
+                    <Phone className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                    <Input
+                      type="tel"
+                      placeholder="+254 712 345 678"
+                      value={formData.phone_number}
+                      onChange={(e) => setFormData({ ...formData, phone_number: e.target.value })}
+                      className="bg-background/50 border-border focus:border-primary h-11 sm:h-12 pl-10 text-base"
+                      required
+                    />
+                  </div>
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium mb-1.5 sm:mb-2 text-foreground">
+                    I am a... *
+                  </label>
+                  <div className="relative">
+                    <Briefcase className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground z-10" />
+                    <Select value={formData.role} onValueChange={(value) => setFormData({ ...formData, role: value })}>
+                      <SelectTrigger className="bg-background/50 border-border focus:border-primary h-11 sm:h-12 pl-10 text-base">
+                        <SelectValue placeholder="Select your role" />
+                      </SelectTrigger>
+                      <SelectContent className="bg-popover border-border z-50">
+                        <SelectItem value="dealer" className="text-base py-2.5">Dealer</SelectItem>
+                        <SelectItem value="buyer" className="text-base py-2.5">Buyer</SelectItem>
+                        <SelectItem value="importer" className="text-base py-2.5">Importer</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                </div>
+
+                <Button 
+                  type="submit" 
+                  disabled={isSubmitting}
+                  size="lg"
+                  className="w-full bg-gradient-primary hover:shadow-glow-primary transition-all duration-300 h-12 sm:h-14 text-base sm:text-lg font-semibold mt-2"
+                >
+                  {isSubmitting ? "Submitting..." : "Join the Waitlist"}
+                </Button>
               </div>
 
-              <div>
-                <label className="block text-sm font-medium mb-2 text-foreground">
-                  Email Address *
-                </label>
-                <Input
-                  type="email"
-                  placeholder="john@example.com"
-                  value={formData.email}
-                  onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                  className="bg-background/50 border-border focus:border-primary h-12"
-                  required
-                />
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium mb-2 text-foreground">
-                  Phone Number *
-                </label>
-                <Input
-                  type="tel"
-                  placeholder="+254 712 345 678"
-                  value={formData.phone_number}
-                  onChange={(e) => setFormData({ ...formData, phone_number: e.target.value })}
-                  className="bg-background/50 border-border focus:border-primary h-12"
-                  required
-                />
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium mb-2 text-foreground">
-                  I am a... *
-                </label>
-                <Select value={formData.role} onValueChange={(value) => setFormData({ ...formData, role: value })}>
-                  <SelectTrigger className="bg-background/50 border-border focus:border-primary h-12">
-                    <SelectValue placeholder="Select your role" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="dealer">Dealer</SelectItem>
-                    <SelectItem value="buyer">Buyer</SelectItem>
-                    <SelectItem value="importer">Importer</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-
-              <Button 
-                type="submit" 
-                disabled={isSubmitting}
-                size="lg"
-                className="w-full bg-gradient-primary hover:shadow-glow-primary transition-all duration-300 h-14 text-lg font-semibold"
-              >
-                {isSubmitting ? "Submitting..." : "Join the Waitlist"}
-              </Button>
-            </div>
-
-            <p className="text-sm text-muted-foreground text-center mt-6">
-              By joining, you'll get exclusive early access and special launch offers.
-            </p>
-          </form>
-        </motion.div>
+              <p className="text-xs sm:text-sm text-muted-foreground text-center mt-4 sm:mt-6">
+                By joining, you'll get exclusive early access and special launch offers.
+              </p>
+            </form>
+          </motion.div>
         </div>
       </div>
     </div>
