@@ -4,7 +4,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { useToast } from '@/hooks/use-toast';
-import { Truck, Calendar, Car, ArrowRight } from 'lucide-react';
+import { Truck, Calendar, Car, ArrowRight, DollarSign, User } from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/card';
 
 interface Shipment {
@@ -29,7 +29,7 @@ const statusFlow = ['accepted', 'in_transit', 'cleared', 'delivered'];
 const statusLabels: Record<string, string> = {
   accepted: 'Accepted',
   in_transit: 'In Transit',
-  cleared: 'Cleared Customs',
+  cleared: 'Cleared',
   delivered: 'Delivered',
 };
 
@@ -152,79 +152,122 @@ export function MyShipmentsTab({ onUpdate }: MyShipmentsTabProps) {
     <div className="space-y-4">
       {shipments.map((shipment) => {
         const nextStatus = getNextStatus(shipment.status);
+        const currentIndex = statusFlow.indexOf(shipment.status);
+        
         return (
-          <Card key={shipment.id} className="border-border/50 bg-card/30">
-            <CardContent className="p-6">
-              <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
-                <div className="flex-1 space-y-2">
-                  <div className="flex items-center gap-3">
+          <Card key={shipment.id} className="border-border/50 bg-card/30 overflow-hidden">
+            <CardContent className="p-4 sm:p-6">
+              {/* Header */}
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-4">
+                <div className="flex items-center gap-3">
+                  <div className="p-2 bg-primary/10 rounded-lg shrink-0">
                     <Car className="h-5 w-5 text-primary" />
-                    <h3 className="text-lg font-semibold">
+                  </div>
+                  <div>
+                    <h3 className="text-base sm:text-lg font-semibold">
                       {shipment.year} {shipment.make} {shipment.model}
                     </h3>
-                    <Badge className={statusColors[shipment.status]}>
-                      {statusLabels[shipment.status]}
-                    </Badge>
-                  </div>
-                  <p className="text-sm text-muted-foreground">
-                    Dealer: {shipment.dealer_email}
-                  </p>
-                  {shipment.specs && (
-                    <p className="text-sm text-muted-foreground">
-                      Specs: {shipment.specs}
+                    <p className="text-sm text-muted-foreground flex items-center gap-1">
+                      <User className="h-3 w-3" />
+                      {shipment.dealer_email}
                     </p>
-                  )}
-                  <div className="flex items-center gap-4 text-sm text-muted-foreground">
-                    <span>Budget: ${shipment.budget.toLocaleString()}</span>
-                    <span className="flex items-center gap-1">
-                      <Calendar className="h-4 w-4" />
-                      Accepted: {shipment.accepted_at ? new Date(shipment.accepted_at).toLocaleDateString() : 'N/A'}
-                    </span>
                   </div>
                 </div>
+                <Badge className={`${statusColors[shipment.status]} self-start sm:self-auto`}>
+                  {statusLabels[shipment.status]}
+                </Badge>
+              </div>
 
-                {/* Status Progress */}
+              {/* Info Grid */}
+              <div className="grid grid-cols-2 gap-3 mb-4 text-sm">
                 <div className="flex items-center gap-2">
+                  <DollarSign className="h-4 w-4 text-green-500" />
+                  <span className="text-green-500 font-medium">
+                    ${shipment.budget.toLocaleString()}
+                  </span>
+                </div>
+                <div className="flex items-center gap-2 text-muted-foreground">
+                  <Calendar className="h-4 w-4" />
+                  <span className="truncate">
+                    {shipment.accepted_at ? new Date(shipment.accepted_at).toLocaleDateString() : 'N/A'}
+                  </span>
+                </div>
+              </div>
+
+              {/* Progress Steps - Mobile */}
+              <div className="block sm:hidden mb-4">
+                <div className="flex items-center justify-between mb-2">
                   {statusFlow.map((status, index) => (
-                    <div key={status} className="flex items-center">
+                    <div key={status} className="flex flex-col items-center flex-1">
                       <div
-                        className={`w-3 h-3 rounded-full ${
-                          statusFlow.indexOf(shipment.status) >= index
-                            ? 'bg-primary'
-                            : 'bg-muted'
+                        className={`w-6 h-6 rounded-full flex items-center justify-center text-xs font-medium ${
+                          currentIndex >= index
+                            ? 'bg-primary text-primary-foreground'
+                            : 'bg-muted text-muted-foreground'
                         }`}
-                      />
-                      {index < statusFlow.length - 1 && (
-                        <div
-                          className={`w-8 h-0.5 ${
-                            statusFlow.indexOf(shipment.status) > index
-                              ? 'bg-primary'
-                              : 'bg-muted'
-                          }`}
-                        />
-                      )}
+                      >
+                        {index + 1}
+                      </div>
+                      <span className="text-[10px] text-muted-foreground mt-1 text-center">
+                        {statusLabels[status].split(' ')[0]}
+                      </span>
                     </div>
                   ))}
                 </div>
-
-                {/* Action Button */}
-                {nextStatus && (
-                  <Button
-                    onClick={() => handleUpdateStatus(shipment.id, shipment.status)}
-                    disabled={updatingId === shipment.id}
-                    className="gap-2"
-                  >
-                    {updatingId === shipment.id ? (
-                      'Updating...'
-                    ) : (
-                      <>
-                        Mark as {statusLabels[nextStatus]}
-                        <ArrowRight className="h-4 w-4" />
-                      </>
-                    )}
-                  </Button>
-                )}
+                <div className="h-1 bg-muted rounded-full overflow-hidden">
+                  <div 
+                    className="h-full bg-primary transition-all duration-300"
+                    style={{ width: `${((currentIndex + 1) / statusFlow.length) * 100}%` }}
+                  />
+                </div>
               </div>
+
+              {/* Progress Steps - Desktop */}
+              <div className="hidden sm:flex items-center gap-2 mb-4">
+                {statusFlow.map((status, index) => (
+                  <div key={status} className="flex items-center">
+                    <div
+                      className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium ${
+                        currentIndex >= index
+                          ? 'bg-primary text-primary-foreground'
+                          : 'bg-muted text-muted-foreground'
+                      }`}
+                    >
+                      {index + 1}
+                    </div>
+                    <span className={`ml-2 text-sm ${
+                      currentIndex >= index ? 'text-foreground' : 'text-muted-foreground'
+                    }`}>
+                      {statusLabels[status]}
+                    </span>
+                    {index < statusFlow.length - 1 && (
+                      <div
+                        className={`w-8 lg:w-12 h-0.5 mx-2 ${
+                          currentIndex > index ? 'bg-primary' : 'bg-muted'
+                        }`}
+                      />
+                    )}
+                  </div>
+                ))}
+              </div>
+
+              {/* Action Button */}
+              {nextStatus && (
+                <Button
+                  onClick={() => handleUpdateStatus(shipment.id, shipment.status)}
+                  disabled={updatingId === shipment.id}
+                  className="w-full sm:w-auto gap-2 h-11"
+                >
+                  {updatingId === shipment.id ? (
+                    'Updating...'
+                  ) : (
+                    <>
+                      Mark as {statusLabels[nextStatus]}
+                      <ArrowRight className="h-4 w-4" />
+                    </>
+                  )}
+                </Button>
+              )}
             </CardContent>
           </Card>
         );

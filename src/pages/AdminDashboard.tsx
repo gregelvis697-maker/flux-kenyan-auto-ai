@@ -662,24 +662,24 @@ export default function AdminDashboard() {
     switch (activeTab) {
       case 'overview':
         return (
-          <div className="space-y-6">
+          <div className="space-y-4 sm:space-y-6">
             {/* Metrics Grid */}
-            <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
-              <MetricCard title="Pending Approvals" value={metrics.pending} icon={Clock} />
-              <MetricCard title="Approved Accounts" value={metrics.approved} icon={UserCheck} />
-              <MetricCard title="Rejected Accounts" value={metrics.rejected} icon={UserX} />
-              <MetricCard title="Total Applications" value={metrics.total} icon={Users} />
+            <div className="grid gap-3 sm:gap-4 md:gap-6 grid-cols-2 lg:grid-cols-4">
+              <MetricCard title="Pending" value={metrics.pending} icon={Clock} />
+              <MetricCard title="Approved" value={metrics.approved} icon={UserCheck} />
+              <MetricCard title="Rejected" value={metrics.rejected} icon={UserX} />
+              <MetricCard title="Total" value={metrics.total} icon={Users} />
             </div>
             
             {/* Recent Activity */}
             <Card className="border-border/50 bg-gradient-card shadow-card">
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
+              <CardHeader className="p-4 sm:p-6">
+                <CardTitle className="flex items-center gap-2 text-base sm:text-lg">
                   <BarChart3 className="h-5 w-5 text-primary" />
                   Recent Activity
                 </CardTitle>
               </CardHeader>
-              <CardContent>
+              <CardContent className="p-4 sm:p-6 pt-0 sm:pt-0">
                 <ActivityFeed activities={activities.slice(0, 5)} loading={false} />
               </CardContent>
             </Card>
@@ -689,36 +689,38 @@ export default function AdminDashboard() {
       case 'pending-dealers':
         return (
           <div className="space-y-4">
-            <div className="flex items-center gap-4">
-              <div className="relative flex-1 max-w-md">
+            <div className="flex flex-col sm:flex-row gap-3 sm:gap-4">
+              <div className="relative flex-1 sm:max-w-md">
                 <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                 <Input
                   placeholder="Search dealers..."
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
-                  className="pl-10"
+                  className="pl-10 h-11"
                 />
               </div>
               {selectedUsers.length > 0 && (
-                <>
+                <div className="flex gap-2 flex-wrap">
                   <Button
                     onClick={() => setBulkApproveDialogOpen(true)}
                     disabled={actionLoading}
-                    className="gap-2"
+                    className="gap-2 flex-1 sm:flex-none h-11"
+                    size="sm"
                   >
                     <CheckCircle2 className="h-4 w-4" />
-                    Approve Selected ({selectedUsers.length})
+                    <span className="hidden sm:inline">Approve</span> ({selectedUsers.length})
                   </Button>
                   <Button
                     variant="destructive"
                     onClick={() => setBulkRejectDialogOpen(true)}
                     disabled={actionLoading}
-                    className="gap-2"
+                    className="gap-2 flex-1 sm:flex-none h-11"
+                    size="sm"
                   >
                     <XCircle className="h-4 w-4" />
-                    Reject Selected ({selectedUsers.length})
+                    <span className="hidden sm:inline">Reject</span> ({selectedUsers.length})
                   </Button>
-                </>
+                </div>
               )}
             </div>
             <UserTable
@@ -737,36 +739,38 @@ export default function AdminDashboard() {
       case 'pending-importers':
         return (
           <div className="space-y-4">
-            <div className="flex items-center gap-4">
-              <div className="relative flex-1 max-w-md">
+            <div className="flex flex-col sm:flex-row gap-3 sm:gap-4">
+              <div className="relative flex-1 sm:max-w-md">
                 <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                 <Input
                   placeholder="Search importers..."
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
-                  className="pl-10"
+                  className="pl-10 h-11"
                 />
               </div>
               {selectedUsers.length > 0 && (
-                <>
+                <div className="flex gap-2 flex-wrap">
                   <Button
                     onClick={() => setBulkApproveDialogOpen(true)}
                     disabled={actionLoading}
-                    className="gap-2"
+                    className="gap-2 flex-1 sm:flex-none h-11"
+                    size="sm"
                   >
                     <CheckCircle2 className="h-4 w-4" />
-                    Approve Selected ({selectedUsers.length})
+                    <span className="hidden sm:inline">Approve</span> ({selectedUsers.length})
                   </Button>
                   <Button
                     variant="destructive"
                     onClick={() => setBulkRejectDialogOpen(true)}
                     disabled={actionLoading}
-                    className="gap-2"
+                    className="gap-2 flex-1 sm:flex-none h-11"
+                    size="sm"
                   >
                     <XCircle className="h-4 w-4" />
-                    Reject Selected ({selectedUsers.length})
+                    <span className="hidden sm:inline">Reject</span> ({selectedUsers.length})
                   </Button>
-                </>
+                </div>
               )}
             </div>
             <UserTable
@@ -785,16 +789,14 @@ export default function AdminDashboard() {
       case 'verified':
         return (
           <div className="space-y-4">
-            <div className="flex items-center gap-4">
-              <div className="relative flex-1 max-w-md">
-                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                <Input
-                  placeholder="Search verified users..."
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                  className="pl-10"
-                />
-              </div>
+            <div className="relative max-w-full sm:max-w-md">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+              <Input
+                placeholder="Search verified users..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="pl-10 h-11"
+              />
             </div>
             <UserTable users={filterUsers(verifiedUsers)} type="verified" />
           </div>
@@ -803,16 +805,14 @@ export default function AdminDashboard() {
       case 'rejected':
         return (
           <div className="space-y-4">
-            <div className="flex items-center gap-4">
-              <div className="relative flex-1 max-w-md">
-                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                <Input
-                  placeholder="Search rejected users..."
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                  className="pl-10"
-                />
-              </div>
+            <div className="relative max-w-full sm:max-w-md">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+              <Input
+                placeholder="Search rejected users..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="pl-10 h-11"
+              />
             </div>
             <UserTable users={filterUsers(rejectedUsers)} type="rejected" />
           </div>
@@ -871,15 +871,16 @@ export default function AdminDashboard() {
       
       <main className={cn(
         'transition-all duration-300 pt-24 pb-8 px-4',
-        sidebarCollapsed ? 'ml-16' : 'ml-64'
+        'ml-0 lg:ml-16',
+        !sidebarCollapsed && 'lg:ml-64'
       )}>
         <div className="max-w-7xl mx-auto">
           {/* Header */}
-          <div className="mb-8">
-            <h1 className="text-3xl font-bold text-foreground mb-2">
+          <div className="mb-6 sm:mb-8 pl-14 lg:pl-0">
+            <h1 className="text-2xl sm:text-3xl font-bold text-foreground mb-1 sm:mb-2">
               {getPageTitle()}
             </h1>
-            <p className="text-muted-foreground">
+            <p className="text-sm sm:text-base text-muted-foreground">
               Manage user verification, view analytics, and monitor system activity
             </p>
           </div>
