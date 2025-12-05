@@ -4,7 +4,8 @@ import { useAuth } from '@/contexts/AuthContext';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { useToast } from '@/hooks/use-toast';
-import { Package, Calendar, DollarSign, Car } from 'lucide-react';
+import { Package, Calendar, DollarSign, Car, FileText } from 'lucide-react';
+import { Card, CardContent } from '@/components/ui/card';
 import {
   Table,
   TableBody,
@@ -127,62 +128,121 @@ export function AvailableRequestsTab({ onUpdate }: AvailableRequestsTabProps) {
   }
 
   return (
-    <div className="overflow-x-auto">
-      <Table>
-        <TableHeader>
-          <TableRow>
-            <TableHead>Vehicle</TableHead>
-            <TableHead>Year</TableHead>
-            <TableHead>Budget</TableHead>
-            <TableHead>Specs</TableHead>
-            <TableHead>Dealer</TableHead>
-            <TableHead>Date</TableHead>
-            <TableHead>Action</TableHead>
-          </TableRow>
-        </TableHeader>
-        <TableBody>
-          {requests.map((request) => (
-            <TableRow key={request.id}>
-              <TableCell className="font-medium">
+    <div>
+      {/* Mobile Card View */}
+      <div className="block lg:hidden space-y-4">
+        {requests.map((request) => (
+          <Card key={request.id} className="border-border/50 bg-card/30">
+            <CardContent className="p-4 space-y-4">
+              <div className="flex items-start justify-between">
                 <div className="flex items-center gap-2">
-                  <Car className="h-4 w-4 text-primary" />
-                  {request.make} {request.model}
+                  <Car className="h-5 w-5 text-primary shrink-0" />
+                  <div>
+                    <h3 className="font-semibold text-base">
+                      {request.make} {request.model}
+                    </h3>
+                    <p className="text-sm text-muted-foreground">{request.year}</p>
+                  </div>
                 </div>
-              </TableCell>
-              <TableCell>{request.year}</TableCell>
-              <TableCell>
-                <div className="flex items-center gap-1 text-green-500">
-                  <DollarSign className="h-4 w-4" />
-                  {request.budget.toLocaleString()}
+                <Badge variant="secondary" className="bg-gray-500/20 text-gray-400 border-gray-500/30">
+                  New
+                </Badge>
+              </div>
+
+              <div className="grid grid-cols-2 gap-3 text-sm">
+                <div className="flex items-center gap-2">
+                  <DollarSign className="h-4 w-4 text-green-500" />
+                  <span className="text-green-500 font-medium">
+                    ${request.budget.toLocaleString()}
+                  </span>
                 </div>
-              </TableCell>
-              <TableCell>
-                <span className="text-muted-foreground text-sm">
-                  {request.specs || 'No specific specs'}
-                </span>
-              </TableCell>
-              <TableCell>
-                <span className="text-sm">{request.dealer_email}</span>
-              </TableCell>
-              <TableCell>
-                <div className="flex items-center gap-1 text-sm text-muted-foreground">
+                <div className="flex items-center gap-2 text-muted-foreground">
                   <Calendar className="h-4 w-4" />
-                  {new Date(request.created_at).toLocaleDateString()}
+                  <span>{new Date(request.created_at).toLocaleDateString()}</span>
                 </div>
-              </TableCell>
-              <TableCell>
-                <Button
-                  size="sm"
-                  onClick={() => handleAccept(request.id)}
-                  disabled={acceptingId === request.id}
-                >
-                  {acceptingId === request.id ? 'Accepting...' : 'Accept'}
-                </Button>
-              </TableCell>
+              </div>
+
+              {request.specs && (
+                <div className="flex items-start gap-2 text-sm text-muted-foreground">
+                  <FileText className="h-4 w-4 shrink-0 mt-0.5" />
+                  <span className="line-clamp-2">{request.specs}</span>
+                </div>
+              )}
+
+              <div className="text-sm text-muted-foreground">
+                <span className="font-medium">Dealer:</span> {request.dealer_email}
+              </div>
+
+              <Button
+                onClick={() => handleAccept(request.id)}
+                disabled={acceptingId === request.id}
+                className="w-full h-11"
+              >
+                {acceptingId === request.id ? 'Accepting...' : 'Accept Request'}
+              </Button>
+            </CardContent>
+          </Card>
+        ))}
+      </div>
+
+      {/* Desktop Table View */}
+      <div className="hidden lg:block overflow-x-auto">
+        <Table>
+          <TableHeader>
+            <TableRow>
+              <TableHead>Vehicle</TableHead>
+              <TableHead>Year</TableHead>
+              <TableHead>Budget</TableHead>
+              <TableHead>Specs</TableHead>
+              <TableHead>Dealer</TableHead>
+              <TableHead>Date</TableHead>
+              <TableHead>Action</TableHead>
             </TableRow>
-          ))}
-        </TableBody>
-      </Table>
+          </TableHeader>
+          <TableBody>
+            {requests.map((request) => (
+              <TableRow key={request.id}>
+                <TableCell className="font-medium">
+                  <div className="flex items-center gap-2">
+                    <Car className="h-4 w-4 text-primary" />
+                    {request.make} {request.model}
+                  </div>
+                </TableCell>
+                <TableCell>{request.year}</TableCell>
+                <TableCell>
+                  <div className="flex items-center gap-1 text-green-500">
+                    <DollarSign className="h-4 w-4" />
+                    {request.budget.toLocaleString()}
+                  </div>
+                </TableCell>
+                <TableCell>
+                  <span className="text-muted-foreground text-sm max-w-[200px] truncate block">
+                    {request.specs || 'No specific specs'}
+                  </span>
+                </TableCell>
+                <TableCell>
+                  <span className="text-sm">{request.dealer_email}</span>
+                </TableCell>
+                <TableCell>
+                  <div className="flex items-center gap-1 text-sm text-muted-foreground">
+                    <Calendar className="h-4 w-4" />
+                    {new Date(request.created_at).toLocaleDateString()}
+                  </div>
+                </TableCell>
+                <TableCell>
+                  <Button
+                    size="sm"
+                    onClick={() => handleAccept(request.id)}
+                    disabled={acceptingId === request.id}
+                  >
+                    {acceptingId === request.id ? 'Accepting...' : 'Accept'}
+                  </Button>
+                </TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
+      </div>
     </div>
   );
 }

@@ -3,7 +3,8 @@ import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
 import { Badge } from '@/components/ui/badge';
 import { useToast } from '@/hooks/use-toast';
-import { CheckCircle, Calendar, Car, DollarSign } from 'lucide-react';
+import { CheckCircle, Calendar, Car, DollarSign, User } from 'lucide-react';
+import { Card, CardContent } from '@/components/ui/card';
 import {
   Table,
   TableBody,
@@ -91,60 +92,120 @@ export function DeliveredTab() {
   }
 
   return (
-    <div className="overflow-x-auto">
-      <Table>
-        <TableHeader>
-          <TableRow>
-            <TableHead>Vehicle</TableHead>
-            <TableHead>Year</TableHead>
-            <TableHead>Budget</TableHead>
-            <TableHead>Dealer</TableHead>
-            <TableHead>Accepted</TableHead>
-            <TableHead>Delivered</TableHead>
-            <TableHead>Status</TableHead>
-          </TableRow>
-        </TableHeader>
-        <TableBody>
-          {shipments.map((shipment) => (
-            <TableRow key={shipment.id}>
-              <TableCell className="font-medium">
-                <div className="flex items-center gap-2">
-                  <Car className="h-4 w-4 text-primary" />
-                  {shipment.make} {shipment.model}
+    <div>
+      {/* Mobile Card View */}
+      <div className="block lg:hidden space-y-4">
+        {shipments.map((shipment) => (
+          <Card key={shipment.id} className="border-border/50 bg-card/30">
+            <CardContent className="p-4 space-y-4">
+              <div className="flex items-start justify-between">
+                <div className="flex items-center gap-3">
+                  <div className="p-2 bg-green-500/10 rounded-lg shrink-0">
+                    <Car className="h-5 w-5 text-green-500" />
+                  </div>
+                  <div>
+                    <h3 className="font-semibold text-base">
+                      {shipment.make} {shipment.model}
+                    </h3>
+                    <p className="text-sm text-muted-foreground">{shipment.year}</p>
+                  </div>
                 </div>
-              </TableCell>
-              <TableCell>{shipment.year}</TableCell>
-              <TableCell>
-                <div className="flex items-center gap-1 text-green-500">
-                  <DollarSign className="h-4 w-4" />
-                  {shipment.budget.toLocaleString()}
-                </div>
-              </TableCell>
-              <TableCell>
-                <span className="text-sm">{shipment.dealer_email}</span>
-              </TableCell>
-              <TableCell>
-                <div className="flex items-center gap-1 text-sm text-muted-foreground">
-                  <Calendar className="h-4 w-4" />
-                  {shipment.accepted_at ? new Date(shipment.accepted_at).toLocaleDateString() : 'N/A'}
-                </div>
-              </TableCell>
-              <TableCell>
-                <div className="flex items-center gap-1 text-sm text-muted-foreground">
-                  <Calendar className="h-4 w-4" />
-                  {shipment.delivered_at ? new Date(shipment.delivered_at).toLocaleDateString() : 'N/A'}
-                </div>
-              </TableCell>
-              <TableCell>
                 <Badge className="bg-green-500/20 text-green-400 border-green-500/30">
                   <CheckCircle className="h-3 w-3 mr-1" />
                   Delivered
                 </Badge>
-              </TableCell>
+              </div>
+
+              <div className="grid grid-cols-2 gap-3 text-sm">
+                <div className="flex items-center gap-2">
+                  <DollarSign className="h-4 w-4 text-green-500" />
+                  <span className="text-green-500 font-medium">
+                    ${shipment.budget.toLocaleString()}
+                  </span>
+                </div>
+                <div className="flex items-center gap-2 text-muted-foreground">
+                  <User className="h-4 w-4" />
+                  <span className="truncate">{shipment.dealer_email}</span>
+                </div>
+              </div>
+
+              <div className="grid grid-cols-2 gap-3 text-sm text-muted-foreground">
+                <div>
+                  <span className="text-xs uppercase tracking-wider opacity-70">Accepted</span>
+                  <div className="flex items-center gap-1 mt-0.5">
+                    <Calendar className="h-3 w-3" />
+                    {shipment.accepted_at ? new Date(shipment.accepted_at).toLocaleDateString() : 'N/A'}
+                  </div>
+                </div>
+                <div>
+                  <span className="text-xs uppercase tracking-wider opacity-70">Delivered</span>
+                  <div className="flex items-center gap-1 mt-0.5">
+                    <Calendar className="h-3 w-3" />
+                    {shipment.delivered_at ? new Date(shipment.delivered_at).toLocaleDateString() : 'N/A'}
+                  </div>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        ))}
+      </div>
+
+      {/* Desktop Table View */}
+      <div className="hidden lg:block overflow-x-auto">
+        <Table>
+          <TableHeader>
+            <TableRow>
+              <TableHead>Vehicle</TableHead>
+              <TableHead>Year</TableHead>
+              <TableHead>Budget</TableHead>
+              <TableHead>Dealer</TableHead>
+              <TableHead>Accepted</TableHead>
+              <TableHead>Delivered</TableHead>
+              <TableHead>Status</TableHead>
             </TableRow>
-          ))}
-        </TableBody>
-      </Table>
+          </TableHeader>
+          <TableBody>
+            {shipments.map((shipment) => (
+              <TableRow key={shipment.id}>
+                <TableCell className="font-medium">
+                  <div className="flex items-center gap-2">
+                    <Car className="h-4 w-4 text-primary" />
+                    {shipment.make} {shipment.model}
+                  </div>
+                </TableCell>
+                <TableCell>{shipment.year}</TableCell>
+                <TableCell>
+                  <div className="flex items-center gap-1 text-green-500">
+                    <DollarSign className="h-4 w-4" />
+                    {shipment.budget.toLocaleString()}
+                  </div>
+                </TableCell>
+                <TableCell>
+                  <span className="text-sm">{shipment.dealer_email}</span>
+                </TableCell>
+                <TableCell>
+                  <div className="flex items-center gap-1 text-sm text-muted-foreground">
+                    <Calendar className="h-4 w-4" />
+                    {shipment.accepted_at ? new Date(shipment.accepted_at).toLocaleDateString() : 'N/A'}
+                  </div>
+                </TableCell>
+                <TableCell>
+                  <div className="flex items-center gap-1 text-sm text-muted-foreground">
+                    <Calendar className="h-4 w-4" />
+                    {shipment.delivered_at ? new Date(shipment.delivered_at).toLocaleDateString() : 'N/A'}
+                  </div>
+                </TableCell>
+                <TableCell>
+                  <Badge className="bg-green-500/20 text-green-400 border-green-500/30">
+                    <CheckCircle className="h-3 w-3 mr-1" />
+                    Delivered
+                  </Badge>
+                </TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
+      </div>
     </div>
   );
 }
