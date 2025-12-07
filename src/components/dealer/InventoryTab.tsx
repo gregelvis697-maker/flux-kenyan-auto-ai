@@ -6,7 +6,7 @@ import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Plus, Edit, Trash2, X, Car, Fuel, Settings, DollarSign } from 'lucide-react';
+import { Plus, Edit, Trash2, Car, Fuel, Settings, DollarSign, Gauge, Palette } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import {
   Select,
@@ -22,6 +22,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog';
+import { PhotoUploader } from './PhotoUploader';
 
 interface Vehicle {
   id: string;
@@ -52,6 +53,7 @@ export function InventoryTab({ onUpdate }: InventoryTabProps) {
   const [showForm, setShowForm] = useState(false);
   const [editingVehicle, setEditingVehicle] = useState<Vehicle | null>(null);
   const [loading, setLoading] = useState(false);
+  const [photos, setPhotos] = useState<string[]>([]);
   const [formData, setFormData] = useState({
     make: '',
     model: '',
@@ -65,7 +67,6 @@ export function InventoryTab({ onUpdate }: InventoryTabProps) {
     description: '',
     price: '',
     negotiable: true,
-    photos: '',
   });
 
   useEffect(() => {
@@ -113,7 +114,7 @@ export function InventoryTab({ onUpdate }: InventoryTabProps) {
         description: formData.description || null,
         price: parseFloat(formData.price),
         negotiable: formData.negotiable,
-        photos: formData.photos ? formData.photos.split(',').map(p => p.trim()) : [],
+        photos: photos,
       };
 
       let error;
@@ -150,6 +151,7 @@ export function InventoryTab({ onUpdate }: InventoryTabProps) {
 
   const handleEdit = (vehicle: Vehicle) => {
     setEditingVehicle(vehicle);
+    setPhotos(vehicle.photos || []);
     setFormData({
       make: vehicle.make,
       model: vehicle.model,
@@ -163,7 +165,6 @@ export function InventoryTab({ onUpdate }: InventoryTabProps) {
       description: vehicle.description || '',
       price: vehicle.price.toString(),
       negotiable: vehicle.negotiable,
-      photos: vehicle.photos.join(', '),
     });
     setShowForm(true);
   };
@@ -233,8 +234,8 @@ export function InventoryTab({ onUpdate }: InventoryTabProps) {
       description: '',
       price: '',
       negotiable: true,
-      photos: '',
     });
+    setPhotos([]);
     setShowForm(false);
     setEditingVehicle(null);
   };
@@ -246,6 +247,14 @@ export function InventoryTab({ onUpdate }: InventoryTabProps) {
       certified_pre_owned: 'Certified Pre-Owned',
     };
     return labels[condition] || condition;
+  };
+
+  const formatPrice = (price: number) => {
+    return new Intl.NumberFormat('en-US', {
+      style: 'currency',
+      currency: 'USD',
+      maximumFractionDigits: 0,
+    }).format(price);
   };
 
   return (
@@ -269,52 +278,57 @@ export function InventoryTab({ onUpdate }: InventoryTabProps) {
 
       {/* Form Dialog */}
       <Dialog open={showForm} onOpenChange={(open) => !open && resetForm()}>
-        <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto bg-card border-border/50">
+        <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto bg-card border-border/50 w-[95vw] sm:w-full p-4 sm:p-6">
           <DialogHeader>
-            <DialogTitle className="text-xl">
+            <DialogTitle className="text-lg sm:text-xl">
               {editingVehicle ? 'Edit Vehicle' : 'Add New Vehicle'}
             </DialogTitle>
           </DialogHeader>
           <form onSubmit={handleSubmit} className="space-y-4 mt-4">
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-              <div className="space-y-2">
-                <Label htmlFor="make" className="text-sm">Make *</Label>
+            {/* Photo Upload Section */}
+            <PhotoUploader photos={photos} onPhotosChange={setPhotos} maxPhotos={10} />
+
+            <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 sm:gap-4">
+              <div className="space-y-1.5">
+                <Label htmlFor="make" className="text-xs sm:text-sm">Make *</Label>
                 <Input
                   id="make"
                   value={formData.make}
                   onChange={(e) => setFormData({ ...formData, make: e.target.value })}
                   required
-                  className="bg-background/50"
+                  className="bg-background/50 h-9 sm:h-10 text-sm"
+                  placeholder="Toyota"
                 />
               </div>
-              <div className="space-y-2">
-                <Label htmlFor="model" className="text-sm">Model *</Label>
+              <div className="space-y-1.5">
+                <Label htmlFor="model" className="text-xs sm:text-sm">Model *</Label>
                 <Input
                   id="model"
                   value={formData.model}
                   onChange={(e) => setFormData({ ...formData, model: e.target.value })}
                   required
-                  className="bg-background/50"
+                  className="bg-background/50 h-9 sm:h-10 text-sm"
+                  placeholder="Camry"
                 />
               </div>
-              <div className="space-y-2">
-                <Label htmlFor="year" className="text-sm">Year *</Label>
+              <div className="space-y-1.5">
+                <Label htmlFor="year" className="text-xs sm:text-sm">Year *</Label>
                 <Input
                   id="year"
                   type="number"
                   value={formData.year}
                   onChange={(e) => setFormData({ ...formData, year: parseInt(e.target.value) })}
                   required
-                  className="bg-background/50"
+                  className="bg-background/50 h-9 sm:h-10 text-sm"
                 />
               </div>
-              <div className="space-y-2">
-                <Label htmlFor="condition" className="text-sm">Condition *</Label>
+              <div className="space-y-1.5">
+                <Label htmlFor="condition" className="text-xs sm:text-sm">Condition *</Label>
                 <Select
                   value={formData.condition}
                   onValueChange={(value) => setFormData({ ...formData, condition: value })}
                 >
-                  <SelectTrigger className="bg-background/50">
+                  <SelectTrigger className="bg-background/50 h-9 sm:h-10 text-sm">
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
@@ -324,13 +338,13 @@ export function InventoryTab({ onUpdate }: InventoryTabProps) {
                   </SelectContent>
                 </Select>
               </div>
-              <div className="space-y-2">
-                <Label htmlFor="fuel_type" className="text-sm">Fuel Type *</Label>
+              <div className="space-y-1.5">
+                <Label htmlFor="fuel_type" className="text-xs sm:text-sm">Fuel Type *</Label>
                 <Select
                   value={formData.fuel_type}
                   onValueChange={(value) => setFormData({ ...formData, fuel_type: value })}
                 >
-                  <SelectTrigger className="bg-background/50">
+                  <SelectTrigger className="bg-background/50 h-9 sm:h-10 text-sm">
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
@@ -342,43 +356,45 @@ export function InventoryTab({ onUpdate }: InventoryTabProps) {
                   </SelectContent>
                 </Select>
               </div>
-              <div className="space-y-2">
-                <Label htmlFor="engine_capacity" className="text-sm">Engine Capacity *</Label>
+              <div className="space-y-1.5">
+                <Label htmlFor="engine_capacity" className="text-xs sm:text-sm">Engine *</Label>
                 <Input
                   id="engine_capacity"
                   value={formData.engine_capacity}
                   onChange={(e) => setFormData({ ...formData, engine_capacity: e.target.value })}
-                  placeholder="e.g., 2.0L"
+                  placeholder="2.0L"
                   required
-                  className="bg-background/50"
+                  className="bg-background/50 h-9 sm:h-10 text-sm"
                 />
               </div>
-              <div className="space-y-2">
-                <Label htmlFor="mileage" className="text-sm">Mileage (km)</Label>
+              <div className="space-y-1.5">
+                <Label htmlFor="mileage" className="text-xs sm:text-sm">Mileage (km)</Label>
                 <Input
                   id="mileage"
                   type="number"
                   value={formData.mileage}
                   onChange={(e) => setFormData({ ...formData, mileage: e.target.value })}
-                  className="bg-background/50"
+                  className="bg-background/50 h-9 sm:h-10 text-sm"
+                  placeholder="50000"
                 />
               </div>
-              <div className="space-y-2">
-                <Label htmlFor="color" className="text-sm">Color</Label>
+              <div className="space-y-1.5">
+                <Label htmlFor="color" className="text-xs sm:text-sm">Color</Label>
                 <Input
                   id="color"
                   value={formData.color}
                   onChange={(e) => setFormData({ ...formData, color: e.target.value })}
-                  className="bg-background/50"
+                  className="bg-background/50 h-9 sm:h-10 text-sm"
+                  placeholder="Silver"
                 />
               </div>
-              <div className="space-y-2">
-                <Label htmlFor="transmission" className="text-sm">Transmission</Label>
+              <div className="space-y-1.5">
+                <Label htmlFor="transmission" className="text-xs sm:text-sm">Transmission</Label>
                 <Select
                   value={formData.transmission}
                   onValueChange={(value) => setFormData({ ...formData, transmission: value })}
                 >
-                  <SelectTrigger className="bg-background/50">
+                  <SelectTrigger className="bg-background/50 h-9 sm:h-10 text-sm">
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
@@ -388,8 +404,8 @@ export function InventoryTab({ onUpdate }: InventoryTabProps) {
                   </SelectContent>
                 </Select>
               </div>
-              <div className="space-y-2">
-                <Label htmlFor="price" className="text-sm">Price ($) *</Label>
+              <div className="space-y-1.5">
+                <Label htmlFor="price" className="text-xs sm:text-sm">Price ($) *</Label>
                 <Input
                   id="price"
                   type="number"
@@ -397,44 +413,36 @@ export function InventoryTab({ onUpdate }: InventoryTabProps) {
                   onChange={(e) => setFormData({ ...formData, price: e.target.value })}
                   required
                   step="0.01"
-                  className="bg-background/50"
+                  className="bg-background/50 h-9 sm:h-10 text-sm"
+                  placeholder="25000"
                 />
               </div>
-              <div className="flex items-center space-x-2 pt-6">
+              <div className="flex items-center space-x-2 pt-5 sm:pt-6">
                 <Switch
                   id="negotiable"
                   checked={formData.negotiable}
                   onCheckedChange={(checked) => setFormData({ ...formData, negotiable: checked })}
                 />
-                <Label htmlFor="negotiable" className="text-sm">Negotiable</Label>
+                <Label htmlFor="negotiable" className="text-xs sm:text-sm">Negotiable</Label>
               </div>
             </div>
-            <div className="space-y-2">
-              <Label htmlFor="description" className="text-sm">Description</Label>
+            <div className="space-y-1.5">
+              <Label htmlFor="description" className="text-xs sm:text-sm">Description</Label>
               <Textarea
                 id="description"
                 value={formData.description}
                 onChange={(e) => setFormData({ ...formData, description: e.target.value })}
                 rows={3}
-                className="bg-background/50 resize-none"
+                className="bg-background/50 resize-none text-sm"
+                placeholder="Add any additional details about the vehicle..."
               />
             </div>
-            <div className="space-y-2">
-              <Label htmlFor="photos" className="text-sm">Photo URLs (comma-separated)</Label>
-              <Input
-                id="photos"
-                value={formData.photos}
-                onChange={(e) => setFormData({ ...formData, photos: e.target.value })}
-                placeholder="https://example.com/photo1.jpg, https://example.com/photo2.jpg"
-                className="bg-background/50"
-              />
-            </div>
-            <div className="flex flex-col sm:flex-row gap-2 pt-2">
-              <Button type="submit" disabled={loading} className="w-full sm:w-auto bg-primary hover:bg-primary/90">
-                {loading ? 'Saving...' : editingVehicle ? 'Update Vehicle' : 'Add Vehicle'}
-              </Button>
-              <Button type="button" variant="outline" onClick={resetForm} className="w-full sm:w-auto">
+            <div className="flex flex-col-reverse sm:flex-row gap-2 pt-2">
+              <Button type="button" variant="outline" onClick={resetForm} className="w-full sm:w-auto h-10">
                 Cancel
+              </Button>
+              <Button type="submit" disabled={loading} className="w-full sm:w-auto bg-primary hover:bg-primary/90 h-10">
+                {loading ? 'Saving...' : editingVehicle ? 'Update Vehicle' : 'Add Vehicle'}
               </Button>
             </div>
           </form>
@@ -449,27 +457,35 @@ export function InventoryTab({ onUpdate }: InventoryTabProps) {
           <p className="text-xs text-muted-foreground/70 mt-1">Add your first vehicle!</p>
         </Card>
       ) : (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
           {vehicles.map((vehicle) => (
             <Card
               key={vehicle.id}
               className="overflow-hidden bg-card/30 backdrop-blur-sm border-border/30 hover:border-primary/30 hover:shadow-[0_0_20px_hsl(var(--primary)/0.15)] transition-all duration-300 group"
             >
               {/* Image */}
-              <div className="h-40 sm:h-48 bg-gradient-to-br from-muted/30 to-muted/10 relative overflow-hidden">
+              <div className="h-36 sm:h-44 bg-gradient-to-br from-muted/30 to-muted/10 relative overflow-hidden">
                 {vehicle.photos && vehicle.photos.length > 0 ? (
                   <img
                     src={vehicle.photos[0]}
                     alt={`${vehicle.make} ${vehicle.model}`}
                     className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                    onError={(e) => {
+                      (e.target as HTMLImageElement).src = '/placeholder.svg';
+                    }}
                   />
                 ) : (
                   <div className="w-full h-full flex items-center justify-center">
-                    <Car className="h-16 w-16 text-muted-foreground/30" />
+                    <Car className="h-12 sm:h-16 w-12 sm:w-16 text-muted-foreground/30" />
                   </div>
                 )}
+                {vehicle.photos && vehicle.photos.length > 1 && (
+                  <Badge className="absolute bottom-2 left-2 bg-background/80 text-foreground text-[10px] px-1.5">
+                    +{vehicle.photos.length - 1} more
+                  </Badge>
+                )}
                 <Badge 
-                  className={`absolute top-3 right-3 ${
+                  className={`absolute top-2 right-2 text-[10px] sm:text-xs ${
                     vehicle.is_sold 
                       ? 'bg-destructive/90 text-destructive-foreground' 
                       : 'bg-emerald-500/90 text-white'
@@ -480,73 +496,81 @@ export function InventoryTab({ onUpdate }: InventoryTabProps) {
               </div>
 
               {/* Content */}
-              <div className="p-4 space-y-3">
+              <div className="p-3 sm:p-4 space-y-2.5 sm:space-y-3">
                 {/* Title */}
                 <div>
-                  <h4 className="font-semibold text-foreground text-base sm:text-lg leading-tight">
+                  <h4 className="font-semibold text-sm sm:text-base text-foreground truncate">
                     {vehicle.year} {vehicle.make} {vehicle.model}
                   </h4>
-                  <Badge variant="outline" className="mt-1.5 text-xs">
+                  <Badge variant="outline" className="mt-1 text-[10px] sm:text-xs">
                     {getConditionLabel(vehicle.condition)}
                   </Badge>
                 </div>
 
-                {/* Specs */}
-                <div className="flex flex-wrap gap-x-4 gap-y-1 text-xs sm:text-sm text-muted-foreground">
+                {/* Quick Stats */}
+                <div className="grid grid-cols-2 gap-1.5 sm:gap-2 text-[10px] sm:text-xs text-muted-foreground">
                   <div className="flex items-center gap-1">
-                    <Fuel className="h-3.5 w-3.5" />
-                    <span className="capitalize">{vehicle.fuel_type.replace('_', ' ')}</span>
+                    <Fuel className="h-3 w-3" />
+                    <span className="capitalize truncate">{vehicle.fuel_type.replace('_', ' ')}</span>
                   </div>
                   <div className="flex items-center gap-1">
-                    <Settings className="h-3.5 w-3.5" />
-                    <span>{vehicle.engine_capacity}</span>
+                    <Settings className="h-3 w-3" />
+                    <span className="capitalize truncate">{vehicle.transmission}</span>
                   </div>
                   {vehicle.mileage && (
-                    <span>{vehicle.mileage.toLocaleString()} km</span>
+                    <div className="flex items-center gap-1">
+                      <Gauge className="h-3 w-3" />
+                      <span>{vehicle.mileage.toLocaleString()} km</span>
+                    </div>
+                  )}
+                  {vehicle.color && (
+                    <div className="flex items-center gap-1">
+                      <Palette className="h-3 w-3" />
+                      <span className="capitalize truncate">{vehicle.color}</span>
+                    </div>
                   )}
                 </div>
 
                 {/* Price */}
                 <div className="flex items-center justify-between pt-2 border-t border-border/30">
-                  <div className="flex items-center gap-1">
-                    <DollarSign className="h-4 w-4 text-primary" />
-                    <span className="text-lg sm:text-xl font-bold text-primary">
-                      {vehicle.price.toLocaleString()}
-                    </span>
+                  <div>
+                    <p className="text-base sm:text-lg font-bold text-primary">
+                      {formatPrice(vehicle.price)}
+                    </p>
+                    {vehicle.negotiable && (
+                      <p className="text-[10px] text-muted-foreground">Negotiable</p>
+                    )}
                   </div>
-                  {vehicle.negotiable && (
-                    <span className="text-xs text-muted-foreground bg-muted/30 px-2 py-0.5 rounded">
-                      Negotiable
-                    </span>
-                  )}
                 </div>
 
                 {/* Actions */}
-                <div className="flex gap-2 pt-2">
+                <div className="grid grid-cols-3 gap-1.5 sm:gap-2 pt-2">
                   <Button
                     size="sm"
                     variant="outline"
                     onClick={() => handleEdit(vehicle)}
-                    className="flex-1 text-xs sm:text-sm"
+                    className="h-8 text-xs px-2"
                   >
-                    <Edit className="h-3.5 w-3.5 mr-1" />
-                    Edit
+                    <Edit className="h-3 w-3 sm:mr-1" />
+                    <span className="hidden sm:inline">Edit</span>
                   </Button>
                   <Button
                     size="sm"
                     variant={vehicle.is_sold ? 'default' : 'secondary'}
                     onClick={() => handleToggleSold(vehicle.id, vehicle.is_sold)}
-                    className="flex-1 text-xs sm:text-sm"
+                    className="h-8 text-xs px-2"
                   >
-                    {vehicle.is_sold ? 'Relist' : 'Mark Sold'}
+                    <DollarSign className="h-3 w-3 sm:mr-1" />
+                    <span className="hidden sm:inline">{vehicle.is_sold ? 'Relist' : 'Sold'}</span>
                   </Button>
                   <Button
                     size="sm"
                     variant="destructive"
                     onClick={() => handleDelete(vehicle.id)}
-                    className="px-2.5"
+                    className="h-8 text-xs px-2"
                   >
-                    <Trash2 className="h-3.5 w-3.5" />
+                    <Trash2 className="h-3 w-3 sm:mr-1" />
+                    <span className="hidden sm:inline">Delete</span>
                   </Button>
                 </div>
               </div>
