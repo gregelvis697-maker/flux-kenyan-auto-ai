@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
+import { compressImage } from '@/lib/imageCompression';
 
 interface UploadedPhoto {
   url: string;
@@ -11,19 +12,28 @@ export function usePhotoUpload() {
   const { toast } = useToast();
   const [uploading, setUploading] = useState(false);
   const [uploadProgress, setUploadProgress] = useState(0);
+  const [compressionProgress, setCompressionProgress] = useState(0);
 
   const uploadPhoto = async (file: File, folder: string = 'vehicles'): Promise<UploadedPhoto | null> => {
     try {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) throw new Error('Not authenticated');
 
+      // Compress image before upload
+      const compressedFile = await compressImage(file, {
+        maxWidth: 1920,
+        maxHeight: 1080,
+        quality: 0.85,
+        maxSizeMB: 1,
+      });
+
       // Generate unique filename
-      const fileExt = file.name.split('.').pop()?.toLowerCase() || 'jpg';
+      const fileExt = 'jpg'; // Always save as JPEG after compression
       const fileName = `${user.id}/${folder}/${Date.now()}-${Math.random().toString(36).substring(2)}.${fileExt}`;
 
       const { data, error } = await supabase.storage
         .from('vehicle-photos')
-        .upload(fileName, file, {
+        .upload(fileName, compressedFile, {
           cacheControl: '3600',
           upsert: false,
         });
@@ -45,15 +55,23 @@ export function usePhotoUpload() {
   const uploadMultiplePhotos = async (files: File[], folder: string = 'vehicles'): Promise<UploadedPhoto[]> => {
     setUploading(true);
     setUploadProgress(0);
+    setCompressionProgress(0);
     const uploadedPhotos: UploadedPhoto[] = [];
 
     try {
-      for (let i = 0; i < files.length; i++) {
+      const total = files.length;
+      
+      for (let i = 0; i < total; i++) {
+        // Update compression progress
+        setCompressionProgress(Math.round(((i + 0.5) / total) * 100));
+        
         const photo = await uploadPhoto(files[i], folder);
         if (photo) {
           uploadedPhotos.push(photo);
         }
-        setUploadProgress(Math.round(((i + 1) / files.length) * 100));
+        
+        // Update upload progress
+        setUploadProgress(Math.round(((i + 1) / total) * 100));
       }
 
       toast({
@@ -72,6 +90,7 @@ export function usePhotoUpload() {
     } finally {
       setUploading(false);
       setUploadProgress(0);
+      setCompressionProgress(0);
     }
   };
 
@@ -97,6 +116,7 @@ export function usePhotoUpload() {
   return {
     uploading,
     uploadProgress,
+    compressionProgress,
     uploadPhoto,
     uploadMultiplePhotos,
     deletePhoto,

@@ -6,7 +6,7 @@ import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Plus, Edit, Trash2, Car, Fuel, Settings, DollarSign, Gauge, Palette } from 'lucide-react';
+import { Plus, Edit, Trash2, Car, Fuel, Settings, DollarSign, Gauge, Palette, Maximize2 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import {
   Select,
@@ -23,6 +23,7 @@ import {
   DialogTitle,
 } from '@/components/ui/dialog';
 import { PhotoUploader } from './PhotoUploader';
+import { PhotoGallery } from './PhotoGallery';
 
 interface Vehicle {
   id: string;
@@ -54,6 +55,9 @@ export function InventoryTab({ onUpdate }: InventoryTabProps) {
   const [editingVehicle, setEditingVehicle] = useState<Vehicle | null>(null);
   const [loading, setLoading] = useState(false);
   const [photos, setPhotos] = useState<string[]>([]);
+  const [galleryOpen, setGalleryOpen] = useState(false);
+  const [galleryPhotos, setGalleryPhotos] = useState<string[]>([]);
+  const [galleryIndex, setGalleryIndex] = useState(0);
   const [formData, setFormData] = useState({
     make: '',
     model: '',
@@ -68,6 +72,12 @@ export function InventoryTab({ onUpdate }: InventoryTabProps) {
     price: '',
     negotiable: true,
   });
+
+  const openVehicleGallery = (vehiclePhotos: string[], startIndex = 0) => {
+    setGalleryPhotos(vehiclePhotos);
+    setGalleryIndex(startIndex);
+    setGalleryOpen(true);
+  };
 
   useEffect(() => {
     fetchVehicles();
@@ -464,7 +474,10 @@ export function InventoryTab({ onUpdate }: InventoryTabProps) {
               className="overflow-hidden bg-card/30 backdrop-blur-sm border-border/30 hover:border-primary/30 hover:shadow-[0_0_20px_hsl(var(--primary)/0.15)] transition-all duration-300 group"
             >
               {/* Image */}
-              <div className="h-36 sm:h-44 bg-gradient-to-br from-muted/30 to-muted/10 relative overflow-hidden">
+              <div 
+                className="h-36 sm:h-44 bg-gradient-to-br from-muted/30 to-muted/10 relative overflow-hidden cursor-pointer"
+                onClick={() => vehicle.photos && vehicle.photos.length > 0 && openVehicleGallery(vehicle.photos)}
+              >
                 {vehicle.photos && vehicle.photos.length > 0 ? (
                   <img
                     src={vehicle.photos[0]}
@@ -480,9 +493,17 @@ export function InventoryTab({ onUpdate }: InventoryTabProps) {
                   </div>
                 )}
                 {vehicle.photos && vehicle.photos.length > 1 && (
-                  <Badge className="absolute bottom-2 left-2 bg-background/80 text-foreground text-[10px] px-1.5">
+                  <button
+                    type="button"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      openVehicleGallery(vehicle.photos);
+                    }}
+                    className="absolute bottom-2 left-2 flex items-center gap-1 px-1.5 py-0.5 bg-background/80 hover:bg-background text-foreground text-[10px] rounded transition-colors"
+                  >
+                    <Maximize2 className="h-3 w-3" />
                     +{vehicle.photos.length - 1} more
-                  </Badge>
+                  </button>
                 )}
                 <Badge 
                   className={`absolute top-2 right-2 text-[10px] sm:text-xs ${
@@ -578,6 +599,14 @@ export function InventoryTab({ onUpdate }: InventoryTabProps) {
           ))}
         </div>
       )}
+
+      {/* Vehicle Photo Gallery */}
+      <PhotoGallery
+        photos={galleryPhotos}
+        initialIndex={galleryIndex}
+        open={galleryOpen}
+        onOpenChange={setGalleryOpen}
+      />
     </div>
   );
 }
