@@ -1,23 +1,19 @@
 import { useState, useEffect, useMemo } from 'react';
 import { supabase } from '@/integrations/supabase/client';
+import { useAuth } from '@/contexts/AuthContext';
 import { Navigation } from '@/components/Navigation';
 import { Card } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
-import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select';
-import { Car, Fuel, Settings, DollarSign, Gauge, Palette, Search, Filter, ChevronDown, ChevronUp, X, Loader2 } from 'lucide-react';
-import { PhotoGallery } from '@/components/dealer/PhotoGallery';
-import { motion, AnimatePresence } from 'framer-motion';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Car, Heart, Loader2, ChevronLeft, ChevronRight } from 'lucide-react';
+import { VehicleCard } from '@/components/marketplace/VehicleCard';
+import { VehicleDetailsModal } from '@/components/marketplace/VehicleDetailsModal';
+import { MarketplaceFilters, MarketplaceFilterValues, defaultMarketplaceFilters } from '@/components/marketplace/MarketplaceFilters';
+import { useFavorites } from '@/hooks/useFavorites';
 
 interface Vehicle {
   id: string;
+  dealer_id: string;
   make: string;
   model: string;
   year: number;
@@ -31,25 +27,27 @@ interface Vehicle {
   price: number;
   negotiable: boolean;
   photos: string[] | null;
+  created_at: string;
 }
 
-export default function Marketplace() {
-  const [vehicles, setVehicles] = useState<Vehicle[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [showFilters, setShowFilters] = useState(false);
-  const [galleryOpen, setGalleryOpen] = useState(false);
-  const [galleryPhotos, setGalleryPhotos] = useState<string[]>([]);
-  const [galleryIndex, setGalleryIndex] = useState(0);
+interface VehicleWithDealer extends Vehicle {
+  dealer_name?: string;
+  dealer_email?: string;
+}
 
-  const [filters, setFilters] = useState({
-    search: '',
-    make: '',
-    model: '',
-    minPrice: '',
-    maxPrice: '',
-    condition: '',
-    fuelType: '',
-  });
+const ITEMS_PER_PAGE = 12;
+
+export default function Marketplace() {
+  const { user } = useAuth();
+  const [vehicles, setVehicles] = useState<VehicleWithDealer[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [activeTab, setActiveTab] = useState<'all' | 'favorites'>('all');
+  const [selectedVehicle, setSelectedVehicle] = useState<VehicleWithDealer | null>(null);
+  const [detailsOpen, setDetailsOpen] = useState(false);
+  const [filters, setFilters] = useState<MarketplaceFilterValues>(defaultMarketplaceFilters);
+
+  const { favorites, toggleFavorite, isFavorite } = useFavorites();
 
   useEffect(() => {
     fetchVehicles();
@@ -57,14 +55,51 @@ export default function Marketplace() {
 
   const fetchVehicles = async () => {
     try {
-      const { data, error } = await supabase
+      setLoading(true);
+      
+      // Fetch vehicles with verified dealers (dealers/importers with approved status)
+      const { data: verifiedDealers, error: dealersError } = await supabase
+        .from('user_roles')
+        .select('user_id, role')
+        .in('role', ['dealer', 'importer'])
+        .eq('status', 'approved');
+
+      if (dealersError) throw dealersError;
+
+      const verifiedDealerIds = verifiedDealers?.map(d => d.user_id) || [];
+
+      if (verifiedDealerIds.length === 0) {
+        setVehicles([]);
+        return;
+      }
+
+      // Fetch vehicles from verified dealers only
+      const { data: vehiclesData, error: vehiclesError } = await supabase
         .from('vehicles')
         .select('*')
         .eq('is_sold', false)
+        .in('dealer_id', verifiedDealerIds)
         .order('created_at', { ascending: false });
 
-      if (error) throw error;
-      setVehicles(data || []);
+      if (vehiclesError) throw vehiclesError;
+
+      // Fetch dealer profiles for contact info
+      const { data: profiles, error: profilesError } = await supabase
+        .from('profiles')
+        .select('id, full_name, email')
+        .in('id', verifiedDealerIds);
+
+      if (profilesError) throw profilesError;
+
+      const profilesMap = new Map(profiles?.map(p => [p.id, p]) || []);
+
+      const vehiclesWithDealers: VehicleWithDealer[] = (vehiclesData || []).map(v => ({
+        ...v,
+        dealer_name: profilesMap.get(v.dealer_id)?.full_name || 'Dealer',
+        dealer_email: profilesMap.get(v.dealer_id)?.email,
+      }));
+
+      setVehicles(vehiclesWithDealers);
     } catch (error) {
       console.error('Error fetching vehicles:', error);
     } finally {
@@ -72,78 +107,90 @@ export default function Marketplace() {
     }
   };
 
-  const makes = useMemo(() => [...new Set(vehicles.map((v) => v.make))].sort(), [vehicles]);
+  // Extract unique makes and models for filters
+  const makes = useMemo(() => [...new Set(vehicles.map(v => v.make))].sort(), [vehicles]);
   const models = useMemo(() => {
     if (filters.make) {
-      return [...new Set(vehicles.filter((v) => v.make === filters.make).map((v) => v.model))].sort();
+      return [...new Set(vehicles.filter(v => v.make === filters.make).map(v => v.model))].sort();
     }
-    return [...new Set(vehicles.map((v) => v.model))].sort();
+    return [...new Set(vehicles.map(v => v.model))].sort();
   }, [vehicles, filters.make]);
 
+  // Filter and sort vehicles
   const filteredVehicles = useMemo(() => {
-    return vehicles.filter((vehicle) => {
+    let result = vehicles;
+
+    // Apply tab filter
+    if (activeTab === 'favorites') {
+      result = result.filter(v => favorites.has(v.id));
+    }
+
+    // Apply search
+    if (filters.search) {
       const searchLower = filters.search.toLowerCase();
-      const matchesSearch =
-        !filters.search ||
-        vehicle.make.toLowerCase().includes(searchLower) ||
-        vehicle.model.toLowerCase().includes(searchLower) ||
-        vehicle.year.toString().includes(searchLower);
-      
-      const matchesMake = !filters.make || vehicle.make === filters.make;
-      const matchesModel = !filters.model || vehicle.model === filters.model;
-      const matchesCondition = !filters.condition || vehicle.condition === filters.condition;
-      const matchesFuelType = !filters.fuelType || vehicle.fuel_type === filters.fuelType;
-      const matchesMinPrice = !filters.minPrice || vehicle.price >= parseFloat(filters.minPrice);
-      const matchesMaxPrice = !filters.maxPrice || vehicle.price <= parseFloat(filters.maxPrice);
+      result = result.filter(v =>
+        v.make.toLowerCase().includes(searchLower) ||
+        v.model.toLowerCase().includes(searchLower) ||
+        v.year.toString().includes(searchLower)
+      );
+    }
 
-      return matchesSearch && matchesMake && matchesModel && matchesCondition && matchesFuelType && matchesMinPrice && matchesMaxPrice;
-    });
-  }, [vehicles, filters]);
+    // Apply filters
+    if (filters.make) {
+      result = result.filter(v => v.make === filters.make);
+    }
+    if (filters.model) {
+      result = result.filter(v => v.model === filters.model);
+    }
+    if (filters.condition) {
+      result = result.filter(v => v.condition === filters.condition);
+    }
+    if (filters.fuelType) {
+      result = result.filter(v => v.fuel_type === filters.fuelType);
+    }
+    if (filters.minPrice) {
+      result = result.filter(v => v.price >= parseFloat(filters.minPrice));
+    }
+    if (filters.maxPrice) {
+      result = result.filter(v => v.price <= parseFloat(filters.maxPrice));
+    }
 
-  const activeFilterCount = useMemo(() => {
-    let count = 0;
-    if (filters.make) count++;
-    if (filters.model) count++;
-    if (filters.minPrice) count++;
-    if (filters.maxPrice) count++;
-    if (filters.condition) count++;
-    if (filters.fuelType) count++;
-    return count;
-  }, [filters]);
+    // Apply sorting
+    switch (filters.sortBy) {
+      case 'price_asc':
+        result = [...result].sort((a, b) => a.price - b.price);
+        break;
+      case 'price_desc':
+        result = [...result].sort((a, b) => b.price - a.price);
+        break;
+      case 'mileage':
+        result = [...result].sort((a, b) => (a.mileage || 0) - (b.mileage || 0));
+        break;
+      case 'newest':
+      default:
+        result = [...result].sort((a, b) => 
+          new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
+        );
+    }
 
-  const clearFilters = () => {
-    setFilters({
-      search: '',
-      make: '',
-      model: '',
-      minPrice: '',
-      maxPrice: '',
-      condition: '',
-      fuelType: '',
-    });
-  };
+    return result;
+  }, [vehicles, filters, activeTab, favorites]);
 
-  const openGallery = (photos: string[], startIndex = 0) => {
-    setGalleryPhotos(photos);
-    setGalleryIndex(startIndex);
-    setGalleryOpen(true);
-  };
+  // Pagination
+  const totalPages = Math.ceil(filteredVehicles.length / ITEMS_PER_PAGE);
+  const paginatedVehicles = useMemo(() => {
+    const start = (currentPage - 1) * ITEMS_PER_PAGE;
+    return filteredVehicles.slice(start, start + ITEMS_PER_PAGE);
+  }, [filteredVehicles, currentPage]);
 
-  const formatPrice = (price: number) => {
-    return new Intl.NumberFormat('en-US', {
-      style: 'currency',
-      currency: 'USD',
-      maximumFractionDigits: 0,
-    }).format(price);
-  };
+  // Reset page when filters change
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [filters, activeTab]);
 
-  const getConditionLabel = (condition: string) => {
-    const labels: Record<string, string> = {
-      new: 'New',
-      used: 'Used',
-      certified_pre_owned: 'Certified Pre-Owned',
-    };
-    return labels[condition] || condition;
+  const handleViewDetails = (vehicle: VehicleWithDealer) => {
+    setSelectedVehicle(vehicle);
+    setDetailsOpen(true);
   };
 
   return (
@@ -157,236 +204,134 @@ export default function Marketplace() {
             Vehicle Marketplace
           </h1>
           <p className="text-sm sm:text-base text-muted-foreground mt-1 sm:mt-2">
-            Browse {filteredVehicles.length} available vehicles from trusted dealers
+            Browse vehicles from verified dealers and importers
           </p>
         </div>
 
-        {/* Search and Filters */}
-        <div className="space-y-3 mb-6 sm:mb-8">
-          <div className="flex flex-col sm:flex-row gap-2 sm:gap-3">
-            <div className="relative flex-1">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-              <Input
-                placeholder="Search by make, model, or year..."
-                value={filters.search}
-                onChange={(e) => setFilters({ ...filters, search: e.target.value })}
-                className="pl-9 bg-card/50 h-11 sm:h-12"
-              />
-            </div>
-            <Button
-              variant="outline"
-              onClick={() => setShowFilters(!showFilters)}
-              className="h-11 sm:h-12 gap-2"
-            >
-              <Filter className="h-4 w-4" />
-              Filters
-              {activeFilterCount > 0 && (
-                <Badge variant="secondary" className="h-5 px-1.5 text-xs">
-                  {activeFilterCount}
-                </Badge>
-              )}
-              {showFilters ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
-            </Button>
-          </div>
+        {/* Tabs for All/Favorites */}
+        {user && (
+          <Tabs value={activeTab} onValueChange={(v) => setActiveTab(v as 'all' | 'favorites')} className="mb-4">
+            <TabsList className="bg-card/50">
+              <TabsTrigger value="all" className="gap-2">
+                <Car className="h-4 w-4" />
+                All Vehicles
+              </TabsTrigger>
+              <TabsTrigger value="favorites" className="gap-2">
+                <Heart className="h-4 w-4" />
+                Favorites ({favorites.size})
+              </TabsTrigger>
+            </TabsList>
+          </Tabs>
+        )}
 
-          <AnimatePresence>
-            {showFilters && (
-              <motion.div
-                initial={{ height: 0, opacity: 0 }}
-                animate={{ height: 'auto', opacity: 1 }}
-                exit={{ height: 0, opacity: 0 }}
-                transition={{ duration: 0.2 }}
-                className="overflow-hidden"
-              >
-                <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-2 sm:gap-3 p-4 bg-card/50 rounded-xl border border-border/50">
-                  <Select value={filters.make} onValueChange={(v) => setFilters({ ...filters, make: v, model: '' })}>
-                    <SelectTrigger className="bg-background/50">
-                      <SelectValue placeholder="Make" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="">All Makes</SelectItem>
-                      {makes.map((make) => (
-                        <SelectItem key={make} value={make}>{make}</SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-
-                  <Select value={filters.model} onValueChange={(v) => setFilters({ ...filters, model: v })}>
-                    <SelectTrigger className="bg-background/50">
-                      <SelectValue placeholder="Model" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="">All Models</SelectItem>
-                      {models.map((model) => (
-                        <SelectItem key={model} value={model}>{model}</SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-
-                  <Select value={filters.condition} onValueChange={(v) => setFilters({ ...filters, condition: v })}>
-                    <SelectTrigger className="bg-background/50">
-                      <SelectValue placeholder="Condition" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="">All Conditions</SelectItem>
-                      <SelectItem value="new">New</SelectItem>
-                      <SelectItem value="used">Used</SelectItem>
-                      <SelectItem value="certified_pre_owned">Certified Pre-Owned</SelectItem>
-                    </SelectContent>
-                  </Select>
-
-                  <Select value={filters.fuelType} onValueChange={(v) => setFilters({ ...filters, fuelType: v })}>
-                    <SelectTrigger className="bg-background/50">
-                      <SelectValue placeholder="Fuel Type" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="">All Fuel Types</SelectItem>
-                      <SelectItem value="petrol">Petrol</SelectItem>
-                      <SelectItem value="diesel">Diesel</SelectItem>
-                      <SelectItem value="electric">Electric</SelectItem>
-                      <SelectItem value="hybrid">Hybrid</SelectItem>
-                      <SelectItem value="plug_in_hybrid">Plug-in Hybrid</SelectItem>
-                    </SelectContent>
-                  </Select>
-
-                  <Input
-                    type="number"
-                    placeholder="Min Price"
-                    value={filters.minPrice}
-                    onChange={(e) => setFilters({ ...filters, minPrice: e.target.value })}
-                    className="bg-background/50"
-                  />
-
-                  <Input
-                    type="number"
-                    placeholder="Max Price"
-                    value={filters.maxPrice}
-                    onChange={(e) => setFilters({ ...filters, maxPrice: e.target.value })}
-                    className="bg-background/50"
-                  />
-                </div>
-
-                {activeFilterCount > 0 && (
-                  <div className="flex justify-end mt-2">
-                    <Button variant="ghost" size="sm" onClick={clearFilters} className="text-muted-foreground">
-                      <X className="h-3 w-3 mr-1" />
-                      Clear all filters
-                    </Button>
-                  </div>
-                )}
-              </motion.div>
-            )}
-          </AnimatePresence>
-        </div>
+        {/* Filters */}
+        <MarketplaceFilters
+          filters={filters}
+          onFiltersChange={setFilters}
+          makes={makes}
+          models={models}
+          totalCount={filteredVehicles.length}
+        />
 
         {/* Vehicle Grid */}
         {loading ? (
           <div className="flex items-center justify-center py-20">
             <Loader2 className="h-8 w-8 animate-spin text-primary" />
           </div>
-        ) : filteredVehicles.length === 0 ? (
+        ) : paginatedVehicles.length === 0 ? (
           <Card className="p-12 bg-card/30 border-border/30 text-center">
-            <Car className="h-16 w-16 mx-auto text-muted-foreground/40 mb-4" />
-            <p className="text-lg font-medium text-foreground">No vehicles found</p>
-            <p className="text-sm text-muted-foreground mt-1">
-              {activeFilterCount > 0 ? 'Try adjusting your filters' : 'Check back later for new listings'}
-            </p>
+            {activeTab === 'favorites' ? (
+              <>
+                <Heart className="h-16 w-16 mx-auto text-muted-foreground/40 mb-4" />
+                <p className="text-lg font-medium text-foreground">No favorites yet</p>
+                <p className="text-sm text-muted-foreground mt-1">
+                  Click the heart icon on vehicles to save them here
+                </p>
+              </>
+            ) : (
+              <>
+                <Car className="h-16 w-16 mx-auto text-muted-foreground/40 mb-4" />
+                <p className="text-lg font-medium text-foreground">No vehicles found</p>
+                <p className="text-sm text-muted-foreground mt-1">
+                  Try adjusting your filters or check back later
+                </p>
+              </>
+            )}
           </Card>
         ) : (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6">
-            {filteredVehicles.map((vehicle) => (
-              <motion.div
-                key={vehicle.id}
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.3 }}
-              >
-                <Card className="overflow-hidden bg-card/50 border-border/30 hover:border-primary/30 hover:shadow-[0_0_30px_hsl(var(--primary)/0.15)] transition-all duration-300 group">
-                  {/* Image */}
-                  <div
-                    className="h-44 sm:h-52 bg-gradient-to-br from-muted/30 to-muted/10 relative overflow-hidden cursor-pointer"
-                    onClick={() => vehicle.photos && vehicle.photos.length > 0 && openGallery(vehicle.photos)}
-                  >
-                    {vehicle.photos && vehicle.photos.length > 0 ? (
-                      <img
-                        src={vehicle.photos[0]}
-                        alt={`${vehicle.make} ${vehicle.model}`}
-                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                        onError={(e) => {
-                          (e.target as HTMLImageElement).src = '/placeholder.svg';
-                        }}
-                      />
-                    ) : (
-                      <div className="w-full h-full flex items-center justify-center">
-                        <Car className="h-16 w-16 text-muted-foreground/30" />
-                      </div>
-                    )}
-                    {vehicle.photos && vehicle.photos.length > 1 && (
-                      <Badge className="absolute bottom-2 left-2 bg-background/80 text-foreground text-xs">
-                        +{vehicle.photos.length - 1} photos
-                      </Badge>
-                    )}
-                    <Badge variant="outline" className="absolute top-2 right-2 bg-background/80 text-xs">
-                      {getConditionLabel(vehicle.condition)}
-                    </Badge>
-                  </div>
+          <>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6">
+              {paginatedVehicles.map((vehicle) => (
+                <VehicleCard
+                  key={vehicle.id}
+                  vehicle={vehicle}
+                  isFavorite={isFavorite(vehicle.id)}
+                  onToggleFavorite={() => toggleFavorite(vehicle.id)}
+                  onViewDetails={() => handleViewDetails(vehicle)}
+                  isLoggedIn={!!user}
+                />
+              ))}
+            </div>
 
-                  {/* Content */}
-                  <div className="p-4 space-y-3">
-                    <div>
-                      <h3 className="font-semibold text-lg text-foreground truncate">
-                        {vehicle.year} {vehicle.make} {vehicle.model}
-                      </h3>
-                    </div>
-
-                    <div className="grid grid-cols-2 gap-2 text-xs text-muted-foreground">
-                      <div className="flex items-center gap-1.5">
-                        <Fuel className="h-3.5 w-3.5" />
-                        <span className="capitalize truncate">{vehicle.fuel_type.replace('_', ' ')}</span>
-                      </div>
-                      <div className="flex items-center gap-1.5">
-                        <Settings className="h-3.5 w-3.5" />
-                        <span className="capitalize truncate">{vehicle.transmission}</span>
-                      </div>
-                      {vehicle.mileage && (
-                        <div className="flex items-center gap-1.5">
-                          <Gauge className="h-3.5 w-3.5" />
-                          <span>{vehicle.mileage.toLocaleString()} km</span>
-                        </div>
-                      )}
-                      {vehicle.color && (
-                        <div className="flex items-center gap-1.5">
-                          <Palette className="h-3.5 w-3.5" />
-                          <span className="capitalize truncate">{vehicle.color}</span>
-                        </div>
-                      )}
-                    </div>
-
-                    <div className="flex items-center justify-between pt-3 border-t border-border/30">
-                      <div>
-                        <p className="text-xl font-bold text-primary">{formatPrice(vehicle.price)}</p>
-                        {vehicle.negotiable && (
-                          <p className="text-xs text-muted-foreground">Negotiable</p>
-                        )}
-                      </div>
-                      <Button size="sm" className="bg-primary hover:bg-primary/90">
-                        <DollarSign className="h-4 w-4 mr-1" />
-                        Contact
+            {/* Pagination */}
+            {totalPages > 1 && (
+              <div className="flex items-center justify-center gap-2 mt-8">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
+                  disabled={currentPage === 1}
+                >
+                  <ChevronLeft className="h-4 w-4" />
+                  Previous
+                </Button>
+                
+                <div className="flex items-center gap-1">
+                  {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
+                    let pageNum: number;
+                    if (totalPages <= 5) {
+                      pageNum = i + 1;
+                    } else if (currentPage <= 3) {
+                      pageNum = i + 1;
+                    } else if (currentPage >= totalPages - 2) {
+                      pageNum = totalPages - 4 + i;
+                    } else {
+                      pageNum = currentPage - 2 + i;
+                    }
+                    
+                    return (
+                      <Button
+                        key={pageNum}
+                        variant={currentPage === pageNum ? "default" : "outline"}
+                        size="sm"
+                        className="w-10"
+                        onClick={() => setCurrentPage(pageNum)}
+                      >
+                        {pageNum}
                       </Button>
-                    </div>
-                  </div>
-                </Card>
-              </motion.div>
-            ))}
-          </div>
+                    );
+                  })}
+                </div>
+                
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
+                  disabled={currentPage === totalPages}
+                >
+                  Next
+                  <ChevronRight className="h-4 w-4" />
+                </Button>
+              </div>
+            )}
+          </>
         )}
       </main>
 
-      <PhotoGallery
-        photos={galleryPhotos}
-        initialIndex={galleryIndex}
-        open={galleryOpen}
-        onOpenChange={setGalleryOpen}
+      <VehicleDetailsModal
+        vehicle={selectedVehicle}
+        open={detailsOpen}
+        onOpenChange={setDetailsOpen}
       />
     </div>
   );
