@@ -4,12 +4,18 @@ import { useAuth } from '@/contexts/AuthContext';
 import { Navigation } from '@/components/Navigation';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Car, Heart, Loader2, ChevronLeft, ChevronRight } from 'lucide-react';
+import { Car, Heart, Loader2, ChevronLeft, ChevronRight, GitCompare } from 'lucide-react';
 import { VehicleCard } from '@/components/marketplace/VehicleCard';
 import { VehicleDetailsModal } from '@/components/marketplace/VehicleDetailsModal';
 import { MarketplaceFilters, MarketplaceFilterValues, defaultMarketplaceFilters } from '@/components/marketplace/MarketplaceFilters';
+import { ContactRequestForm } from '@/components/marketplace/ContactRequestForm';
+import { VehicleComparisonModal } from '@/components/marketplace/VehicleComparisonModal';
+import { RecentlyViewedSection } from '@/components/marketplace/RecentlyViewedSection';
 import { useFavorites } from '@/hooks/useFavorites';
+import { useRecentlyViewed } from '@/hooks/useRecentlyViewed';
+import { useVehicleComparison } from '@/hooks/useVehicleComparison';
 
 interface Vehicle {
   id: string;
@@ -45,9 +51,13 @@ export default function Marketplace() {
   const [activeTab, setActiveTab] = useState<'all' | 'favorites'>('all');
   const [selectedVehicle, setSelectedVehicle] = useState<VehicleWithDealer | null>(null);
   const [detailsOpen, setDetailsOpen] = useState(false);
+  const [contactFormOpen, setContactFormOpen] = useState(false);
+  const [comparisonOpen, setComparisonOpen] = useState(false);
   const [filters, setFilters] = useState<MarketplaceFilterValues>(defaultMarketplaceFilters);
 
   const { favorites, toggleFavorite, isFavorite } = useFavorites();
+  const { recentlyViewed, addToRecentlyViewed, clearRecentlyViewed } = useRecentlyViewed();
+  const { compareList, addToCompare, removeFromCompare, clearCompare, isInCompare, canAddMore } = useVehicleComparison();
 
   useEffect(() => {
     fetchVehicles();
@@ -176,6 +186,11 @@ export default function Marketplace() {
     return result;
   }, [vehicles, filters, activeTab, favorites]);
 
+  // Get vehicles for comparison
+  const vehiclesForComparison = useMemo(() => {
+    return vehicles.filter(v => compareList.includes(v.id));
+  }, [vehicles, compareList]);
+
   // Pagination
   const totalPages = Math.ceil(filteredVehicles.length / ITEMS_PER_PAGE);
   const paginatedVehicles = useMemo(() => {
@@ -191,6 +206,19 @@ export default function Marketplace() {
   const handleViewDetails = (vehicle: VehicleWithDealer) => {
     setSelectedVehicle(vehicle);
     setDetailsOpen(true);
+    addToRecentlyViewed(vehicle.id);
+  };
+
+  const handleRequestContact = () => {
+    setDetailsOpen(false);
+    setContactFormOpen(true);
+  };
+
+  const handleRecentlyViewedClick = (vehicle: { id: string; make: string; model: string; year: number; price: number; photos: string[] | null }) => {
+    const fullVehicle = vehicles.find(v => v.id === vehicle.id);
+    if (fullVehicle) {
+      handleViewDetails(fullVehicle);
+    }
   };
 
   return (
@@ -208,21 +236,44 @@ export default function Marketplace() {
           </p>
         </div>
 
-        {/* Tabs for All/Favorites */}
-        {user && (
-          <Tabs value={activeTab} onValueChange={(v) => setActiveTab(v as 'all' | 'favorites')} className="mb-4">
-            <TabsList className="bg-card/50">
-              <TabsTrigger value="all" className="gap-2">
-                <Car className="h-4 w-4" />
-                All Vehicles
-              </TabsTrigger>
-              <TabsTrigger value="favorites" className="gap-2">
-                <Heart className="h-4 w-4" />
-                Favorites ({favorites.size})
-              </TabsTrigger>
-            </TabsList>
-          </Tabs>
-        )}
+        {/* Recently Viewed Section */}
+        <RecentlyViewedSection
+          recentlyViewedIds={recentlyViewed}
+          onClear={clearRecentlyViewed}
+          onViewDetails={handleRecentlyViewedClick}
+        />
+
+        {/* Tabs and Compare Button */}
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-4">
+          {user && (
+            <Tabs value={activeTab} onValueChange={(v) => setActiveTab(v as 'all' | 'favorites')}>
+              <TabsList className="bg-card/50">
+                <TabsTrigger value="all" className="gap-2">
+                  <Car className="h-4 w-4" />
+                  All Vehicles
+                </TabsTrigger>
+                <TabsTrigger value="favorites" className="gap-2">
+                  <Heart className="h-4 w-4" />
+                  Favorites ({favorites.size})
+                </TabsTrigger>
+              </TabsList>
+            </Tabs>
+          )}
+          
+          {compareList.length > 0 && (
+            <Button 
+              onClick={() => setComparisonOpen(true)}
+              className="gap-2"
+              variant="outline"
+            >
+              <GitCompare className="h-4 w-4" />
+              Compare
+              <Badge variant="secondary" className="ml-1">
+                {compareList.length}
+              </Badge>
+            </Button>
+          )}
+        </div>
 
         {/* Filters */}
         <MarketplaceFilters
@@ -269,6 +320,9 @@ export default function Marketplace() {
                   onToggleFavorite={() => toggleFavorite(vehicle.id)}
                   onViewDetails={() => handleViewDetails(vehicle)}
                   isLoggedIn={!!user}
+                  isInCompare={isInCompare(vehicle.id)}
+                  onToggleCompare={() => addToCompare(vehicle.id)}
+                  canAddToCompare={canAddMore}
                 />
               ))}
             </div>
@@ -328,10 +382,25 @@ export default function Marketplace() {
         )}
       </main>
 
+      {/* Modals */}
       <VehicleDetailsModal
         vehicle={selectedVehicle}
         open={detailsOpen}
         onOpenChange={setDetailsOpen}
+        onRequestContact={handleRequestContact}
+      />
+
+      <ContactRequestForm
+        open={contactFormOpen}
+        onOpenChange={setContactFormOpen}
+        vehicle={selectedVehicle}
+      />
+
+      <VehicleComparisonModal
+        open={comparisonOpen}
+        onOpenChange={setComparisonOpen}
+        vehicles={vehiclesForComparison}
+        onRemove={removeFromCompare}
       />
     </div>
   );

@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
-import { supabase } from '@/lib/supabase';
+import { supabase } from '@/integrations/supabase/client';
 import { useNavigate } from 'react-router-dom';
 import { Navigation } from '@/components/Navigation';
 import { Button } from '@/components/ui/button';
@@ -278,7 +278,7 @@ export default function AdminDashboard() {
         .select('id, email, full_name')
         .in('id', userIds);
 
-      const profileMap = new Map(profiles?.map(p => [p.id, p]));
+      const profileMap = new Map<string, { id: string; email: string; full_name: string | null }>(profiles?.map(p => [p.id, p]));
 
       return (data || []).map((u) => ({
         ...u,

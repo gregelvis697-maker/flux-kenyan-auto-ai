@@ -4,10 +4,11 @@ import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
 import { 
   Car, Fuel, Settings, Gauge, Palette, Calendar, 
-  DollarSign, Phone, Mail, ChevronLeft, ChevronRight, X 
+  DollarSign, Phone, Mail, ChevronLeft, ChevronRight 
 } from 'lucide-react';
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { useAuth } from '@/contexts/AuthContext';
 
 interface VehicleDetails {
   id: string;
@@ -33,10 +34,12 @@ interface VehicleDetailsModalProps {
   vehicle: VehicleDetails | null;
   open: boolean;
   onOpenChange: (open: boolean) => void;
+  onRequestContact?: () => void;
 }
 
-export function VehicleDetailsModal({ vehicle, open, onOpenChange }: VehicleDetailsModalProps) {
+export function VehicleDetailsModal({ vehicle, open, onOpenChange, onRequestContact }: VehicleDetailsModalProps) {
   const [currentPhotoIndex, setCurrentPhotoIndex] = useState(0);
+  const { user } = useAuth();
 
   if (!vehicle) return null;
 
@@ -223,10 +226,25 @@ export function VehicleDetailsModal({ vehicle, open, onOpenChange }: VehicleDeta
                   {vehicle.dealer_email}
                 </Button>
               )}
-              <Button className="flex-1 gap-2 bg-primary hover:bg-primary/90">
-                <Phone className="h-4 w-4" />
-                Request Contact
-              </Button>
+              {user && onRequestContact && (
+                <Button 
+                  className="flex-1 gap-2 bg-primary hover:bg-primary/90"
+                  onClick={onRequestContact}
+                >
+                  <Phone className="h-4 w-4" />
+                  Request Contact
+                </Button>
+              )}
+              {!user && (
+                <Button 
+                  variant="outline"
+                  className="flex-1 gap-2"
+                  onClick={() => window.location.href = '/auth'}
+                >
+                  <Phone className="h-4 w-4" />
+                  Login to Contact
+                </Button>
+              )}
             </div>
           </div>
         </div>

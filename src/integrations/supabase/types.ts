@@ -59,6 +59,50 @@ export type Database = {
           },
         ]
       }
+      contact_requests: {
+        Row: {
+          buyer_email: string
+          buyer_id: string
+          buyer_name: string
+          buyer_phone: string | null
+          created_at: string
+          id: string
+          message: string
+          read_at: string | null
+          vehicle_id: string
+        }
+        Insert: {
+          buyer_email: string
+          buyer_id: string
+          buyer_name: string
+          buyer_phone?: string | null
+          created_at?: string
+          id?: string
+          message: string
+          read_at?: string | null
+          vehicle_id: string
+        }
+        Update: {
+          buyer_email?: string
+          buyer_id?: string
+          buyer_name?: string
+          buyer_phone?: string | null
+          created_at?: string
+          id?: string
+          message?: string
+          read_at?: string | null
+          vehicle_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "contact_requests_vehicle_id_fkey"
+            columns: ["vehicle_id"]
+            isOneToOne: false
+            referencedRelation: "vehicles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       dealer_import_requests: {
         Row: {
           accepted_at: string | null

@@ -1,7 +1,7 @@
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Car, Fuel, Settings, Gauge, Palette, Heart, DollarSign } from 'lucide-react';
+import { Car, Fuel, Settings, Gauge, Palette, Heart, DollarSign, GitCompare } from 'lucide-react';
 import { motion } from 'framer-motion';
 
 interface VehicleCardProps {
@@ -23,6 +23,9 @@ interface VehicleCardProps {
   onToggleFavorite: () => void;
   onViewDetails: () => void;
   isLoggedIn: boolean;
+  isInCompare?: boolean;
+  onToggleCompare?: () => void;
+  canAddToCompare?: boolean;
 }
 
 export function VehicleCard({ 
@@ -30,7 +33,10 @@ export function VehicleCard({
   isFavorite, 
   onToggleFavorite, 
   onViewDetails,
-  isLoggedIn 
+  isLoggedIn,
+  isInCompare = false,
+  onToggleCompare,
+  canAddToCompare = true,
 }: VehicleCardProps) {
   const formatPrice = (price: number) => {
     return new Intl.NumberFormat('en-US', {
@@ -86,22 +92,41 @@ export function VehicleCard({
             {getConditionLabel(vehicle.condition)}
           </Badge>
           
-          {/* Favorite Button */}
-          {isLoggedIn && (
-            <Button
-              variant="ghost"
-              size="icon"
-              className={`absolute top-2 left-2 h-8 w-8 rounded-full bg-background/80 hover:bg-background ${
-                isFavorite ? 'text-red-500' : 'text-muted-foreground'
-              }`}
-              onClick={(e) => {
-                e.stopPropagation();
-                onToggleFavorite();
-              }}
-            >
-              <Heart className={`h-4 w-4 ${isFavorite ? 'fill-current' : ''}`} />
-            </Button>
-          )}
+          {/* Action Buttons */}
+          <div className="absolute top-2 left-2 flex gap-1">
+            {isLoggedIn && (
+              <Button
+                variant="ghost"
+                size="icon"
+                className={`h-8 w-8 rounded-full bg-background/80 hover:bg-background ${
+                  isFavorite ? 'text-red-500' : 'text-muted-foreground'
+                }`}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onToggleFavorite();
+                }}
+              >
+                <Heart className={`h-4 w-4 ${isFavorite ? 'fill-current' : ''}`} />
+              </Button>
+            )}
+            {onToggleCompare && (
+              <Button
+                variant="ghost"
+                size="icon"
+                className={`h-8 w-8 rounded-full bg-background/80 hover:bg-background ${
+                  isInCompare ? 'text-primary' : 'text-muted-foreground'
+                } ${!canAddToCompare && !isInCompare ? 'opacity-50' : ''}`}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onToggleCompare();
+                }}
+                disabled={!canAddToCompare && !isInCompare}
+                title={isInCompare ? 'Remove from comparison' : 'Add to comparison'}
+              >
+                <GitCompare className={`h-4 w-4 ${isInCompare ? 'fill-current' : ''}`} />
+              </Button>
+            )}
+          </div>
         </div>
 
         {/* Content */}
