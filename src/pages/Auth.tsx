@@ -34,10 +34,18 @@ const Auth = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    if (user && approvalStatus === 'pending') {
-      navigate('/pending-approval', { replace: true });
-    } else if (user && userRole && approvalStatus === 'approved') {
-      navigate(`/dashboard/${userRole}`, { replace: true });
+    if (user && userRole && approvalStatus) {
+      if (approvalStatus === 'pending') {
+        navigate('/pending-approval', { replace: true });
+      } else if (approvalStatus === 'approved') {
+        if (userRole === 'admin') {
+          navigate('/admin/dashboard', { replace: true });
+        } else if (userRole === 'buyer') {
+          navigate('/marketplace', { replace: true });
+        } else {
+          navigate(`/dashboard/${userRole}`, { replace: true });
+        }
+      }
     }
   }, [user, userRole, approvalStatus, navigate]);
 

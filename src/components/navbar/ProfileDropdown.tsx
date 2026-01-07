@@ -23,7 +23,9 @@ export const ProfileDropdown = () => {
   };
 
   const getRoleDashboard = () => {
-    if (!userRole) return "/dashboard/buyer";
+    if (!userRole) return "/marketplace";
+    if (userRole === 'admin') return "/admin/dashboard";
+    if (userRole === 'buyer') return "/marketplace";
     return `/dashboard/${userRole}`;
   };
 
