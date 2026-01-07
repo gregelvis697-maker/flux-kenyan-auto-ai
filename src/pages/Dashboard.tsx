@@ -1,13 +1,29 @@
-import React from 'react';
+import React, { useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Navigation } from '@/components/Navigation';
 import { Button } from '@/components/ui/button';
 import { Link } from 'react-router-dom';
-import { BarChart3 } from 'lucide-react';
+import { BarChart3, Car, ShoppingBag } from 'lucide-react';
 
 const Dashboard = () => {
-  const { userRole } = useAuth();
+  const { userRole, approvalStatus, loading } = useAuth();
+  const navigate = useNavigate();
+
+  // Redirect to proper dashboard based on role
+  useEffect(() => {
+    if (!loading && userRole && approvalStatus === 'approved') {
+      if (userRole === 'admin') {
+        navigate('/admin/dashboard', { replace: true });
+      } else if (userRole === 'dealer') {
+        navigate('/dashboard/dealer', { replace: true });
+      } else if (userRole === 'importer') {
+        navigate('/dashboard/importer', { replace: true });
+      }
+      // Buyers stay on this page or go to marketplace
+    }
+  }, [userRole, approvalStatus, loading, navigate]);
 
   const getRoleInfo = () => {
     switch (userRole) {
@@ -71,6 +87,17 @@ const Dashboard = () => {
                       <Link to="/admin/dashboard">
                         <BarChart3 className="h-5 w-5" />
                         Admin Dashboard
+                      </Link>
+                    </Button>
+                  </div>
+                )}
+
+                {userRole === 'buyer' && (
+                  <div className="mb-6">
+                    <Button asChild size="lg" className="w-full sm:w-auto gap-2">
+                      <Link to="/marketplace">
+                        <Car className="h-5 w-5" />
+                        Browse Marketplace
                       </Link>
                     </Button>
                   </div>

@@ -35,6 +35,12 @@ export const ProtectedRoute = ({ children, allowedRoles }: ProtectedRouteProps) 
   }
 
   if (allowedRoles && userRole && !allowedRoles.includes(userRole)) {
+    // Redirect to appropriate dashboard based on role
+    if (userRole === 'admin') {
+      return <Navigate to="/admin/dashboard" replace />;
+    } else if (userRole === 'buyer') {
+      return <Navigate to="/marketplace" replace />;
+    }
     return <Navigate to={`/dashboard/${userRole}`} replace />;
   }
 
