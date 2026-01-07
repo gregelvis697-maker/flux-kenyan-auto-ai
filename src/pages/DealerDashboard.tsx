@@ -4,11 +4,12 @@ import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Package, TrendingUp, Car, FileText, Truck, LayoutGrid } from 'lucide-react';
+import { Package, TrendingUp, Car, FileText, Truck, LayoutGrid, MessageSquare } from 'lucide-react';
 import { Navigation } from '@/components/Navigation';
 import { ImportRequestsTab } from '@/components/dealer/ImportRequestsTab';
 import { MyImportsTab } from '@/components/dealer/MyImportsTab';
 import { InventoryTab } from '@/components/dealer/InventoryTab';
+import { ContactRequestsTab } from '@/components/dealer/ContactRequestsTab';
 
 export default function DealerDashboard() {
   const { user, userRole, approvalStatus, loading } = useAuth();
@@ -80,7 +81,7 @@ export default function DealerDashboard() {
   return (
     <div className="min-h-screen bg-background">
       <Navigation />
-      <div className="py-4 sm:py-6 lg:py-8 px-3 sm:px-4 lg:px-6">
+        <div className="pt-20 sm:pt-24 pb-4 sm:pb-6 lg:pb-8 px-3 sm:px-4 lg:px-6">
         <div className="max-w-7xl mx-auto space-y-4 sm:space-y-6 lg:space-y-8">
           {/* Header */}
           <div className="space-y-1 sm:space-y-2">
@@ -166,6 +167,13 @@ export default function DealerDashboard() {
                     <LayoutGrid className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
                     Inventory
                   </TabsTrigger>
+                  <TabsTrigger 
+                    value="contacts" 
+                    className="flex-1 sm:flex-none data-[state=active]:bg-primary data-[state=active]:text-primary-foreground text-xs sm:text-sm py-2 px-3 sm:px-4 gap-1.5 sm:gap-2"
+                  >
+                    <MessageSquare className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
+                    Contacts
+                  </TabsTrigger>
                 </TabsList>
               </CardHeader>
               <CardContent className="p-3 sm:p-4 lg:p-6">
@@ -177,6 +185,9 @@ export default function DealerDashboard() {
                 </TabsContent>
                 <TabsContent value="inventory" className="mt-0 focus-visible:outline-none">
                   <InventoryTab onUpdate={fetchMetrics} />
+                </TabsContent>
+                <TabsContent value="contacts" className="mt-0 focus-visible:outline-none">
+                  <ContactRequestsTab onUpdate={fetchMetrics} />
                 </TabsContent>
               </CardContent>
             </Tabs>

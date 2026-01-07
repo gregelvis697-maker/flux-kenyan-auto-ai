@@ -91,9 +91,13 @@ export function InventoryTab({ onUpdate }: InventoryTabProps) {
 
   const fetchVehicles = async () => {
     try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) throw new Error('Not authenticated');
+
       const { data, error } = await supabase
         .from('vehicles')
         .select('*')
+        .eq('dealer_id', user.id)
         .order('created_at', { ascending: false });
 
       if (error) throw error;

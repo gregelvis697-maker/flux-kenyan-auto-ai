@@ -47,16 +47,26 @@ export function ContactRequestForm({ open, onOpenChange, vehicle }: ContactReque
 
     setLoading(true);
     try {
-      const { error } = await supabase.from('contact_requests').insert({
+      const { data, error } = await supabase.from('contact_requests').insert({
         vehicle_id: vehicle.id,
         buyer_id: user.id,
         buyer_name: formData.name,
         buyer_email: formData.email,
         buyer_phone: formData.phone || null,
         message: formData.message,
-      });
+      }).select().single();
 
       if (error) throw error;
+
+      // Send email notification to dealer
+      try {
+        await supabase.functions.invoke('send-contact-notification', {
+          body: { contact_request_id: data.id },
+        });
+      } catch (emailError) {
+        console.error('Failed to send email notification:', emailError);
+        // Don't fail the whole operation if email fails
+      }
 
       toast({
         title: 'Request Sent!',
