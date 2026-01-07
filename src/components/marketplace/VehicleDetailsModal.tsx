@@ -4,11 +4,19 @@ import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
 import { 
   Car, Fuel, Settings, Gauge, Palette, Calendar, 
-  DollarSign, Phone, Mail, ChevronLeft, ChevronRight 
+  DollarSign, Phone, Mail, ChevronLeft, ChevronRight,
+  Share2, Copy, Facebook, Twitter, Linkedin, Check
 } from 'lucide-react';
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useAuth } from '@/contexts/AuthContext';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
+import { useToast } from '@/hooks/use-toast';
 
 interface VehicleDetails {
   id: string;
@@ -39,7 +47,9 @@ interface VehicleDetailsModalProps {
 
 export function VehicleDetailsModal({ vehicle, open, onOpenChange, onRequestContact }: VehicleDetailsModalProps) {
   const [currentPhotoIndex, setCurrentPhotoIndex] = useState(0);
+  const [copied, setCopied] = useState(false);
   const { user } = useAuth();
+  const { toast } = useToast();
 
   if (!vehicle) return null;
 
@@ -52,6 +62,41 @@ export function VehicleDetailsModal({ vehicle, open, onOpenChange, onRequestCont
 
   const prevPhoto = () => {
     setCurrentPhotoIndex((prev) => (prev - 1 + photos.length) % photos.length);
+  };
+
+  const getShareUrl = () => {
+    return `${window.location.origin}/marketplace?vehicle=${vehicle.id}`;
+  };
+
+  const handleCopyLink = async () => {
+    try {
+      await navigator.clipboard.writeText(getShareUrl());
+      setCopied(true);
+      toast({
+        title: 'Link copied!',
+        description: 'Vehicle link copied to clipboard',
+      });
+      setTimeout(() => setCopied(false), 2000);
+    } catch (error) {
+      toast({
+        title: 'Failed to copy',
+        description: 'Please try again',
+        variant: 'destructive',
+      });
+    }
+  };
+
+  const handleShareSocial = (platform: 'facebook' | 'twitter' | 'linkedin') => {
+    const shareUrl = getShareUrl();
+    const text = `Check out this ${vehicle.year} ${vehicle.make} ${vehicle.model} for ${formatPrice(vehicle.price)}!`;
+    
+    const urls = {
+      facebook: `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(shareUrl)}`,
+      twitter: `https://twitter.com/intent/tweet?url=${encodeURIComponent(shareUrl)}&text=${encodeURIComponent(text)}`,
+      linkedin: `https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(shareUrl)}`,
+    };
+
+    window.open(urls[platform], '_blank', 'width=600,height=400');
   };
 
   const formatPrice = (price: number) => {
@@ -173,11 +218,38 @@ export function VehicleDetailsModal({ vehicle, open, onOpenChange, onRequestCont
                 </DialogTitle>
               </DialogHeader>
             </div>
-            <div className="text-left sm:text-right">
-              <p className="text-2xl sm:text-3xl font-bold text-primary">{formatPrice(vehicle.price)}</p>
-              {vehicle.negotiable && (
-                <p className="text-sm text-muted-foreground">Price negotiable</p>
-              )}
+            <div className="flex items-start gap-3">
+              <div className="text-left sm:text-right">
+                <p className="text-2xl sm:text-3xl font-bold text-primary">{formatPrice(vehicle.price)}</p>
+                {vehicle.negotiable && (
+                  <p className="text-sm text-muted-foreground">Price negotiable</p>
+                )}
+              </div>
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="outline" size="icon" className="shrink-0">
+                    <Share2 className="h-4 w-4" />
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end" className="w-48">
+                  <DropdownMenuItem onClick={handleCopyLink} className="gap-2">
+                    {copied ? <Check className="h-4 w-4 text-green-500" /> : <Copy className="h-4 w-4" />}
+                    Copy Link
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => handleShareSocial('facebook')} className="gap-2">
+                    <Facebook className="h-4 w-4" />
+                    Share on Facebook
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => handleShareSocial('twitter')} className="gap-2">
+                    <Twitter className="h-4 w-4" />
+                    Share on Twitter
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => handleShareSocial('linkedin')} className="gap-2">
+                    <Linkedin className="h-4 w-4" />
+                    Share on LinkedIn
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
             </div>
           </div>
 
