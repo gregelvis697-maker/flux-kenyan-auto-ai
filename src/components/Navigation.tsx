@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
-import { Menu, X, Home, Users, LogIn, UserPlus, Car } from "lucide-react";
+import { Menu, X, Home, Users, LogIn, UserPlus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/contexts/AuthContext";
 import { motion, AnimatePresence } from "framer-motion";
@@ -43,7 +43,6 @@ export const Navigation = ({ children }: { children?: React.ReactNode }) => {
 
   const navLinks = [
     { name: "Home", path: "/", icon: Home },
-    { name: "Marketplace", path: "/marketplace", icon: Car },
     { name: "Waitlist", path: "/waitlist", icon: Users },
   ];
 

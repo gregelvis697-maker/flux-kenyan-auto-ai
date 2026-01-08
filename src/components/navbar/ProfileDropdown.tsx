@@ -11,7 +11,6 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useAuth } from "@/contexts/AuthContext";
-import { getDashboardPath } from "@/components/ProtectedRoute";
 import { motion } from "framer-motion";
 
 export const ProfileDropdown = () => {
@@ -20,12 +19,12 @@ export const ProfileDropdown = () => {
 
   const handleSignOut = async () => {
     await signOut();
-    navigate("/", { replace: true });
+    navigate("/auth");
   };
 
-  const handleDashboardClick = () => {
-    const dashboardPath = getDashboardPath(userRole);
-    navigate(dashboardPath);
+  const getRoleDashboard = () => {
+    if (!userRole) return "/dashboard/buyer";
+    return `/dashboard/${userRole}`;
   };
 
   const getRoleLabel = () => {
@@ -68,7 +67,7 @@ export const ProfileDropdown = () => {
         </DropdownMenuLabel>
         <DropdownMenuSeparator />
         <DropdownMenuItem
-          onClick={handleDashboardClick}
+          onClick={() => navigate(getRoleDashboard())}
           className="cursor-pointer hover:bg-accent/50"
         >
           <LayoutDashboard className="mr-2 h-4 w-4" />

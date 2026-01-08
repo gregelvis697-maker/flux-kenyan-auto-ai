@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -6,7 +6,6 @@ import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Checkbox } from '@/components/ui/checkbox';
 import { Plus, Edit, Trash2, Car, Fuel, Settings, DollarSign, Gauge, Palette, Maximize2 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import {
@@ -25,8 +24,6 @@ import {
 } from '@/components/ui/dialog';
 import { PhotoUploader } from './PhotoUploader';
 import { PhotoGallery } from './PhotoGallery';
-import { InventoryFilters, FilterValues, defaultFilters } from './InventoryFilters';
-import { BulkActions } from './BulkActions';
 
 interface Vehicle {
   id: string;
@@ -57,13 +54,10 @@ export function InventoryTab({ onUpdate }: InventoryTabProps) {
   const [showForm, setShowForm] = useState(false);
   const [editingVehicle, setEditingVehicle] = useState<Vehicle | null>(null);
   const [loading, setLoading] = useState(false);
-  const [bulkLoading, setBulkLoading] = useState(false);
   const [photos, setPhotos] = useState<string[]>([]);
   const [galleryOpen, setGalleryOpen] = useState(false);
   const [galleryPhotos, setGalleryPhotos] = useState<string[]>([]);
   const [galleryIndex, setGalleryIndex] = useState(0);
-  const [filters, setFilters] = useState<FilterValues>(defaultFilters);
-  const [selectedVehicles, setSelectedVehicles] = useState<Set<string>>(new Set());
   const [formData, setFormData] = useState({
     make: '',
     model: '',
@@ -91,13 +85,9 @@ export function InventoryTab({ onUpdate }: InventoryTabProps) {
 
   const fetchVehicles = async () => {
     try {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) throw new Error('Not authenticated');
-
       const { data, error } = await supabase
         .from('vehicles')
         .select('*')
-        .eq('dealer_id', user.id)
         .order('created_at', { ascending: false });
 
       if (error) throw error;
@@ -111,50 +101,6 @@ export function InventoryTab({ onUpdate }: InventoryTabProps) {
       });
     }
   };
-
-  // Extract unique makes and models for filter dropdowns
-  const makes = useMemo(() => [...new Set(vehicles.map((v) => v.make))].sort(), [vehicles]);
-  const models = useMemo(() => {
-    if (filters.make) {
-      return [...new Set(vehicles.filter((v) => v.make === filters.make).map((v) => v.model))].sort();
-    }
-    return [...new Set(vehicles.map((v) => v.model))].sort();
-  }, [vehicles, filters.make]);
-
-  // Filter vehicles based on current filters
-  const filteredVehicles = useMemo(() => {
-    return vehicles.filter((vehicle) => {
-      const searchLower = filters.search.toLowerCase();
-      const matchesSearch =
-        !filters.search ||
-        vehicle.make.toLowerCase().includes(searchLower) ||
-        vehicle.model.toLowerCase().includes(searchLower) ||
-        vehicle.year.toString().includes(searchLower) ||
-        (vehicle.description && vehicle.description.toLowerCase().includes(searchLower));
-
-      const matchesMake = !filters.make || vehicle.make === filters.make;
-      const matchesModel = !filters.model || vehicle.model === filters.model;
-      const matchesCondition = !filters.condition || vehicle.condition === filters.condition;
-      const matchesFuelType = !filters.fuelType || vehicle.fuel_type === filters.fuelType;
-      const matchesMinPrice = !filters.minPrice || vehicle.price >= parseFloat(filters.minPrice);
-      const matchesMaxPrice = !filters.maxPrice || vehicle.price <= parseFloat(filters.maxPrice);
-      const matchesStatus =
-        filters.status === 'all' ||
-        (filters.status === 'sold' && vehicle.is_sold) ||
-        (filters.status === 'available' && !vehicle.is_sold);
-
-      return (
-        matchesSearch &&
-        matchesMake &&
-        matchesModel &&
-        matchesCondition &&
-        matchesFuelType &&
-        matchesMinPrice &&
-        matchesMaxPrice &&
-        matchesStatus
-      );
-    });
-  }, [vehicles, filters]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -284,128 +230,6 @@ export function InventoryTab({ onUpdate }: InventoryTabProps) {
     }
   };
 
-  // Bulk actions
-  const toggleSelectVehicle = (vehicleId: string) => {
-    const newSelected = new Set(selectedVehicles);
-    if (newSelected.has(vehicleId)) {
-      newSelected.delete(vehicleId);
-    } else {
-      newSelected.add(vehicleId);
-    }
-    setSelectedVehicles(newSelected);
-  };
-
-  const toggleSelectAll = () => {
-    if (selectedVehicles.size === filteredVehicles.length) {
-      setSelectedVehicles(new Set());
-    } else {
-      setSelectedVehicles(new Set(filteredVehicles.map((v) => v.id)));
-    }
-  };
-
-  const handleBulkMarkSold = async () => {
-    if (selectedVehicles.size === 0) return;
-    setBulkLoading(true);
-    try {
-      const { error } = await supabase
-        .from('vehicles')
-        .update({ is_sold: true })
-        .in('id', Array.from(selectedVehicles));
-
-      if (error) throw error;
-
-      toast({ title: 'Success', description: `${selectedVehicles.size} vehicles marked as sold` });
-      setSelectedVehicles(new Set());
-      fetchVehicles();
-      onUpdate();
-    } catch (error) {
-      console.error('Error bulk updating:', error);
-      toast({ title: 'Error', description: 'Failed to update vehicles', variant: 'destructive' });
-    } finally {
-      setBulkLoading(false);
-    }
-  };
-
-  const handleBulkMarkAvailable = async () => {
-    if (selectedVehicles.size === 0) return;
-    setBulkLoading(true);
-    try {
-      const { error } = await supabase
-        .from('vehicles')
-        .update({ is_sold: false })
-        .in('id', Array.from(selectedVehicles));
-
-      if (error) throw error;
-
-      toast({ title: 'Success', description: `${selectedVehicles.size} vehicles marked as available` });
-      setSelectedVehicles(new Set());
-      fetchVehicles();
-      onUpdate();
-    } catch (error) {
-      console.error('Error bulk updating:', error);
-      toast({ title: 'Error', description: 'Failed to update vehicles', variant: 'destructive' });
-    } finally {
-      setBulkLoading(false);
-    }
-  };
-
-  const handleBulkDelete = async () => {
-    if (selectedVehicles.size === 0) return;
-    if (!confirm(`Are you sure you want to delete ${selectedVehicles.size} vehicles?`)) return;
-
-    setBulkLoading(true);
-    try {
-      const { error } = await supabase
-        .from('vehicles')
-        .delete()
-        .in('id', Array.from(selectedVehicles));
-
-      if (error) throw error;
-
-      toast({ title: 'Success', description: `${selectedVehicles.size} vehicles deleted` });
-      setSelectedVehicles(new Set());
-      fetchVehicles();
-      onUpdate();
-    } catch (error) {
-      console.error('Error bulk deleting:', error);
-      toast({ title: 'Error', description: 'Failed to delete vehicles', variant: 'destructive' });
-    } finally {
-      setBulkLoading(false);
-    }
-  };
-
-  const handleBulkExport = () => {
-    const selectedData = vehicles.filter((v) => selectedVehicles.has(v.id));
-    const csvContent = [
-      ['Make', 'Model', 'Year', 'Condition', 'Fuel Type', 'Engine', 'Mileage', 'Color', 'Transmission', 'Price', 'Status'].join(','),
-      ...selectedData.map((v) =>
-        [
-          v.make,
-          v.model,
-          v.year,
-          v.condition,
-          v.fuel_type,
-          v.engine_capacity,
-          v.mileage || '',
-          v.color || '',
-          v.transmission || '',
-          v.price,
-          v.is_sold ? 'Sold' : 'Available',
-        ].join(',')
-      ),
-    ].join('\n');
-
-    const blob = new Blob([csvContent], { type: 'text/csv' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = `vehicles-export-${new Date().toISOString().split('T')[0]}.csv`;
-    a.click();
-    URL.revokeObjectURL(url);
-
-    toast({ title: 'Success', description: `Exported ${selectedData.length} vehicles` });
-  };
-
   const resetForm = () => {
     setFormData({
       make: '',
@@ -450,37 +274,17 @@ export function InventoryTab({ onUpdate }: InventoryTabProps) {
         <div>
           <h3 className="text-lg sm:text-xl font-semibold text-foreground">Vehicle Inventory</h3>
           <p className="text-xs sm:text-sm text-muted-foreground mt-0.5">
-            {filteredVehicles.length} of {vehicles.length} vehicles
+            Manage your listed vehicles
           </p>
         </div>
-        <div className="flex gap-2">
-          {filteredVehicles.length > 0 && (
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={toggleSelectAll}
-              className="text-xs"
-            >
-              {selectedVehicles.size === filteredVehicles.length ? 'Deselect All' : 'Select All'}
-            </Button>
-          )}
-          <Button
-            onClick={() => setShowForm(true)}
-            className="w-full sm:w-auto bg-primary hover:bg-primary/90 shadow-[0_0_20px_hsl(var(--primary)/0.3)] hover:shadow-[0_0_30px_hsl(var(--primary)/0.4)] transition-all"
-          >
-            <Plus className="h-4 w-4 mr-2" />
-            Add Vehicle
-          </Button>
-        </div>
+        <Button
+          onClick={() => setShowForm(true)}
+          className="w-full sm:w-auto bg-primary hover:bg-primary/90 shadow-[0_0_20px_hsl(var(--primary)/0.3)] hover:shadow-[0_0_30px_hsl(var(--primary)/0.4)] transition-all"
+        >
+          <Plus className="h-4 w-4 mr-2" />
+          Add Vehicle
+        </Button>
       </div>
-
-      {/* Filters */}
-      <InventoryFilters
-        filters={filters}
-        onFiltersChange={setFilters}
-        makes={makes}
-        models={models}
-      />
 
       {/* Form Dialog */}
       <Dialog open={showForm} onOpenChange={(open) => !open && resetForm()}>
@@ -656,24 +460,18 @@ export function InventoryTab({ onUpdate }: InventoryTabProps) {
       </Dialog>
 
       {/* Vehicle Grid */}
-      {filteredVehicles.length === 0 ? (
+      {vehicles.length === 0 ? (
         <Card className="p-8 sm:p-12 bg-card/20 backdrop-blur-sm border-border/30 text-center">
           <Car className="h-12 w-12 mx-auto text-muted-foreground/50 mb-3" />
-          <p className="text-muted-foreground">
-            {vehicles.length === 0 ? 'No vehicles in inventory' : 'No vehicles match your filters'}
-          </p>
-          <p className="text-xs text-muted-foreground/70 mt-1">
-            {vehicles.length === 0 ? 'Add your first vehicle!' : 'Try adjusting your search criteria'}
-          </p>
+          <p className="text-muted-foreground">No vehicles in inventory</p>
+          <p className="text-xs text-muted-foreground/70 mt-1">Add your first vehicle!</p>
         </Card>
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
-          {filteredVehicles.map((vehicle) => (
+          {vehicles.map((vehicle) => (
             <Card
               key={vehicle.id}
-              className={`overflow-hidden bg-card/30 backdrop-blur-sm border-border/30 hover:border-primary/30 hover:shadow-[0_0_20px_hsl(var(--primary)/0.15)] transition-all duration-300 group ${
-                selectedVehicles.has(vehicle.id) ? 'ring-2 ring-primary border-primary/50' : ''
-              }`}
+              className="overflow-hidden bg-card/30 backdrop-blur-sm border-border/30 hover:border-primary/30 hover:shadow-[0_0_20px_hsl(var(--primary)/0.15)] transition-all duration-300 group"
             >
               {/* Image */}
               <div 
@@ -716,17 +514,6 @@ export function InventoryTab({ onUpdate }: InventoryTabProps) {
                 >
                   {vehicle.is_sold ? 'Sold' : 'Available'}
                 </Badge>
-                {/* Selection checkbox */}
-                <div
-                  className="absolute top-2 left-2"
-                  onClick={(e) => e.stopPropagation()}
-                >
-                  <Checkbox
-                    checked={selectedVehicles.has(vehicle.id)}
-                    onCheckedChange={() => toggleSelectVehicle(vehicle.id)}
-                    className="h-5 w-5 bg-background/80 border-border"
-                  />
-                </div>
               </div>
 
               {/* Content */}
@@ -819,17 +606,6 @@ export function InventoryTab({ onUpdate }: InventoryTabProps) {
         initialIndex={galleryIndex}
         open={galleryOpen}
         onOpenChange={setGalleryOpen}
-      />
-
-      {/* Bulk Actions Bar */}
-      <BulkActions
-        selectedCount={selectedVehicles.size}
-        onMarkSold={handleBulkMarkSold}
-        onMarkAvailable={handleBulkMarkAvailable}
-        onDelete={handleBulkDelete}
-        onExport={handleBulkExport}
-        onClearSelection={() => setSelectedVehicles(new Set())}
-        loading={bulkLoading}
       />
     </div>
   );

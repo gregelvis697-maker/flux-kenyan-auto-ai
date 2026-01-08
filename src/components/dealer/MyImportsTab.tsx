@@ -42,13 +42,9 @@ export function MyImportsTab({ onUpdate }: MyImportsTabProps) {
 
   const fetchImports = async () => {
     try {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) throw new Error('Not authenticated');
-
       const { data, error } = await supabase
         .from('dealer_import_requests')
         .select('*')
-        .eq('dealer_id', user.id)
         .in('status', ['accepted', 'in_transit', 'cleared', 'delivered'])
         .order('created_at', { ascending: false });
 

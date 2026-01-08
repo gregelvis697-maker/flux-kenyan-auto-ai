@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
-import { getDashboardPath } from '@/components/ProtectedRoute';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -30,26 +29,17 @@ const Auth = () => {
   const [password, setPassword] = useState('');
   const [role, setRole] = useState<UserRole>('buyer');
   const [isLoading, setIsLoading] = useState(false);
-  const { signIn, signUp, user, userRole, approvalStatus, loading } = useAuth();
+  const { signIn, signUp, user, userRole, approvalStatus } = useAuth();
   const { toast } = useToast();
   const navigate = useNavigate();
 
-  // Redirect authenticated users to their proper dashboard
   useEffect(() => {
-    // Wait for auth state to be fully resolved
-    if (loading) return;
-    
-    // If user is authenticated with a role
-    if (user && userRole && approvalStatus) {
-      if (approvalStatus === 'pending') {
-        navigate('/pending-approval', { replace: true });
-      } else if (approvalStatus === 'approved') {
-        // Use deterministic role-based routing
-        const dashboardPath = getDashboardPath(userRole);
-        navigate(dashboardPath, { replace: true });
-      }
+    if (user && approvalStatus === 'pending') {
+      navigate('/pending-approval', { replace: true });
+    } else if (user && userRole && approvalStatus === 'approved') {
+      navigate(`/dashboard/${userRole}`, { replace: true });
     }
-  }, [user, userRole, approvalStatus, loading, navigate]);
+  }, [user, userRole, approvalStatus, navigate]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -64,13 +54,6 @@ const Auth = () => {
             description: error.message,
             variant: 'destructive',
           });
-          setIsLoading(false);
-        } else {
-          toast({
-            title: 'Success',
-            description: 'Signed in successfully! Redirecting...',
-          });
-          // Navigation will be handled by useEffect after auth state updates
         }
       } else {
         const validatedData = authSchema.parse({ email, password });
@@ -81,7 +64,6 @@ const Auth = () => {
             description: error.message,
             variant: 'destructive',
           });
-          setIsLoading(false);
         } else {
           const successMessage = role === 'buyer' 
             ? 'Account created successfully! Redirecting to your dashboard...'
@@ -91,7 +73,6 @@ const Auth = () => {
             title: 'Success',
             description: successMessage,
           });
-          // Navigation will be handled by useEffect after auth state updates
         }
       }
     } catch (error) {
@@ -102,6 +83,7 @@ const Auth = () => {
           variant: 'destructive',
         });
       }
+    } finally {
       setIsLoading(false);
     }
   };
