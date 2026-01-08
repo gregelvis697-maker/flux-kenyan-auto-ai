@@ -73,17 +73,9 @@ const App = () => (
             }
           />
           
-          {/* Generic dashboard fallback - redirects to proper role dashboard */}
+          {/* Generic dashboard - redirects to proper role dashboard */}
           <Route
             path="/dashboard"
-            element={
-              <ProtectedRoute>
-                <Dashboard />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/dashboard/:role"
             element={
               <ProtectedRoute>
                 <Dashboard />
