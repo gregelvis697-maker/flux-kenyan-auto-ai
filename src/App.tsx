@@ -9,7 +9,9 @@ import Index from "./pages/Index";
 import Waitlist from "./pages/Waitlist";
 import Auth from "./pages/Auth";
 import Dashboard from "./pages/Dashboard";
+import BuyerDashboard from "./pages/BuyerDashboard";
 import PendingApproval from "./pages/PendingApproval";
+import Unauthorized from "./pages/Unauthorized";
 import AdminDashboard from "./pages/AdminDashboard";
 import DealerDashboard from "./pages/DealerDashboard";
 import ImporterDashboard from "./pages/ImporterDashboard";
@@ -23,11 +25,25 @@ const App = () => (
     <BrowserRouter>
       <AuthProvider>
         <Routes>
+          {/* Public Routes */}
           <Route path="/" element={<Index />} />
           <Route path="/marketplace" element={<Marketplace />} />
           <Route path="/waitlist" element={<Waitlist />} />
           <Route path="/auth" element={<Auth />} />
           <Route path="/pending-approval" element={<PendingApproval />} />
+          <Route path="/unauthorized" element={<Unauthorized />} />
+          
+          {/* Buyer Dashboard - Protected for 'buyer' role only */}
+          <Route
+            path="/dashboard/buyer"
+            element={
+              <ProtectedRoute allowedRoles={['buyer']}>
+                <BuyerDashboard />
+              </ProtectedRoute>
+            }
+          />
+          
+          {/* Dealer Dashboard - Protected for 'dealer' role only */}
           <Route
             path="/dashboard/dealer"
             element={
@@ -36,11 +52,33 @@ const App = () => (
               </ProtectedRoute>
             }
           />
+          
+          {/* Importer Dashboard - Protected for 'importer' role only */}
           <Route
             path="/dashboard/importer"
             element={
               <ProtectedRoute allowedRoles={['importer']}>
                 <ImporterDashboard />
+              </ProtectedRoute>
+            }
+          />
+          
+          {/* Admin Dashboard - Protected for 'admin' role only */}
+          <Route
+            path="/admin/dashboard"
+            element={
+              <ProtectedRoute allowedRoles={['admin']}>
+                <AdminDashboard />
+              </ProtectedRoute>
+            }
+          />
+          
+          {/* Generic dashboard fallback - redirects to proper role dashboard */}
+          <Route
+            path="/dashboard"
+            element={
+              <ProtectedRoute>
+                <Dashboard />
               </ProtectedRoute>
             }
           />
@@ -52,15 +90,8 @@ const App = () => (
               </ProtectedRoute>
             }
           />
-          <Route
-            path="/admin/dashboard"
-            element={
-              <ProtectedRoute allowedRoles={['admin']}>
-                <AdminDashboard />
-              </ProtectedRoute>
-            }
-          />
-          {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
+          
+          {/* Catch-all for 404 */}
           <Route path="*" element={<NotFound />} />
         </Routes>
       </AuthProvider>

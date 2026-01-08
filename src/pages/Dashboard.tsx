@@ -1,135 +1,42 @@
 import React, { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Navigation } from '@/components/Navigation';
-import { Button } from '@/components/ui/button';
-import { Link } from 'react-router-dom';
-import { BarChart3, Car, ShoppingBag } from 'lucide-react';
+import { getDashboardPath } from '@/components/ProtectedRoute';
 
+/**
+ * Generic Dashboard component that redirects users to their role-specific dashboard.
+ * This page should never be directly accessed - it's a fallback that ensures
+ * proper routing for any edge cases.
+ */
 const Dashboard = () => {
   const { userRole, approvalStatus, loading } = useAuth();
   const navigate = useNavigate();
 
-  // Redirect to proper dashboard based on role
   useEffect(() => {
-    if (!loading && userRole && approvalStatus === 'approved') {
-      if (userRole === 'admin') {
-        navigate('/admin/dashboard', { replace: true });
-      } else if (userRole === 'dealer') {
-        navigate('/dashboard/dealer', { replace: true });
-      } else if (userRole === 'importer') {
-        navigate('/dashboard/importer', { replace: true });
-      }
-      // Buyers stay on this page or go to marketplace
+    if (loading) return;
+    
+    if (!userRole) {
+      // No role - redirect to auth
+      navigate('/auth', { replace: true });
+      return;
+    }
+
+    if (approvalStatus === 'pending') {
+      navigate('/pending-approval', { replace: true });
+      return;
+    }
+
+    if (approvalStatus === 'approved') {
+      // Redirect to proper role-specific dashboard
+      const dashboardPath = getDashboardPath(userRole);
+      navigate(dashboardPath, { replace: true });
     }
   }, [userRole, approvalStatus, loading, navigate]);
 
-  const getRoleInfo = () => {
-    switch (userRole) {
-      case 'buyer':
-        return {
-          title: 'Buyer Dashboard',
-          description: 'Browse and purchase vehicles',
-          color: 'from-blue-500 to-blue-600',
-        };
-      case 'dealer':
-        return {
-          title: 'Dealer Dashboard',
-          description: 'Manage your inventory and sales',
-          color: 'from-green-500 to-green-600',
-        };
-      case 'importer':
-        return {
-          title: 'Importer Dashboard',
-          description: 'Manage imports and logistics',
-          color: 'from-purple-500 to-purple-600',
-        };
-      case 'admin':
-        return {
-          title: 'Admin Dashboard',
-          description: 'Platform management and oversight',
-          color: 'from-red-500 to-red-600',
-        };
-      default:
-        return {
-          title: 'Dashboard',
-          description: 'Welcome',
-          color: 'from-gray-500 to-gray-600',
-        };
-    }
-  };
-
-  const roleInfo = getRoleInfo();
-
+  // Show loading while redirecting
   return (
-    <div className="min-h-screen bg-background">
-      <Navigation />
-      
-      <main className="container py-8 pt-24">
-        <div className="max-w-4xl mx-auto space-y-6">
-          <Card className="border-none shadow-lg">
-            <CardHeader className={`bg-gradient-to-br ${roleInfo.color} text-white rounded-t-lg`}>
-              <CardTitle className="text-3xl">{roleInfo.title}</CardTitle>
-              <CardDescription className="text-white/90">
-                {roleInfo.description}
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="pt-6">
-              <div className="space-y-4">
-                <p className="text-muted-foreground">
-                  Welcome to your dashboard. This is a secure area based on your role permissions.
-                </p>
-                
-                {userRole === 'admin' && (
-                  <div className="mb-6">
-                    <Button asChild size="lg" className="w-full sm:w-auto gap-2">
-                      <Link to="/admin/dashboard">
-                        <BarChart3 className="h-5 w-5" />
-                        Admin Dashboard
-                      </Link>
-                    </Button>
-                  </div>
-                )}
-
-                {userRole === 'buyer' && (
-                  <div className="mb-6">
-                    <Button asChild size="lg" className="w-full sm:w-auto gap-2">
-                      <Link to="/marketplace">
-                        <Car className="h-5 w-5" />
-                        Browse Marketplace
-                      </Link>
-                    </Button>
-                  </div>
-                )}
-
-                <div className="grid gap-4 md:grid-cols-2">
-                  <Card>
-                    <CardHeader>
-                      <CardTitle className="text-lg">Quick Stats</CardTitle>
-                    </CardHeader>
-                    <CardContent>
-                      <p className="text-sm text-muted-foreground">
-                        Dashboard metrics will appear here
-                      </p>
-                    </CardContent>
-                  </Card>
-                  <Card>
-                    <CardHeader>
-                      <CardTitle className="text-lg">Recent Activity</CardTitle>
-                    </CardHeader>
-                    <CardContent>
-                      <p className="text-sm text-muted-foreground">
-                        Your recent actions will appear here
-                      </p>
-                    </CardContent>
-                  </Card>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-        </div>
-      </main>
+    <div className="min-h-screen flex items-center justify-center">
+      <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
     </div>
   );
 };
