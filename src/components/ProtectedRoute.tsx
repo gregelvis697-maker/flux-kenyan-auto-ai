@@ -12,6 +12,7 @@ interface ProtectedRouteProps {
 export const ProtectedRoute = ({ children, allowedRoles }: ProtectedRouteProps) => {
   const { user, userRole, approvalStatus, loading } = useAuth();
 
+  // Block UI until auth state is resolved
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
@@ -20,8 +21,18 @@ export const ProtectedRoute = ({ children, allowedRoles }: ProtectedRouteProps) 
     );
   }
 
+  // Not authenticated - redirect to auth
   if (!user) {
     return <Navigate to="/auth" replace />;
+  }
+
+  // User is authenticated but role/status not yet loaded - wait
+  if (!userRole || !approvalStatus) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+      </div>
+    );
   }
 
   // Redirect to pending approval page if status is pending
@@ -34,15 +45,27 @@ export const ProtectedRoute = ({ children, allowedRoles }: ProtectedRouteProps) 
     return <Navigate to="/auth" replace />;
   }
 
-  if (allowedRoles && userRole && !allowedRoles.includes(userRole)) {
-    // Redirect to appropriate dashboard based on role
-    if (userRole === 'admin') {
-      return <Navigate to="/admin/dashboard" replace />;
-    } else if (userRole === 'buyer') {
-      return <Navigate to="/marketplace" replace />;
-    }
-    return <Navigate to={`/dashboard/${userRole}`} replace />;
+  // Check role-based access
+  if (allowedRoles && !allowedRoles.includes(userRole as UserRole)) {
+    // Redirect to unauthorized page for strict access control
+    return <Navigate to="/unauthorized" replace />;
   }
 
   return <>{children}</>;
+};
+
+// Helper function to get proper dashboard path for a role
+export const getDashboardPath = (role: UserRole | null): string => {
+  switch (role) {
+    case 'admin':
+      return '/admin/dashboard';
+    case 'dealer':
+      return '/dashboard/dealer';
+    case 'importer':
+      return '/dashboard/importer';
+    case 'buyer':
+      return '/dashboard/buyer';
+    default:
+      return '/auth';
+  }
 };

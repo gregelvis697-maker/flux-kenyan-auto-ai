@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
+import { getDashboardPath } from '@/components/ProtectedRoute';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -29,25 +30,26 @@ const Auth = () => {
   const [password, setPassword] = useState('');
   const [role, setRole] = useState<UserRole>('buyer');
   const [isLoading, setIsLoading] = useState(false);
-  const { signIn, signUp, user, userRole, approvalStatus } = useAuth();
+  const { signIn, signUp, user, userRole, approvalStatus, loading } = useAuth();
   const { toast } = useToast();
   const navigate = useNavigate();
 
+  // Redirect authenticated users to their proper dashboard
   useEffect(() => {
+    // Wait for auth state to be fully resolved
+    if (loading) return;
+    
+    // If user is authenticated with a role
     if (user && userRole && approvalStatus) {
       if (approvalStatus === 'pending') {
         navigate('/pending-approval', { replace: true });
       } else if (approvalStatus === 'approved') {
-        if (userRole === 'admin') {
-          navigate('/admin/dashboard', { replace: true });
-        } else if (userRole === 'buyer') {
-          navigate('/marketplace', { replace: true });
-        } else {
-          navigate(`/dashboard/${userRole}`, { replace: true });
-        }
+        // Use deterministic role-based routing
+        const dashboardPath = getDashboardPath(userRole);
+        navigate(dashboardPath, { replace: true });
       }
     }
-  }, [user, userRole, approvalStatus, navigate]);
+  }, [user, userRole, approvalStatus, loading, navigate]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -63,6 +65,7 @@ const Auth = () => {
             variant: 'destructive',
           });
         }
+        // Navigation handled by useEffect after auth state updates
       } else {
         const validatedData = authSchema.parse({ email, password });
         const { error } = await signUp(validatedData.email, validatedData.password, role);
@@ -81,6 +84,7 @@ const Auth = () => {
             title: 'Success',
             description: successMessage,
           });
+          // Navigation handled by useEffect after auth state updates
         }
       }
     } catch (error) {
