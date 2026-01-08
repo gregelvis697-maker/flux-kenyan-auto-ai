@@ -64,8 +64,14 @@ const Auth = () => {
             description: error.message,
             variant: 'destructive',
           });
+          setIsLoading(false);
+        } else {
+          toast({
+            title: 'Success',
+            description: 'Signed in successfully! Redirecting...',
+          });
+          // Navigation will be handled by useEffect after auth state updates
         }
-        // Navigation handled by useEffect after auth state updates
       } else {
         const validatedData = authSchema.parse({ email, password });
         const { error } = await signUp(validatedData.email, validatedData.password, role);
@@ -75,6 +81,7 @@ const Auth = () => {
             description: error.message,
             variant: 'destructive',
           });
+          setIsLoading(false);
         } else {
           const successMessage = role === 'buyer' 
             ? 'Account created successfully! Redirecting to your dashboard...'
@@ -84,7 +91,7 @@ const Auth = () => {
             title: 'Success',
             description: successMessage,
           });
-          // Navigation handled by useEffect after auth state updates
+          // Navigation will be handled by useEffect after auth state updates
         }
       }
     } catch (error) {
@@ -95,7 +102,6 @@ const Auth = () => {
           variant: 'destructive',
         });
       }
-    } finally {
       setIsLoading(false);
     }
   };

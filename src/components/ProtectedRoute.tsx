@@ -26,7 +26,7 @@ export const ProtectedRoute = ({ children, allowedRoles }: ProtectedRouteProps) 
     return <Navigate to="/auth" replace />;
   }
 
-  // User is authenticated but role/status not yet loaded - wait
+  // User is authenticated but role/status not yet loaded - show loading
   if (!userRole || !approvalStatus) {
     return (
       <div className="min-h-screen flex items-center justify-center">
@@ -35,19 +35,17 @@ export const ProtectedRoute = ({ children, allowedRoles }: ProtectedRouteProps) 
     );
   }
 
-  // Redirect to pending approval page if status is pending
+  // Check approval status first
   if (approvalStatus === 'pending') {
     return <Navigate to="/pending-approval" replace />;
   }
 
-  // Redirect to auth if rejected
   if (approvalStatus === 'rejected') {
     return <Navigate to="/auth" replace />;
   }
 
-  // Check role-based access
+  // Check role-based access - redirect to correct dashboard if wrong role
   if (allowedRoles && !allowedRoles.includes(userRole as UserRole)) {
-    // Redirect to unauthorized page for strict access control
     return <Navigate to="/unauthorized" replace />;
   }
 
