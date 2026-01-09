@@ -13,6 +13,7 @@ import PendingApproval from "./pages/PendingApproval";
 import AdminDashboard from "./pages/AdminDashboard";
 import DealerDashboard from "./pages/DealerDashboard";
 import ImporterDashboard from "./pages/ImporterDashboard";
+import BuyerDashboard from "./pages/BuyerDashboard";
 import NotFound from "./pages/NotFound";
 
 const App = () => (
@@ -26,6 +27,14 @@ const App = () => (
           <Route path="/waitlist" element={<Waitlist />} />
           <Route path="/auth" element={<Auth />} />
           <Route path="/pending-approval" element={<PendingApproval />} />
+          <Route
+            path="/dashboard/buyer"
+            element={
+              <ProtectedRoute allowedRoles={['buyer']}>
+                <BuyerDashboard />
+              </ProtectedRoute>
+            }
+          />
           <Route
             path="/dashboard/dealer"
             element={
