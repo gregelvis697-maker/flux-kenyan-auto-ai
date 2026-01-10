@@ -56,19 +56,25 @@ export default function DealerDashboard() {
 
   const fetchMetrics = async () => {
     try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return;
+
       const { count: inProgressCount } = await supabase
         .from('dealer_import_requests')
         .select('*', { count: 'exact', head: true })
+        .eq('dealer_id', user.id)
         .in('status', ['requested', 'accepted', 'in_transit', 'cleared']);
 
       const { count: deliveredCount } = await supabase
         .from('dealer_import_requests')
         .select('*', { count: 'exact', head: true })
+        .eq('dealer_id', user.id)
         .eq('status', 'delivered');
 
       const { count: inventoryCount } = await supabase
         .from('vehicles')
         .select('*', { count: 'exact', head: true })
+        .eq('dealer_id', user.id)
         .eq('is_sold', false);
 
       setMetrics({

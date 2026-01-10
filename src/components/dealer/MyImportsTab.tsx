@@ -42,9 +42,13 @@ export function MyImportsTab({ onUpdate }: MyImportsTabProps) {
 
   const fetchImports = async () => {
     try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return;
+
       const { data, error } = await supabase
         .from('dealer_import_requests')
         .select('*')
+        .eq('dealer_id', user.id)
         .in('status', ['accepted', 'in_transit', 'cleared', 'delivered'])
         .order('created_at', { ascending: false });
 
@@ -71,8 +75,8 @@ export function MyImportsTab({ onUpdate }: MyImportsTabProps) {
       if (error) throw error;
 
       toast({
-        title: 'Success',
-        description: 'Import marked as received. You can now add it to your inventory.',
+        title: 'Import Received!',
+        description: 'Vehicle has been automatically added to your inventory as "Imported via Flux".',
       });
 
       fetchImports();
@@ -212,15 +216,20 @@ export function MyImportsTab({ onUpdate }: MyImportsTabProps) {
                   </p>
                   
                   {item.status === 'delivered' && (
-                    <Button
-                      size="sm"
-                      onClick={() => handleMarkReceived(item.id)}
-                      disabled={loading === item.id}
-                      className="w-full sm:w-auto bg-emerald-500 hover:bg-emerald-600 text-white shadow-[0_0_15px_rgba(16,185,129,0.3)]"
-                    >
-                      <CheckCircle className="h-4 w-4 mr-2" />
-                      {loading === item.id ? 'Processing...' : 'Mark as Received'}
-                    </Button>
+                    <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2">
+                      <p className="text-xs text-emerald-400/80 hidden sm:block">
+                        Ready for pickup • Click to add to inventory
+                      </p>
+                      <Button
+                        size="sm"
+                        onClick={() => handleMarkReceived(item.id)}
+                        disabled={loading === item.id}
+                        className="w-full sm:w-auto bg-emerald-500 hover:bg-emerald-600 text-white shadow-[0_0_15px_rgba(16,185,129,0.3)]"
+                      >
+                        <CheckCircle className="h-4 w-4 mr-2" />
+                        {loading === item.id ? 'Processing...' : 'Mark as Received & Add to Inventory'}
+                      </Button>
+                    </div>
                   )}
                 </div>
               </Card>

@@ -6,7 +6,7 @@ import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Plus, Edit, Trash2, Car, Fuel, Settings, DollarSign, Gauge, Palette, Maximize2 } from 'lucide-react';
+import { Plus, Edit, Trash2, Car, Fuel, Settings, DollarSign, Gauge, Palette, Maximize2, Package, Lock } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import {
   Select,
@@ -42,7 +42,10 @@ interface Vehicle {
   is_sold: boolean;
   photos: string[];
   created_at: string;
+  import_request_id: string | null;
 }
+
+type InventorySource = 'all' | 'dealer_owned' | 'imported';
 
 interface InventoryTabProps {
   onUpdate: () => void;
@@ -58,6 +61,7 @@ export function InventoryTab({ onUpdate }: InventoryTabProps) {
   const [galleryOpen, setGalleryOpen] = useState(false);
   const [galleryPhotos, setGalleryPhotos] = useState<string[]>([]);
   const [galleryIndex, setGalleryIndex] = useState(0);
+  const [sourceFilter, setSourceFilter] = useState<InventorySource>('all');
   const [formData, setFormData] = useState({
     make: '',
     model: '',
@@ -85,9 +89,13 @@ export function InventoryTab({ onUpdate }: InventoryTabProps) {
 
   const fetchVehicles = async () => {
     try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return;
+
       const { data, error } = await supabase
         .from('vehicles')
         .select('*')
+        .eq('dealer_id', user.id)
         .order('created_at', { ascending: false });
 
       if (error) throw error;
@@ -259,6 +267,17 @@ export function InventoryTab({ onUpdate }: InventoryTabProps) {
     return labels[condition] || condition;
   };
 
+  const isImported = (vehicle: Vehicle) => vehicle.import_request_id !== null;
+
+  const filteredVehicles = vehicles.filter(vehicle => {
+    if (sourceFilter === 'all') return true;
+    if (sourceFilter === 'imported') return isImported(vehicle);
+    return !isImported(vehicle);
+  });
+
+  const dealerOwnedCount = vehicles.filter(v => !isImported(v)).length;
+  const importedCount = vehicles.filter(v => isImported(v)).length;
+
   const formatPrice = (price: number) => {
     return new Intl.NumberFormat('en-US', {
       style: 'currency',
@@ -283,6 +302,39 @@ export function InventoryTab({ onUpdate }: InventoryTabProps) {
         >
           <Plus className="h-4 w-4 mr-2" />
           Add Vehicle
+        </Button>
+      </div>
+
+      {/* Source Filter Tabs */}
+      <div className="flex flex-wrap gap-2">
+        <Button
+          variant={sourceFilter === 'all' ? 'default' : 'outline'}
+          size="sm"
+          onClick={() => setSourceFilter('all')}
+          className="gap-2"
+        >
+          All
+          <Badge variant="secondary" className="ml-1">{vehicles.length}</Badge>
+        </Button>
+        <Button
+          variant={sourceFilter === 'dealer_owned' ? 'default' : 'outline'}
+          size="sm"
+          onClick={() => setSourceFilter('dealer_owned')}
+          className="gap-2"
+        >
+          <Car className="h-4 w-4" />
+          Dealer-Owned
+          <Badge variant="secondary" className="ml-1">{dealerOwnedCount}</Badge>
+        </Button>
+        <Button
+          variant={sourceFilter === 'imported' ? 'default' : 'outline'}
+          size="sm"
+          onClick={() => setSourceFilter('imported')}
+          className="gap-2"
+        >
+          <Package className="h-4 w-4" />
+          Imported via Flux
+          <Badge variant="secondary" className="ml-1">{importedCount}</Badge>
         </Button>
       </div>
 
@@ -460,15 +512,25 @@ export function InventoryTab({ onUpdate }: InventoryTabProps) {
       </Dialog>
 
       {/* Vehicle Grid */}
-      {vehicles.length === 0 ? (
+      {filteredVehicles.length === 0 ? (
         <Card className="p-8 sm:p-12 bg-card/20 backdrop-blur-sm border-border/30 text-center">
           <Car className="h-12 w-12 mx-auto text-muted-foreground/50 mb-3" />
-          <p className="text-muted-foreground">No vehicles in inventory</p>
-          <p className="text-xs text-muted-foreground/70 mt-1">Add your first vehicle!</p>
+          <p className="text-muted-foreground">
+            {sourceFilter === 'all' 
+              ? 'No vehicles in inventory' 
+              : sourceFilter === 'imported' 
+                ? 'No imported vehicles yet' 
+                : 'No dealer-owned vehicles yet'}
+          </p>
+          <p className="text-xs text-muted-foreground/70 mt-1">
+            {sourceFilter === 'imported' 
+              ? 'Vehicles from accepted import requests will appear here'
+              : 'Add your first vehicle!'}
+          </p>
         </Card>
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
-          {vehicles.map((vehicle) => (
+          {filteredVehicles.map((vehicle) => (
             <Card
               key={vehicle.id}
               className="overflow-hidden bg-card/30 backdrop-blur-sm border-border/30 hover:border-primary/30 hover:shadow-[0_0_20px_hsl(var(--primary)/0.15)] transition-all duration-300 group"
@@ -523,9 +585,22 @@ export function InventoryTab({ onUpdate }: InventoryTabProps) {
                   <h4 className="font-semibold text-sm sm:text-base text-foreground truncate">
                     {vehicle.year} {vehicle.make} {vehicle.model}
                   </h4>
-                  <Badge variant="outline" className="mt-1 text-[10px] sm:text-xs">
-                    {getConditionLabel(vehicle.condition)}
-                  </Badge>
+                  <div className="flex flex-wrap gap-1 mt-1">
+                    <Badge variant="outline" className="text-[10px] sm:text-xs">
+                      {getConditionLabel(vehicle.condition)}
+                    </Badge>
+                    {isImported(vehicle) ? (
+                      <Badge className="text-[10px] sm:text-xs bg-secondary/20 text-secondary border-secondary/30">
+                        <Package className="h-2.5 w-2.5 mr-1" />
+                        Imported
+                      </Badge>
+                    ) : (
+                      <Badge className="text-[10px] sm:text-xs bg-primary/20 text-primary border-primary/30">
+                        <Car className="h-2.5 w-2.5 mr-1" />
+                        Dealer-Owned
+                      </Badge>
+                    )}
+                  </div>
                 </div>
 
                 {/* Quick Stats */}
