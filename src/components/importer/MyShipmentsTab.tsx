@@ -113,7 +113,9 @@ export function MyShipmentsTab({ onUpdate }: MyShipmentsTabProps) {
 
       toast({
         title: 'Status Updated',
-        description: `Shipment status updated to ${statusLabels[nextStatus]}`,
+        description: nextStatus === 'delivered' 
+          ? 'Vehicle marked as delivered. Dealer will now receive notification to pick up.'
+          : `Shipment status updated to ${statusLabels[nextStatus]}`,
       });
 
       fetchMyShipments();
