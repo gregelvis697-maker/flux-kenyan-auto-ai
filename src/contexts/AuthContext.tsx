@@ -1,6 +1,6 @@
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import { User, Session } from '@supabase/supabase-js';
-import { supabase } from '@/integrations/supabase/client';
+import { supabase } from '@/lib/supabase';
 
 type UserRole = 'buyer' | 'dealer' | 'importer' | 'admin' | null;
 type ApprovalStatus = 'pending' | 'approved' | 'rejected' | null;
