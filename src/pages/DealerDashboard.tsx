@@ -26,9 +26,12 @@ export default function DealerDashboard() {
   const [activeTab, setActiveTab] = useState('overview');
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [metrics, setMetrics] = useState({
+    totalRequests: 0,
     inProgress: 0,
     delivered: 0,
     inventory: 0,
+    dealerOwned: 0,
+    imported: 0,
   });
 
   useEffect(() => {
@@ -59,6 +62,12 @@ export default function DealerDashboard() {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) return;
 
+      // Fetch all import requests count
+      const { count: totalRequestsCount } = await supabase
+        .from('dealer_import_requests')
+        .select('*', { count: 'exact', head: true })
+        .eq('dealer_id', user.id);
+
       const { count: inProgressCount } = await supabase
         .from('dealer_import_requests')
         .select('*', { count: 'exact', head: true })
@@ -71,16 +80,24 @@ export default function DealerDashboard() {
         .eq('dealer_id', user.id)
         .eq('status', 'delivered');
 
-      const { count: inventoryCount } = await supabase
+      // Fetch all inventory for breakdown
+      const { data: vehicles } = await supabase
         .from('vehicles')
-        .select('*', { count: 'exact', head: true })
+        .select('id, import_request_id, is_sold')
         .eq('dealer_id', user.id)
         .eq('is_sold', false);
 
+      const inventoryCount = vehicles?.length || 0;
+      const dealerOwnedCount = vehicles?.filter(v => !v.import_request_id).length || 0;
+      const importedCount = vehicles?.filter(v => v.import_request_id !== null).length || 0;
+
       setMetrics({
+        totalRequests: totalRequestsCount || 0,
         inProgress: inProgressCount || 0,
         delivered: deliveredCount || 0,
-        inventory: inventoryCount || 0,
+        inventory: inventoryCount,
+        dealerOwned: dealerOwnedCount,
+        imported: importedCount,
       });
     } catch (error) {
       console.error('Error fetching metrics:', error);
@@ -100,12 +117,27 @@ export default function DealerDashboard() {
       case 'overview':
         return (
           <div className="space-y-4 sm:space-y-6">
-            {/* Metrics Cards */}
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4 lg:gap-6">
+            {/* Primary Metrics Cards */}
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4 lg:gap-6">
               <Card className="bg-card/60 backdrop-blur-lg border-border/50 shadow-card hover:shadow-elevated transition-all duration-300 group">
                 <CardHeader className="flex flex-row items-center justify-between pb-2 space-y-0">
                   <CardTitle className="text-xs sm:text-sm font-medium text-muted-foreground">
-                    Imports In Progress
+                    Total Requests
+                  </CardTitle>
+                  <div className="p-2 rounded-lg bg-blue-500/10 group-hover:bg-blue-500/20 transition-colors">
+                    <FileText className="h-4 w-4 sm:h-5 sm:w-5 text-blue-400" />
+                  </div>
+                </CardHeader>
+                <CardContent className="pt-0">
+                  <div className="text-2xl sm:text-3xl font-bold text-foreground">{metrics.totalRequests}</div>
+                  <p className="text-xs text-muted-foreground mt-1">All time</p>
+                </CardContent>
+              </Card>
+
+              <Card className="bg-card/60 backdrop-blur-lg border-border/50 shadow-card hover:shadow-elevated transition-all duration-300 group">
+                <CardHeader className="flex flex-row items-center justify-between pb-2 space-y-0">
+                  <CardTitle className="text-xs sm:text-sm font-medium text-muted-foreground">
+                    In Progress
                   </CardTitle>
                   <div className="p-2 rounded-lg bg-primary/10 group-hover:bg-primary/20 transition-colors">
                     <Package className="h-4 w-4 sm:h-5 sm:w-5 text-primary" />
@@ -113,7 +145,7 @@ export default function DealerDashboard() {
                 </CardHeader>
                 <CardContent className="pt-0">
                   <div className="text-2xl sm:text-3xl font-bold text-foreground">{metrics.inProgress}</div>
-                  <p className="text-xs text-muted-foreground mt-1">Active requests</p>
+                  <p className="text-xs text-muted-foreground mt-1">Active imports</p>
                 </CardContent>
               </Card>
 
@@ -135,7 +167,7 @@ export default function DealerDashboard() {
               <Card className="bg-card/60 backdrop-blur-lg border-border/50 shadow-card hover:shadow-elevated transition-all duration-300 group">
                 <CardHeader className="flex flex-row items-center justify-between pb-2 space-y-0">
                   <CardTitle className="text-xs sm:text-sm font-medium text-muted-foreground">
-                    Inventory Listed
+                    Total Inventory
                   </CardTitle>
                   <div className="p-2 rounded-lg bg-secondary/10 group-hover:bg-secondary/20 transition-colors">
                     <Car className="h-4 w-4 sm:h-5 sm:w-5 text-secondary" />
@@ -144,6 +176,59 @@ export default function DealerDashboard() {
                 <CardContent className="pt-0">
                   <div className="text-2xl sm:text-3xl font-bold text-foreground">{metrics.inventory}</div>
                   <p className="text-xs text-muted-foreground mt-1">Available vehicles</p>
+                </CardContent>
+              </Card>
+            </div>
+
+            {/* Inventory Breakdown */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
+              <Card className="bg-card/60 backdrop-blur-lg border-border/50 shadow-card">
+                <CardHeader className="pb-3">
+                  <CardTitle className="text-base font-medium flex items-center gap-2">
+                    <Car className="h-5 w-5 text-primary" />
+                    Inventory Breakdown
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-3">
+                  <div className="flex items-center justify-between p-3 rounded-lg bg-muted/30">
+                    <div className="flex items-center gap-2">
+                      <div className="w-3 h-3 rounded-full bg-primary"></div>
+                      <span className="text-sm text-muted-foreground">Dealer-Owned</span>
+                    </div>
+                    <span className="text-lg font-semibold text-foreground">{metrics.dealerOwned}</span>
+                  </div>
+                  <div className="flex items-center justify-between p-3 rounded-lg bg-muted/30">
+                    <div className="flex items-center gap-2">
+                      <div className="w-3 h-3 rounded-full bg-emerald-400"></div>
+                      <span className="text-sm text-muted-foreground">Imported via Flux</span>
+                    </div>
+                    <span className="text-lg font-semibold text-foreground">{metrics.imported}</span>
+                  </div>
+                </CardContent>
+              </Card>
+
+              <Card className="bg-card/60 backdrop-blur-lg border-border/50 shadow-card">
+                <CardHeader className="pb-3">
+                  <CardTitle className="text-base font-medium flex items-center gap-2">
+                    <Package className="h-5 w-5 text-primary" />
+                    Import Summary
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-3">
+                  <div className="flex items-center justify-between p-3 rounded-lg bg-muted/30">
+                    <div className="flex items-center gap-2">
+                      <div className="w-3 h-3 rounded-full bg-yellow-400"></div>
+                      <span className="text-sm text-muted-foreground">Pending/Active</span>
+                    </div>
+                    <span className="text-lg font-semibold text-foreground">{metrics.inProgress}</span>
+                  </div>
+                  <div className="flex items-center justify-between p-3 rounded-lg bg-muted/30">
+                    <div className="flex items-center gap-2">
+                      <div className="w-3 h-3 rounded-full bg-emerald-400"></div>
+                      <span className="text-sm text-muted-foreground">Ready for Pickup</span>
+                    </div>
+                    <span className="text-lg font-semibold text-foreground">{metrics.delivered}</span>
+                  </div>
                 </CardContent>
               </Card>
             </div>
