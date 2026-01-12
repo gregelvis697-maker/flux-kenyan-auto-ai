@@ -43,31 +43,54 @@ export function DeliveredTab() {
 
   const fetchDeliveredShipments = async () => {
     try {
+      if (!user?.id) {
+        setShipments([]);
+        setLoading(false);
+        return;
+      }
+
+      // Fetch shipments without join to avoid RLS issues
       const { data, error } = await supabase
         .from('dealer_import_requests')
-        .select(`
-          *,
-          profiles:dealer_id(email)
-        `)
-        .eq('importer_id', user?.id)
+        .select('*')
+        .eq('importer_id', user.id)
         .eq('status', 'delivered')
         .order('delivered_at', { ascending: false });
 
-      if (error) throw error;
+      if (error) {
+        console.error('Error fetching delivered shipments:', error);
+        setShipments([]);
+        setLoading(false);
+        return;
+      }
+
+      // Fetch dealer emails separately (non-blocking)
+      const dealerIds = [...new Set((data || []).map(r => r.dealer_id))];
+      let emailMap: Record<string, string> = {};
+      
+      if (dealerIds.length > 0) {
+        const { data: profiles } = await supabase
+          .from('profiles')
+          .select('id, email')
+          .in('id', dealerIds);
+        
+        if (profiles) {
+          emailMap = profiles.reduce((acc: Record<string, string>, p) => {
+            acc[p.id] = p.email;
+            return acc;
+          }, {});
+        }
+      }
 
       const formattedData = (data || []).map((req: any) => ({
         ...req,
-        dealer_email: req.profiles?.email,
+        dealer_email: emailMap[req.dealer_id] || 'Contact via platform',
       }));
 
       setShipments(formattedData);
     } catch (error: any) {
       console.error('Error fetching delivered shipments:', error);
-      toast({
-        title: 'Error',
-        description: 'Failed to fetch delivered shipments',
-        variant: 'destructive',
-      });
+      setShipments([]);
     } finally {
       setLoading(false);
     }
