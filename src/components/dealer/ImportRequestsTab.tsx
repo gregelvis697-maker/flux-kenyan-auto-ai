@@ -44,7 +44,10 @@ export function ImportRequestsTab({ onUpdate }: ImportRequestsTabProps) {
   const fetchRequests = async () => {
     try {
       const { data: { user } } = await supabase.auth.getUser();
-      if (!user) return;
+      if (!user) {
+        setRequests([]);
+        return;
+      }
 
       const { data, error } = await supabase
         .from('dealer_import_requests')
@@ -52,15 +55,15 @@ export function ImportRequestsTab({ onUpdate }: ImportRequestsTabProps) {
         .eq('dealer_id', user.id)
         .order('created_at', { ascending: false });
 
-      if (error) throw error;
+      if (error) {
+        console.error('Error fetching requests:', error);
+        setRequests([]);
+        return;
+      }
       setRequests(data || []);
     } catch (error) {
       console.error('Error fetching requests:', error);
-      toast({
-        title: 'Error',
-        description: 'Failed to load import requests',
-        variant: 'destructive',
-      });
+      setRequests([]);
     }
   };
 

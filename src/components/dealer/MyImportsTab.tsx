@@ -43,7 +43,10 @@ export function MyImportsTab({ onUpdate }: MyImportsTabProps) {
   const fetchImports = async () => {
     try {
       const { data: { user } } = await supabase.auth.getUser();
-      if (!user) return;
+      if (!user) {
+        setImports([]);
+        return;
+      }
 
       const { data, error } = await supabase
         .from('dealer_import_requests')
@@ -52,15 +55,15 @@ export function MyImportsTab({ onUpdate }: MyImportsTabProps) {
         .in('status', ['accepted', 'in_transit', 'cleared', 'delivered'])
         .order('created_at', { ascending: false });
 
-      if (error) throw error;
+      if (error) {
+        console.error('Error fetching imports:', error);
+        setImports([]);
+        return;
+      }
       setImports(data || []);
     } catch (error) {
       console.error('Error fetching imports:', error);
-      toast({
-        title: 'Error',
-        description: 'Failed to load imports',
-        variant: 'destructive',
-      });
+      setImports([]);
     }
   };
 
