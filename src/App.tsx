@@ -14,6 +14,7 @@ import AdminDashboard from "./pages/AdminDashboard";
 import DealerDashboard from "./pages/DealerDashboard";
 import ImporterDashboard from "./pages/ImporterDashboard";
 import BuyerDashboard from "./pages/BuyerDashboard";
+import Marketplace from "./pages/Marketplace";
 import NotFound from "./pages/NotFound";
 
 const App = () => (
@@ -24,6 +25,7 @@ const App = () => (
       <AuthProvider>
         <Routes>
           <Route path="/" element={<Index />} />
+          <Route path="/marketplace" element={<Marketplace />} />
           <Route path="/waitlist" element={<Waitlist />} />
           <Route path="/auth" element={<Auth />} />
           <Route path="/pending-approval" element={<PendingApproval />} />

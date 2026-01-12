@@ -7,24 +7,23 @@ import { Button } from '@/components/ui/button';
 import { 
   LayoutDashboard, 
   ShoppingCart, 
-  Search, 
   Car, 
   Settings,
   Package,
   Heart,
   Sparkles,
-  Trash2,
   ExternalLink
 } from 'lucide-react';
 import { Navigation } from '@/components/Navigation';
 import { DashboardSidebar, MenuItem } from '@/components/dashboard/DashboardSidebar';
 import { SettingsPanel } from '@/components/dashboard/SettingsPanel';
+import { SavedVehiclesTab } from '@/components/marketplace/SavedVehiclesTab';
 import { cn } from '@/lib/utils';
 
 const buyerMenuItems: MenuItem[] = [
   { id: 'overview', label: 'Overview', icon: LayoutDashboard },
+  { id: 'saved-vehicles', label: 'Saved Vehicles', icon: Heart },
   { id: 'orders', label: 'My Orders', icon: ShoppingCart },
-  { id: 'saved-searches', label: 'Saved Searches', icon: Search },
   { id: 'recommendations', label: 'Recommended Vehicles', icon: Car },
   { id: 'settings', label: 'Settings', icon: Settings },
 ];
@@ -39,11 +38,6 @@ interface OrderRecord {
   created_at: string;
 }
 
-interface SavedSearch {
-  id: string;
-  criteria: string;
-  created_at: string;
-}
 
 interface Vehicle {
   id: string;
@@ -62,12 +56,10 @@ export default function BuyerDashboard() {
   
   const [metrics, setMetrics] = useState({
     orders: 0,
-    savedSearches: 0,
     favorites: 0,
   });
   
   const [orders, setOrders] = useState<OrderRecord[]>([]);
-  const [savedSearches, setSavedSearches] = useState<SavedSearch[]>([]);
   const [recommendations, setRecommendations] = useState<Vehicle[]>([]);
   const [dataLoading, setDataLoading] = useState(true);
 
@@ -116,7 +108,6 @@ export default function BuyerDashboard() {
 
       setMetrics({
         orders: ordersCount || 0,
-        savedSearches: 0, // Saved searches not implemented yet
         favorites: favoritesCount || 0,
       });
 
@@ -140,10 +131,6 @@ export default function BuyerDashboard() {
     }
   };
 
-  const handleDeleteSavedSearch = async (id: string) => {
-    // Placeholder for when saved searches are implemented
-    setSavedSearches(savedSearches.filter(s => s.id !== id));
-  };
 
   if (loading) {
     return (
@@ -318,55 +305,8 @@ export default function BuyerDashboard() {
           </div>
         );
 
-      case 'saved-searches':
-        return (
-          <div className="space-y-4 sm:space-y-6">
-            <div>
-              <h2 className="text-xl sm:text-2xl font-semibold text-foreground">Saved Searches</h2>
-              <p className="text-sm text-muted-foreground mt-1">
-                Your saved vehicle search preferences
-              </p>
-            </div>
-
-            <Card className="bg-card/60 backdrop-blur-lg border-border/50 shadow-card">
-              <CardContent className="p-6">
-                {savedSearches.length > 0 ? (
-                  <div className="space-y-3">
-                    {savedSearches.map((search) => (
-                      <div key={search.id} className="flex items-center justify-between p-4 rounded-lg bg-muted/30">
-                        <div className="flex items-center gap-3">
-                          <Search className="h-5 w-5 text-primary" />
-                          <div>
-                            <p className="font-medium text-sm">{search.criteria}</p>
-                            <p className="text-xs text-muted-foreground">
-                              Saved on {new Date(search.created_at).toLocaleDateString()}
-                            </p>
-                          </div>
-                        </div>
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          onClick={() => handleDeleteSavedSearch(search.id)}
-                          className="text-muted-foreground hover:text-destructive"
-                        >
-                          <Trash2 className="h-4 w-4" />
-                        </Button>
-                      </div>
-                    ))}
-                  </div>
-                ) : (
-                  <div className="text-center py-12">
-                    <Search className="h-12 w-12 mx-auto text-muted-foreground/50 mb-3" />
-                    <p className="text-muted-foreground font-medium">No saved searches</p>
-                    <p className="text-sm text-muted-foreground/70 mt-1">
-                      Save your search filters to quickly find vehicles later
-                    </p>
-                  </div>
-                )}
-              </CardContent>
-            </Card>
-          </div>
-        );
+      case 'saved-vehicles':
+        return <SavedVehiclesTab />;
 
       case 'recommendations':
         return (
