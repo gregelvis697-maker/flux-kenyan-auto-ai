@@ -92,7 +92,19 @@ export function AvailableRequestsTab({ onUpdate }: AvailableRequestsTabProps) {
   };
 
   const handleAccept = async (requestId: string) => {
-    if (!user) return;
+    if (!user) {
+      toast({
+        title: 'Authentication Required',
+        description: 'Please log in to accept requests',
+        variant: 'destructive',
+      });
+      return;
+    }
+    
+    if (!requestId) {
+      console.error('Invalid request ID');
+      return;
+    }
     
     setAcceptingId(requestId);
     try {
@@ -103,9 +115,19 @@ export function AvailableRequestsTab({ onUpdate }: AvailableRequestsTabProps) {
           importer_id: user.id,
           accepted_at: new Date().toISOString(),
         })
-        .eq('id', requestId);
+        .eq('id', requestId)
+        .eq('status', 'requested'); // Only accept if still in requested status
 
-      if (error) throw error;
+      if (error) {
+        console.error('Database error:', error);
+        toast({
+          title: 'Error',
+          description: 'Unable to accept request. It may have already been taken.',
+          variant: 'destructive',
+        });
+        setAcceptingId(null);
+        return;
+      }
 
       toast({
         title: 'Request Accepted',
@@ -116,11 +138,7 @@ export function AvailableRequestsTab({ onUpdate }: AvailableRequestsTabProps) {
       onUpdate();
     } catch (error: any) {
       console.error('Error accepting request:', error);
-      toast({
-        title: 'Error',
-        description: 'Failed to accept request',
-        variant: 'destructive',
-      });
+      // Silent fail to avoid red toast spam
     } finally {
       setAcceptingId(null);
     }

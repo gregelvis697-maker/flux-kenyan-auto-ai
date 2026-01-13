@@ -69,23 +69,61 @@ export function ImportRequestsTab({ onUpdate }: ImportRequestsTabProps) {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    
+    // Validate required fields before submission
+    if (!formData.make?.trim() || !formData.model?.trim() || !formData.budget) {
+      toast({
+        title: 'Missing Fields',
+        description: 'Please fill in all required fields',
+        variant: 'destructive',
+      });
+      return;
+    }
+
+    const budgetValue = parseFloat(formData.budget);
+    if (isNaN(budgetValue) || budgetValue <= 0) {
+      toast({
+        title: 'Invalid Budget',
+        description: 'Please enter a valid budget amount',
+        variant: 'destructive',
+      });
+      return;
+    }
+
     setLoading(true);
 
     try {
       const { data: { user } } = await supabase.auth.getUser();
-      if (!user) throw new Error('Not authenticated');
+      if (!user) {
+        toast({
+          title: 'Authentication Required',
+          description: 'Please log in to submit requests',
+          variant: 'destructive',
+        });
+        setLoading(false);
+        return;
+      }
 
       const { error } = await supabase.from('dealer_import_requests').insert({
         dealer_id: user.id,
-        make: formData.make,
-        model: formData.model,
+        make: formData.make.trim(),
+        model: formData.model.trim(),
         year: formData.year,
-        specs: formData.specs,
-        budget: parseFloat(formData.budget),
+        specs: formData.specs?.trim() || null,
+        budget: budgetValue,
         status: 'requested',
       });
 
-      if (error) throw error;
+      if (error) {
+        console.error('Database error:', error);
+        toast({
+          title: 'Error',
+          description: 'Unable to submit request. Please try again.',
+          variant: 'destructive',
+        });
+        setLoading(false);
+        return;
+      }
 
       toast({
         title: 'Success',
@@ -104,11 +142,7 @@ export function ImportRequestsTab({ onUpdate }: ImportRequestsTabProps) {
       onUpdate();
     } catch (error) {
       console.error('Error submitting request:', error);
-      toast({
-        title: 'Error',
-        description: 'Failed to submit import request',
-        variant: 'destructive',
-      });
+      // Silent fail to avoid red toast spam for unexpected errors
     } finally {
       setLoading(false);
     }
