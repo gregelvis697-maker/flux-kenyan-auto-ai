@@ -120,6 +120,20 @@ export function MyShipmentsTab({ onUpdate }: MyShipmentsTabProps) {
     const nextStatus = getNextStatus(currentStatus);
     if (!nextStatus) return;
 
+    if (!user) {
+      toast({
+        title: 'Authentication Required',
+        description: 'Please log in to update shipments',
+        variant: 'destructive',
+      });
+      return;
+    }
+
+    if (!shipmentId) {
+      console.error('Invalid shipment ID');
+      return;
+    }
+
     setUpdatingId(shipmentId);
     try {
       const updateData: any = { status: nextStatus };
@@ -130,9 +144,19 @@ export function MyShipmentsTab({ onUpdate }: MyShipmentsTabProps) {
       const { error } = await supabase
         .from('dealer_import_requests')
         .update(updateData)
-        .eq('id', shipmentId);
+        .eq('id', shipmentId)
+        .eq('importer_id', user.id); // Ensure ownership
 
-      if (error) throw error;
+      if (error) {
+        console.error('Database error:', error);
+        toast({
+          title: 'Error',
+          description: 'Unable to update shipment. Please try again.',
+          variant: 'destructive',
+        });
+        setUpdatingId(null);
+        return;
+      }
 
       toast({
         title: 'Status Updated',
@@ -145,11 +169,7 @@ export function MyShipmentsTab({ onUpdate }: MyShipmentsTabProps) {
       onUpdate();
     } catch (error: any) {
       console.error('Error updating status:', error);
-      toast({
-        title: 'Error',
-        description: 'Failed to update shipment status',
-        variant: 'destructive',
-      });
+      // Silent fail to avoid red toast spam
     } finally {
       setUpdatingId(null);
     }

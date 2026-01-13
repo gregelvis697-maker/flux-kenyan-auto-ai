@@ -115,25 +115,54 @@ export function InventoryTab({ onUpdate }: InventoryTabProps) {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    
+    // Validate required fields before submission
+    if (!formData.make?.trim() || !formData.model?.trim() || !formData.engine_capacity?.trim() || !formData.price) {
+      toast({
+        title: 'Missing Fields',
+        description: 'Please fill in all required fields',
+        variant: 'destructive',
+      });
+      return;
+    }
+
+    const priceValue = parseFloat(formData.price);
+    if (isNaN(priceValue) || priceValue <= 0) {
+      toast({
+        title: 'Invalid Price',
+        description: 'Please enter a valid price',
+        variant: 'destructive',
+      });
+      return;
+    }
+
     setLoading(true);
 
     try {
       const { data: { user } } = await supabase.auth.getUser();
-      if (!user) throw new Error('Not authenticated');
+      if (!user) {
+        toast({
+          title: 'Authentication Required',
+          description: 'Please log in to add vehicles',
+          variant: 'destructive',
+        });
+        setLoading(false);
+        return;
+      }
 
       const vehicleData = {
         dealer_id: user.id,
-        make: formData.make,
-        model: formData.model,
+        make: formData.make.trim(),
+        model: formData.model.trim(),
         year: formData.year,
         condition: formData.condition as 'new' | 'used' | 'certified_pre_owned',
         fuel_type: formData.fuel_type as 'petrol' | 'diesel' | 'electric' | 'hybrid' | 'plug_in_hybrid',
-        engine_capacity: formData.engine_capacity,
+        engine_capacity: formData.engine_capacity.trim(),
         mileage: formData.mileage ? parseInt(formData.mileage) : null,
-        color: formData.color || null,
+        color: formData.color?.trim() || null,
         transmission: formData.transmission || null,
-        description: formData.description || null,
-        price: parseFloat(formData.price),
+        description: formData.description?.trim() || null,
+        price: priceValue,
         negotiable: formData.negotiable,
         photos: photos,
       };
@@ -143,12 +172,22 @@ export function InventoryTab({ onUpdate }: InventoryTabProps) {
         ({ error } = await supabase
           .from('vehicles')
           .update(vehicleData)
-          .eq('id', editingVehicle.id));
+          .eq('id', editingVehicle.id)
+          .eq('dealer_id', user.id)); // Ensure ownership
       } else {
         ({ error } = await supabase.from('vehicles').insert(vehicleData));
       }
 
-      if (error) throw error;
+      if (error) {
+        console.error('Database error:', error);
+        toast({
+          title: 'Error',
+          description: 'Unable to save vehicle. Please try again.',
+          variant: 'destructive',
+        });
+        setLoading(false);
+        return;
+      }
 
       toast({
         title: 'Success',
@@ -160,11 +199,7 @@ export function InventoryTab({ onUpdate }: InventoryTabProps) {
       onUpdate();
     } catch (error) {
       console.error('Error saving vehicle:', error);
-      toast({
-        title: 'Error',
-        description: 'Failed to save vehicle',
-        variant: 'destructive',
-      });
+      // Silent fail - don't show toast for unexpected errors to avoid red toast spam
     } finally {
       setLoading(false);
     }
