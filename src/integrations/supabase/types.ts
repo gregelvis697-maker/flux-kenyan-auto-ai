@@ -47,8 +47,22 @@ export type Database = {
             foreignKeyName: "approval_audit_performed_by_profiles_fkey"
             columns: ["performed_by"]
             isOneToOne: false
+            referencedRelation: "dealer_trust_stats"
+            referencedColumns: ["dealer_id"]
+          },
+          {
+            foreignKeyName: "approval_audit_performed_by_profiles_fkey"
+            columns: ["performed_by"]
+            isOneToOne: false
             referencedRelation: "profiles"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "approval_audit_user_id_profiles_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "dealer_trust_stats"
+            referencedColumns: ["dealer_id"]
           },
           {
             foreignKeyName: "approval_audit_user_id_profiles_fkey"
@@ -94,6 +108,13 @@ export type Database = {
           vehicle_id?: string
         }
         Relationships: [
+          {
+            foreignKeyName: "contact_requests_vehicle_id_fkey"
+            columns: ["vehicle_id"]
+            isOneToOne: false
+            referencedRelation: "vehicle_risk_flags"
+            referencedColumns: ["vehicle_id"]
+          },
           {
             foreignKeyName: "contact_requests_vehicle_id_fkey"
             columns: ["vehicle_id"]
@@ -187,6 +208,13 @@ export type Database = {
             foreignKeyName: "email_logs_recipient_user_id_fkey"
             columns: ["recipient_user_id"]
             isOneToOne: false
+            referencedRelation: "dealer_trust_stats"
+            referencedColumns: ["dealer_id"]
+          },
+          {
+            foreignKeyName: "email_logs_recipient_user_id_fkey"
+            columns: ["recipient_user_id"]
+            isOneToOne: false
             referencedRelation: "profiles"
             referencedColumns: ["id"]
           },
@@ -242,6 +270,13 @@ export type Database = {
           vehicle_id?: string
         }
         Relationships: [
+          {
+            foreignKeyName: "favorites_vehicle_id_fkey"
+            columns: ["vehicle_id"]
+            isOneToOne: false
+            referencedRelation: "vehicle_risk_flags"
+            referencedColumns: ["vehicle_id"]
+          },
           {
             foreignKeyName: "favorites_vehicle_id_fkey"
             columns: ["vehicle_id"]
@@ -317,6 +352,13 @@ export type Database = {
             foreignKeyName: "user_roles_user_id_profiles_fkey"
             columns: ["user_id"]
             isOneToOne: true
+            referencedRelation: "dealer_trust_stats"
+            referencedColumns: ["dealer_id"]
+          },
+          {
+            foreignKeyName: "user_roles_user_id_profiles_fkey"
+            columns: ["user_id"]
+            isOneToOne: true
             referencedRelation: "profiles"
             referencedColumns: ["id"]
           },
@@ -342,6 +384,10 @@ export type Database = {
           price: number
           transmission: string | null
           updated_at: string
+          verification_notes: string | null
+          verification_status: string | null
+          verified_at: string | null
+          verified_by: string | null
           year: number
         }
         Insert: {
@@ -363,6 +409,10 @@ export type Database = {
           price: number
           transmission?: string | null
           updated_at?: string
+          verification_notes?: string | null
+          verification_status?: string | null
+          verified_at?: string | null
+          verified_by?: string | null
           year: number
         }
         Update: {
@@ -384,6 +434,10 @@ export type Database = {
           price?: number
           transmission?: string | null
           updated_at?: string
+          verification_notes?: string | null
+          verification_status?: string | null
+          verified_at?: string | null
+          verified_by?: string | null
           year?: number
         }
         Relationships: [
@@ -425,7 +479,64 @@ export type Database = {
       }
     }
     Views: {
-      [_ in never]: never
+      dealer_trust_stats: {
+        Row: {
+          active_listings: number | null
+          dealer_id: string | null
+          email: string | null
+          fulfilled_imports: number | null
+          fulfillment_rate: number | null
+          full_name: string | null
+          member_since: string | null
+          total_imports: number | null
+          total_listings: number | null
+        }
+        Relationships: []
+      }
+      market_demand_stats: {
+        Row: {
+          available_count: number | null
+          demand_ratio: number | null
+          make: string | null
+          model: string | null
+          request_count: number | null
+        }
+        Relationships: []
+      }
+      market_pricing_stats: {
+        Row: {
+          avg_price: number | null
+          make: string | null
+          max_price: number | null
+          min_price: number | null
+          model: string | null
+          price_stddev: number | null
+          vehicle_count: number | null
+          year: number | null
+        }
+        Relationships: []
+      }
+      vehicle_risk_flags: {
+        Row: {
+          dealer_fulfillment_rate: number | null
+          dealer_id: string | null
+          dealer_member_since: string | null
+          incomplete_data: boolean | null
+          make: string | null
+          market_avg_price: number | null
+          market_max_price: number | null
+          market_min_price: number | null
+          missing_photos: boolean | null
+          model: string | null
+          new_dealer: boolean | null
+          price: number | null
+          price_below_market: boolean | null
+          risk_score: number | null
+          vehicle_id: string | null
+          year: number | null
+        }
+        Relationships: []
+      }
     }
     Functions: {
       create_admin_user: {
