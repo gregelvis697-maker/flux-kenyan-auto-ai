@@ -24,6 +24,7 @@ import {
 } from '@/components/ui/dialog';
 import { PhotoUploader } from './PhotoUploader';
 import { PhotoGallery } from './PhotoGallery';
+import { PriceGuidance } from '@/components/marketplace/PriceGuidance';
 
 interface Vehicle {
   id: string;
@@ -515,6 +516,13 @@ export function InventoryTab({ onUpdate }: InventoryTabProps) {
                   step="0.01"
                   className="bg-background/50 h-9 sm:h-10 text-sm"
                   placeholder="25000"
+                />
+                {/* Price Guidance - Market Intelligence */}
+                <PriceGuidance
+                  make={formData.make}
+                  model={formData.model}
+                  year={formData.year}
+                  currentPrice={formData.price}
                 />
               </div>
               <div className="flex items-center space-x-2 pt-5 sm:pt-6">

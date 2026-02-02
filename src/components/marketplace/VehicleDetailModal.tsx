@@ -1,4 +1,4 @@
-import { X, Heart, Car, Fuel, Gauge, Calendar, Palette, Settings, User } from 'lucide-react';
+import { Heart, Car, Fuel, Gauge, Calendar, Palette, Settings, User } from 'lucide-react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -6,9 +6,11 @@ import { Separator } from '@/components/ui/separator';
 import { cn } from '@/lib/utils';
 import { useState } from 'react';
 import type { MarketplaceVehicle } from '@/pages/Marketplace';
+import { MarketInsightsPanel } from './MarketInsightsPanel';
+import { VerifiedBadge } from './IntelligenceBadges';
 
 interface VehicleDetailModalProps {
-  vehicle: MarketplaceVehicle | null;
+  vehicle: (MarketplaceVehicle & { verification_status?: string }) | null;
   dealerName: string;
   isFavorited: boolean;
   isLoggedIn: boolean;
@@ -29,6 +31,7 @@ export function VehicleDetailModal({
   if (!vehicle) return null;
 
   const isImported = !!vehicle.import_request_id;
+  const isVerified = vehicle.verification_status === 'verified';
   const photos = vehicle.photos || [];
 
   const formatPrice = (price: number, negotiable: boolean) => {
@@ -83,6 +86,7 @@ export function VehicleDetailModal({
                 <Badge variant="outline">
                   {formatCondition(vehicle.condition)}
                 </Badge>
+                <VerifiedBadge isVerified={isVerified} size="md" />
               </div>
             </div>
           </div>
@@ -180,6 +184,19 @@ export function VehicleDetailModal({
               </div>
             </>
           )}
+
+          <Separator />
+
+          {/* Market Insights Section */}
+          <MarketInsightsPanel
+            vehicleId={vehicle.id}
+            make={vehicle.make}
+            model={vehicle.model}
+            year={vehicle.year}
+            price={vehicle.price}
+            dealerId={vehicle.dealer_id}
+            verificationStatus={vehicle.verification_status}
+          />
 
           <Separator />
 
