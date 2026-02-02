@@ -4,9 +4,18 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { cn } from '@/lib/utils';
 import type { MarketplaceVehicle } from '@/pages/Marketplace';
+import { 
+  useMarketPricing, 
+  useMarketDemand, 
+  useDealerTrust,
+  getPricePosition,
+  getPriceDifferencePercent,
+  getDemandLevel
+} from '@/hooks/useMarketIntelligence';
+import { PricePositionBadge, DemandBadge, VerifiedBadge, TrustIndicator } from './IntelligenceBadges';
 
 interface VehicleCardProps {
-  vehicle: MarketplaceVehicle;
+  vehicle: MarketplaceVehicle & { verification_status?: string };
   dealerName: string;
   isFavorited: boolean;
   isLoggedIn: boolean;
@@ -23,6 +32,17 @@ export function VehicleCard({
   onViewDetails,
 }: VehicleCardProps) {
   const isImported = !!vehicle.import_request_id;
+  const isVerified = vehicle.verification_status === 'verified';
+  
+  // Market intelligence hooks - silent errors, non-blocking
+  const { data: pricing } = useMarketPricing(vehicle.make, vehicle.model, vehicle.year);
+  const { data: demand } = useMarketDemand(vehicle.make, vehicle.model);
+  const { data: dealerTrust } = useDealerTrust(vehicle.dealer_id);
+  
+  // Calculate intelligence metrics
+  const pricePosition = getPricePosition(vehicle.price, pricing?.avg_price);
+  const priceDiff = getPriceDifferencePercent(vehicle.price, pricing?.avg_price);
+  const demandLevel = getDemandLevel(demand?.demand_ratio);
 
   const formatPrice = (price: number, negotiable: boolean) => {
     if (negotiable) {
@@ -56,18 +76,22 @@ export function VehicleCard({
           </div>
         )}
 
-        {/* Source Badge */}
-        <Badge
-          variant="secondary"
-          className={cn(
-            "absolute top-3 left-3",
-            isImported 
-              ? "bg-primary/90 text-primary-foreground" 
-              : "bg-secondary/90 text-secondary-foreground"
-          )}
-        >
-          {isImported ? 'Imported via Flux' : 'Dealer-Owned'}
-        </Badge>
+        {/* Source Badge & Intelligence Badges */}
+        <div className="absolute top-3 left-3 flex flex-wrap gap-1.5 max-w-[70%]">
+          <Badge
+            variant="secondary"
+            className={cn(
+              isImported 
+                ? "bg-primary/90 text-primary-foreground" 
+                : "bg-secondary/90 text-secondary-foreground"
+            )}
+          >
+            {isImported ? 'Imported via Flux' : 'Dealer-Owned'}
+          </Badge>
+          <VerifiedBadge isVerified={isVerified} />
+          <PricePositionBadge position={pricePosition} percentDiff={priceDiff} />
+          <DemandBadge level={demandLevel} />
+        </div>
 
         {/* Favorite Button */}
         {isLoggedIn && (
@@ -118,6 +142,9 @@ export function VehicleCard({
             <div className="flex items-center gap-1.5 truncate">
               <Car className="h-4 w-4 flex-shrink-0" />
               <span className="truncate">{dealerName}</span>
+              {dealerTrust?.fulfillment_rate && (
+                <TrustIndicator fulfillmentRate={dealerTrust.fulfillment_rate} />
+              )}
             </div>
           </div>
 
