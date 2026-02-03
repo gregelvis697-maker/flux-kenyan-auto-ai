@@ -6,7 +6,7 @@ import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Plus, Edit, Trash2, Car, Fuel, Settings, DollarSign, Gauge, Palette, Maximize2, Package, Lock } from 'lucide-react';
+import { Plus, Edit, Trash2, Car, Fuel, Settings, DollarSign, Gauge, Palette, Maximize2, Package, ShieldCheck, ShieldX, Shield } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import {
   Select,
@@ -44,6 +44,7 @@ interface Vehicle {
   photos: string[];
   created_at: string;
   import_request_id: string | null;
+  verification_status: string | null;
 }
 
 type InventorySource = 'all' | 'dealer_owned' | 'imported';
@@ -98,7 +99,7 @@ export function InventoryTab({ onUpdate }: InventoryTabProps) {
 
       const { data, error } = await supabase
         .from('vehicles')
-        .select('*')
+        .select('id, make, model, year, condition, fuel_type, engine_capacity, mileage, color, transmission, description, price, negotiable, is_sold, photos, created_at, import_request_id, verification_status')
         .eq('dealer_id', user.id)
         .order('created_at', { ascending: false });
 
@@ -274,6 +275,59 @@ export function InventoryTab({ onUpdate }: InventoryTabProps) {
         description: 'Failed to delete vehicle',
         variant: 'destructive',
       });
+    }
+  };
+
+  const handleRequestVerification = async (vehicleId: string) => {
+    try {
+      const { error } = await supabase
+        .from('vehicles')
+        .update({ verification_status: 'pending' })
+        .eq('id', vehicleId);
+
+      if (error) throw error;
+
+      toast({
+        title: '✅ Verification Requested',
+        description: 'Your vehicle has been submitted for verification.',
+      });
+
+      fetchVehicles();
+    } catch (error) {
+      console.error('Error requesting verification:', error);
+      toast({
+        title: 'Error',
+        description: 'Failed to request verification',
+        variant: 'destructive',
+      });
+    }
+  };
+
+  const getVerificationBadge = (status: string | null) => {
+    switch (status) {
+      case 'verified':
+        return (
+          <Badge className="text-[10px] sm:text-xs bg-emerald-500/20 text-emerald-400 border-emerald-500/30 gap-1">
+            <ShieldCheck className="h-2.5 w-2.5" />
+            Verified
+          </Badge>
+        );
+      case 'pending':
+        return (
+          <Badge className="text-[10px] sm:text-xs bg-amber-500/20 text-amber-400 border-amber-500/30 gap-1">
+            <Shield className="h-2.5 w-2.5" />
+            Pending
+          </Badge>
+        );
+      case 'rejected':
+        return (
+          <Badge className="text-[10px] sm:text-xs bg-red-500/20 text-red-400 border-red-500/30 gap-1">
+            <ShieldX className="h-2.5 w-2.5" />
+            Rejected
+          </Badge>
+        );
+      default:
+        return null;
     }
   };
 
@@ -626,7 +680,7 @@ export function InventoryTab({ onUpdate }: InventoryTabProps) {
 
               {/* Content */}
               <div className="p-3 sm:p-4 space-y-2.5 sm:space-y-3">
-                {/* Title */}
+                {/* Source & Verification Badges */}
                 <div>
                   <h4 className="font-semibold text-sm sm:text-base text-foreground truncate">
                     {vehicle.year} {vehicle.make} {vehicle.model}
@@ -646,6 +700,7 @@ export function InventoryTab({ onUpdate }: InventoryTabProps) {
                         Dealer-Owned
                       </Badge>
                     )}
+                    {getVerificationBadge(vehicle.verification_status)}
                   </div>
                 </div>
 
@@ -686,33 +741,51 @@ export function InventoryTab({ onUpdate }: InventoryTabProps) {
                 </div>
 
                 {/* Actions */}
-                <div className="grid grid-cols-3 gap-1.5 sm:gap-2 pt-2">
+                <div className="grid grid-cols-4 gap-1 sm:gap-1.5 pt-2">
                   <Button
                     size="sm"
                     variant="outline"
                     onClick={() => handleEdit(vehicle)}
-                    className="h-8 text-xs px-2"
+                    className="h-8 text-xs px-1"
                   >
-                    <Edit className="h-3 w-3 sm:mr-1" />
-                    <span className="hidden sm:inline">Edit</span>
+                    <Edit className="h-3 w-3" />
                   </Button>
                   <Button
                     size="sm"
                     variant={vehicle.is_sold ? 'default' : 'secondary'}
                     onClick={() => handleToggleSold(vehicle.id, vehicle.is_sold)}
-                    className="h-8 text-xs px-2"
+                    className="h-8 text-xs px-1"
                   >
-                    <DollarSign className="h-3 w-3 sm:mr-1" />
-                    <span className="hidden sm:inline">{vehicle.is_sold ? 'Relist' : 'Sold'}</span>
+                    <DollarSign className="h-3 w-3" />
                   </Button>
+                  {!vehicle.verification_status || vehicle.verification_status === 'rejected' ? (
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      onClick={() => handleRequestVerification(vehicle.id)}
+                      className="h-8 text-xs px-1 text-emerald-400 hover:text-emerald-300 hover:bg-emerald-500/10"
+                      title="Request Verification"
+                    >
+                      <ShieldCheck className="h-3 w-3" />
+                    </Button>
+                  ) : (
+                    <Button
+                      size="sm"
+                      variant="ghost"
+                      disabled
+                      className="h-8 text-xs px-1"
+                      title={vehicle.verification_status === 'verified' ? 'Verified' : 'Pending'}
+                    >
+                      <Shield className="h-3 w-3" />
+                    </Button>
+                  )}
                   <Button
                     size="sm"
                     variant="destructive"
                     onClick={() => handleDelete(vehicle.id)}
-                    className="h-8 text-xs px-2"
+                    className="h-8 text-xs px-1"
                   >
-                    <Trash2 className="h-3 w-3 sm:mr-1" />
-                    <span className="hidden sm:inline">Delete</span>
+                    <Trash2 className="h-3 w-3" />
                   </Button>
                 </div>
               </div>

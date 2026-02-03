@@ -13,6 +13,7 @@ import { InsightsPanel } from '@/components/admin/InsightsPanel';
 import { EmailLogsPanel } from '@/components/admin/EmailLogsPanel';
 import { EmailTemplatesPanel } from '@/components/admin/EmailTemplatesPanel';
 import { AuditTrailViewer } from '@/components/admin/AuditTrailViewer';
+import { VehicleVerificationPanel } from '@/components/admin/VehicleVerificationPanel';
 import { NotificationBell } from '@/components/admin/NotificationBell';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -833,6 +834,9 @@ export default function AdminDashboard() {
       case 'audit-trail':
         return <AuditTrailViewer />;
 
+      case 'vehicle-verification':
+        return <VehicleVerificationPanel />;
+
       default:
         return null;
     }
@@ -845,6 +849,7 @@ export default function AdminDashboard() {
       'pending-importers': 'Pending Importer Applications',
       'verified': 'Verified Users',
       'rejected': 'Rejected Applications',
+      'vehicle-verification': 'Vehicle Verification',
       'insights': 'Analytics & Insights',
       'activity': 'Activity Log',
       'email-logs': 'Email Logs',

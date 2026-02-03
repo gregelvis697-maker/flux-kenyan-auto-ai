@@ -8,11 +8,13 @@ import {
   useMarketPricing, 
   useMarketDemand, 
   useDealerTrust,
+  useVehicleRisk,
   getPricePosition,
   getPriceDifferencePercent,
-  getDemandLevel
+  getDemandLevel,
+  calculateConfidenceScore
 } from '@/hooks/useMarketIntelligence';
-import { PricePositionBadge, DemandBadge, VerifiedBadge, TrustIndicator } from './IntelligenceBadges';
+import { PricePositionBadge, DemandBadge, VerifiedBadge, TrustIndicator, ConfidenceScoreBadge } from './IntelligenceBadges';
 
 interface VehicleCardProps {
   vehicle: MarketplaceVehicle & { verification_status?: string };
@@ -38,11 +40,27 @@ export function VehicleCard({
   const { data: pricing } = useMarketPricing(vehicle.make, vehicle.model, vehicle.year);
   const { data: demand } = useMarketDemand(vehicle.make, vehicle.model);
   const { data: dealerTrust } = useDealerTrust(vehicle.dealer_id);
+  const { data: riskFlags } = useVehicleRisk(vehicle.id);
   
   // Calculate intelligence metrics
   const pricePosition = getPricePosition(vehicle.price, pricing?.avg_price);
   const priceDiff = getPriceDifferencePercent(vehicle.price, pricing?.avg_price);
   const demandLevel = getDemandLevel(demand?.demand_ratio);
+  
+  // Calculate confidence score
+  const confidenceScore = calculateConfidenceScore({
+    price: vehicle.price,
+    avgPrice: pricing?.avg_price,
+    demandRatio: demand?.demand_ratio,
+    fulfillmentRate: dealerTrust?.fulfillment_rate,
+    riskFlags: riskFlags ? {
+      price_below_market: riskFlags.price_below_market,
+      missing_photos: riskFlags.missing_photos,
+      incomplete_data: riskFlags.incomplete_data,
+      new_dealer: riskFlags.new_dealer,
+    } : undefined,
+    isVerified,
+  });
 
   const formatPrice = (price: number, negotiable: boolean) => {
     if (negotiable) {
@@ -76,8 +94,13 @@ export function VehicleCard({
           </div>
         )}
 
+        {/* Confidence Score Badge - Top Right */}
+        <div className="absolute top-3 right-3 z-10">
+          <ConfidenceScoreBadge score={confidenceScore} />
+        </div>
+
         {/* Source Badge & Intelligence Badges */}
-        <div className="absolute top-3 left-3 flex flex-wrap gap-1.5 max-w-[70%]">
+        <div className="absolute top-3 left-3 flex flex-wrap gap-1.5 max-w-[60%]">
           <Badge
             variant="secondary"
             className={cn(
@@ -93,13 +116,13 @@ export function VehicleCard({
           <DemandBadge level={demandLevel} />
         </div>
 
-        {/* Favorite Button */}
+        {/* Favorite Button - Bottom Right */}
         {isLoggedIn && (
           <Button
             variant="ghost"
             size="icon"
             className={cn(
-              "absolute top-3 right-3 bg-background/80 backdrop-blur-sm hover:bg-background/90",
+              "absolute bottom-3 right-3 bg-background/80 backdrop-blur-sm hover:bg-background/90",
               isFavorited && "text-rose-500"
             )}
             onClick={(e) => {
