@@ -1,7 +1,8 @@
-import { TrendingDown, TrendingUp, Flame, Shield, CheckCircle2, AlertTriangle } from 'lucide-react';
+import { TrendingDown, TrendingUp, Flame, Shield, CheckCircle2, AlertTriangle, Star } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { cn } from '@/lib/utils';
+import { getConfidenceLevel } from '@/hooks/useMarketIntelligence';
 
 interface PricePositionBadgeProps {
   position: 'below' | 'fair' | 'above' | null;
@@ -181,5 +182,145 @@ export function RiskIndicator({ riskScore, size = 'sm' }: RiskIndicatorProps) {
         </TooltipContent>
       </Tooltip>
     </TooltipProvider>
+  );
+}
+
+interface ConfidenceScoreBadgeProps {
+  score: number;
+  size?: 'sm' | 'md' | 'lg';
+  showLabel?: boolean;
+}
+
+export function ConfidenceScoreBadge({ score, size = 'sm', showLabel = false }: ConfidenceScoreBadgeProps) {
+  const level = getConfidenceLevel(score);
+  
+  const config = {
+    excellent: {
+      className: 'bg-emerald-500/20 text-emerald-400 border-emerald-500/30',
+      label: 'Excellent',
+    },
+    good: {
+      className: 'bg-blue-500/20 text-blue-400 border-blue-500/30',
+      label: 'Good',
+    },
+    fair: {
+      className: 'bg-amber-500/20 text-amber-400 border-amber-500/30',
+      label: 'Fair',
+    },
+    low: {
+      className: 'bg-red-500/20 text-red-400 border-red-500/30',
+      label: 'Low',
+    },
+  };
+  
+  const { className, label } = config[level];
+  
+  const sizeClasses = {
+    sm: 'text-[10px] px-1.5 py-0.5',
+    md: 'text-xs px-2 py-1',
+    lg: 'text-sm px-3 py-1.5',
+  };
+  
+  return (
+    <TooltipProvider>
+      <Tooltip>
+        <TooltipTrigger asChild>
+          <Badge 
+            variant="outline" 
+            className={cn(
+              'gap-1 font-medium border',
+              className,
+              sizeClasses[size]
+            )}
+          >
+            <Star className={cn(
+              size === 'sm' ? 'h-3 w-3' : size === 'md' ? 'h-3.5 w-3.5' : 'h-4 w-4',
+              'fill-current'
+            )} />
+            {score}
+            {showLabel && ` - ${label}`}
+          </Badge>
+        </TooltipTrigger>
+        <TooltipContent>
+          <p>Confidence Score: {score}/100 ({label})</p>
+        </TooltipContent>
+      </Tooltip>
+    </TooltipProvider>
+  );
+}
+
+interface LargeConfidenceScoreProps {
+  score: number;
+}
+
+export function LargeConfidenceScore({ score }: LargeConfidenceScoreProps) {
+  const level = getConfidenceLevel(score);
+  
+  const config = {
+    excellent: {
+      ringColor: 'stroke-emerald-500',
+      textColor: 'text-emerald-400',
+      bgColor: 'bg-emerald-500/10',
+      label: 'Excellent',
+    },
+    good: {
+      ringColor: 'stroke-blue-500',
+      textColor: 'text-blue-400',
+      bgColor: 'bg-blue-500/10',
+      label: 'Good',
+    },
+    fair: {
+      ringColor: 'stroke-amber-500',
+      textColor: 'text-amber-400',
+      bgColor: 'bg-amber-500/10',
+      label: 'Fair',
+    },
+    low: {
+      ringColor: 'stroke-red-500',
+      textColor: 'text-red-400',
+      bgColor: 'bg-red-500/10',
+      label: 'Low',
+    },
+  };
+  
+  const { ringColor, textColor, bgColor, label } = config[level];
+  const circumference = 2 * Math.PI * 40;
+  const strokeDashoffset = circumference - (score / 100) * circumference;
+  
+  return (
+    <div className={cn('flex items-center gap-4 p-4 rounded-xl', bgColor)}>
+      <div className="relative w-24 h-24">
+        <svg className="w-full h-full -rotate-90" viewBox="0 0 100 100">
+          <circle
+            className="stroke-muted/30"
+            strokeWidth="8"
+            fill="transparent"
+            r="40"
+            cx="50"
+            cy="50"
+          />
+          <circle
+            className={cn('transition-all duration-500', ringColor)}
+            strokeWidth="8"
+            strokeLinecap="round"
+            fill="transparent"
+            r="40"
+            cx="50"
+            cy="50"
+            style={{
+              strokeDasharray: circumference,
+              strokeDashoffset,
+            }}
+          />
+        </svg>
+        <div className="absolute inset-0 flex flex-col items-center justify-center">
+          <span className={cn('text-2xl font-bold', textColor)}>{score}</span>
+        </div>
+      </div>
+      <div>
+        <p className={cn('text-lg font-semibold', textColor)}>{label}</p>
+        <p className="text-sm text-muted-foreground">Confidence Score</p>
+      </div>
+    </div>
   );
 }

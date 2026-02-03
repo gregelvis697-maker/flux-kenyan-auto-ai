@@ -225,6 +225,98 @@ export function getDemandLevel(
 }
 
 /**
+ * Calculate individual score components
+ */
+export function getPriceScore(price: number, avgPrice: number | null | undefined): number {
+  if (!avgPrice || avgPrice === 0) return 0;
+  const ratio = price / avgPrice;
+  // Below market = good, above market = bad
+  if (ratio < 0.85) return 15; // significantly below market
+  if (ratio < 0.95) return 10; // slightly below market
+  if (ratio <= 1.05) return 5; // fair price
+  return 0; // above market
+}
+
+export function getDemandScore(demandRatio: number | null | undefined): number {
+  if (demandRatio === null || demandRatio === undefined) return 0;
+  if (demandRatio > 1.5) return 15; // very high demand
+  if (demandRatio > 1) return 10; // high demand
+  if (demandRatio > 0.5) return 5; // moderate demand
+  return 0; // low demand
+}
+
+export function getTrustScore(fulfillmentRate: number | null | undefined): number {
+  if (fulfillmentRate === null || fulfillmentRate === undefined) return 0;
+  if (fulfillmentRate >= 90) return 10; // excellent
+  if (fulfillmentRate >= 70) return 7; // good
+  if (fulfillmentRate >= 50) return 3; // average
+  return 0; // poor
+}
+
+export function getRiskPenalty(riskFlags: {
+  price_below_market?: boolean;
+  missing_photos?: boolean;
+  incomplete_data?: boolean;
+  new_dealer?: boolean;
+} | undefined): number {
+  if (!riskFlags) return 0;
+  let penalty = 0;
+  if (riskFlags.missing_photos) penalty += 5;
+  if (riskFlags.incomplete_data) penalty += 5;
+  if (riskFlags.new_dealer) penalty += 5;
+  // price_below_market is already factored into price score positively
+  return penalty;
+}
+
+/**
+ * Calculate confidence score (0-100)
+ * Starts at 50, adds/subtracts based on various factors
+ */
+export function calculateConfidenceScore(params: {
+  price: number;
+  avgPrice?: number | null;
+  demandRatio?: number | null;
+  fulfillmentRate?: number | null;
+  riskFlags?: {
+    price_below_market?: boolean;
+    missing_photos?: boolean;
+    incomplete_data?: boolean;
+    new_dealer?: boolean;
+  };
+  isVerified?: boolean;
+}): number {
+  let score = 50;
+  
+  // Price factor (+0 to +15)
+  score += getPriceScore(params.price, params.avgPrice);
+  
+  // Demand factor (+0 to +15)
+  score += getDemandScore(params.demandRatio);
+  
+  // Trust factor (+0 to +10)
+  score += getTrustScore(params.fulfillmentRate);
+  
+  // Verified bonus (+20)
+  if (params.isVerified) score += 20;
+  
+  // Risk penalty (-0 to -15)
+  score -= getRiskPenalty(params.riskFlags);
+  
+  // Clamp between 0 and 100
+  return Math.max(0, Math.min(100, score));
+}
+
+/**
+ * Get confidence level label
+ */
+export function getConfidenceLevel(score: number): 'excellent' | 'good' | 'fair' | 'low' {
+  if (score >= 80) return 'excellent';
+  if (score >= 60) return 'good';
+  if (score >= 40) return 'fair';
+  return 'low';
+}
+
+/**
  * Generate AI-like insight summary using template strings
  * No external AI calls - purely template-based
  */
@@ -248,11 +340,13 @@ export function generateInsightSummary(params: {
     const priceDiff = getPriceDifferencePercent(params.price, params.avgPrice);
     if (priceDiff !== null) {
       if (priceDiff < -15) {
-        parts.push(`Priced ${Math.abs(priceDiff)}% below market average.`);
-      } else if (priceDiff > 15) {
-        parts.push(`Priced ${priceDiff}% above market average.`);
+        parts.push('Great value.');
+      } else if (priceDiff < -5) {
+        parts.push('Good price.');
+      } else if (priceDiff <= 5) {
+        parts.push('Fair price.');
       } else {
-        parts.push('Priced competitively within market range.');
+        parts.push(`${priceDiff}% above market.`);
       }
     }
   }
@@ -260,42 +354,23 @@ export function generateInsightSummary(params: {
   // Demand insight
   const demandLevel = getDemandLevel(params.demandRatio);
   if (demandLevel === 'high') {
-    parts.push('High demand for this model.');
+    parts.push('High demand.');
   } else if (demandLevel === 'moderate') {
-    parts.push('Moderate market demand.');
+    parts.push('Moderate demand.');
   }
   
   // Dealer trust insight
   if (params.fulfillmentRate !== null && params.fulfillmentRate !== undefined) {
     if (params.fulfillmentRate >= 90) {
-      parts.push(`Dealer has excellent ${params.fulfillmentRate}% fulfillment rate.`);
+      parts.push('Trusted dealer.');
     } else if (params.fulfillmentRate >= 70) {
-      parts.push(`Dealer has good ${params.fulfillmentRate}% fulfillment rate.`);
+      parts.push('Good dealer history.');
     }
   }
   
   // Verification status
   if (params.isVerified) {
-    parts.push('FLUX verified listing.');
-  }
-  
-  // Risk considerations
-  const considerations: string[] = [];
-  if (params.riskFlags?.price_below_market) {
-    considerations.push('unusually low price');
-  }
-  if (params.riskFlags?.missing_photos) {
-    considerations.push('limited photos');
-  }
-  if (params.riskFlags?.incomplete_data) {
-    considerations.push('incomplete details');
-  }
-  if (params.riskFlags?.new_dealer) {
-    considerations.push('new dealer');
-  }
-  
-  if (considerations.length > 0) {
-    parts.push(`Consider: ${considerations.join(', ')}.`);
+    parts.push('FLUX Verified.');
   }
   
   return parts.length > 0 ? parts.join(' ') : 'Market data pending.';

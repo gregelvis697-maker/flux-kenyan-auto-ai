@@ -16,6 +16,7 @@ import {
   FileText,
   History,
   Menu,
+  ShieldCheck,
 } from 'lucide-react';
 
 interface AdminSidebarProps {
@@ -54,6 +55,12 @@ const menuItems = [
     id: 'rejected',
     label: 'Rejected Users',
     icon: UserX,
+    section: 'verification',
+  },
+  {
+    id: 'vehicle-verification',
+    label: 'Vehicle Verification',
+    icon: ShieldCheck,
     section: 'verification',
   },
   {

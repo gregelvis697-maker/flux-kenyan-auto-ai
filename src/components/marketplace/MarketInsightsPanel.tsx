@@ -10,9 +10,10 @@ import {
   getPricePosition,
   getPriceDifferencePercent,
   getDemandLevel,
-  generateInsightSummary 
+  generateInsightSummary,
+  calculateConfidenceScore
 } from '@/hooks/useMarketIntelligence';
-import { PricePositionBadge, DemandBadge, VerifiedBadge, RiskIndicator } from './IntelligenceBadges';
+import { PricePositionBadge, DemandBadge, VerifiedBadge, RiskIndicator, LargeConfidenceScore } from './IntelligenceBadges';
 
 interface MarketInsightsPanelProps {
   vehicleId: string;
@@ -47,17 +48,28 @@ export function MarketInsightsPanel({
   const demandLevel = getDemandLevel(demand?.demand_ratio);
   const isVerified = verificationStatus === 'verified';
   
+  const riskFlagsData = riskFlags ? {
+    price_below_market: riskFlags.price_below_market,
+    missing_photos: riskFlags.missing_photos,
+    incomplete_data: riskFlags.incomplete_data,
+    new_dealer: riskFlags.new_dealer,
+  } : undefined;
+  
+  const confidenceScore = calculateConfidenceScore({
+    price,
+    avgPrice: pricing?.avg_price,
+    demandRatio: demand?.demand_ratio,
+    fulfillmentRate: dealerTrust?.fulfillment_rate,
+    riskFlags: riskFlagsData,
+    isVerified,
+  });
+  
   const insightSummary = generateInsightSummary({
     price,
     avgPrice: pricing?.avg_price,
     demandRatio: demand?.demand_ratio,
     fulfillmentRate: dealerTrust?.fulfillment_rate,
-    riskFlags: riskFlags ? {
-      price_below_market: riskFlags.price_below_market,
-      missing_photos: riskFlags.missing_photos,
-      incomplete_data: riskFlags.incomplete_data,
-      new_dealer: riskFlags.new_dealer,
-    } : undefined,
+    riskFlags: riskFlagsData,
     isVerified,
   });
   
@@ -70,6 +82,9 @@ export function MarketInsightsPanel({
         <h3 className="text-lg font-semibold">Market Insights</h3>
         {isVerified && <VerifiedBadge isVerified={isVerified} size="md" />}
       </div>
+      
+      {/* Confidence Score - Large Display */}
+      <LargeConfidenceScore score={confidenceScore} />
       
       {/* AI Summary */}
       <div className="p-3 bg-primary/5 border border-primary/20 rounded-lg">
