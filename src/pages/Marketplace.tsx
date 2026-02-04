@@ -7,6 +7,7 @@ import { VehicleFilters } from '@/components/marketplace/VehicleFilters';
 import { VehicleDetailModal } from '@/components/marketplace/VehicleDetailModal';
 import { Car, Search } from 'lucide-react';
 import { Input } from '@/components/ui/input';
+import type { VehicleWithIntelligence } from '@/components/marketplace/VehicleCard';
 
 export interface MarketplaceVehicle {
   id: string;
@@ -53,12 +54,12 @@ const initialFilters: VehicleFiltersState = {
 
 export default function Marketplace() {
   const { user } = useAuth();
-  const [vehicles, setVehicles] = useState<MarketplaceVehicle[]>([]);
+  const [vehicles, setVehicles] = useState<VehicleWithIntelligence[]>([]);
   const [favorites, setFavorites] = useState<Set<string>>(new Set());
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
   const [filters, setFilters] = useState<VehicleFiltersState>(initialFilters);
-  const [selectedVehicle, setSelectedVehicle] = useState<MarketplaceVehicle | null>(null);
+  const [selectedVehicle, setSelectedVehicle] = useState<VehicleWithIntelligence | null>(null);
   const [dealerNames, setDealerNames] = useState<Record<string, string>>({});
 
   useEffect(() => {
@@ -71,32 +72,86 @@ export default function Marketplace() {
   const fetchVehicles = async () => {
     setLoading(true);
     try {
-      const { data, error } = await supabase
+      // Fetch vehicles
+      const { data: vehicleData, error: vehicleError } = await supabase
         .from('vehicles')
         .select('id, make, model, year, price, mileage, fuel_type, transmission, color, condition, description, engine_capacity, negotiable, photos, dealer_id, import_request_id, created_at, verification_status')
         .eq('is_sold', false)
         .order('created_at', { ascending: false });
 
-      if (error) {
-        console.error('Error fetching vehicles:', error);
+      if (vehicleError) {
+        console.error('Error fetching vehicles:', vehicleError);
         setVehicles([]);
-      } else {
-        setVehicles(data || []);
-        // Fetch dealer names for all vehicles
-        const dealerIds = [...new Set((data || []).map(v => v.dealer_id))];
-        if (dealerIds.length > 0) {
-          const { data: profiles } = await supabase
-            .from('profiles')
-            .select('id, full_name, email')
-            .in('id', dealerIds);
-          
-          const names: Record<string, string> = {};
-          (profiles || []).forEach(p => {
-            names[p.id] = p.full_name || p.email || 'Dealer';
-          });
-          setDealerNames(names);
-        }
+        return;
       }
+
+      const rawVehicles = vehicleData || [];
+      
+      // Fetch dealer names
+      const dealerIds = [...new Set(rawVehicles.map(v => v.dealer_id))];
+      let dealerNamesMap: Record<string, string> = {};
+      if (dealerIds.length > 0) {
+        const { data: profiles } = await supabase
+          .from('profiles')
+          .select('id, full_name, email')
+          .in('id', dealerIds);
+        
+        (profiles || []).forEach(p => {
+          dealerNamesMap[p.id] = p.full_name || p.email || 'Dealer';
+        });
+        setDealerNames(dealerNamesMap);
+      }
+
+      // Fetch bulk intelligence data (silent failure)
+      let pricingMap: Record<string, number> = {};
+      let demandMap: Record<string, number> = {};
+      let trustMap: Record<string, number> = {};
+
+      try {
+        // Get unique make/model/year combinations for pricing
+        const { data: pricingData } = await supabase
+          .from('market_pricing_stats')
+          .select('make, model, year, avg_price');
+        
+        (pricingData || []).forEach(p => {
+          const key = `${p.make}-${p.model}-${p.year}`;
+          pricingMap[key] = p.avg_price;
+        });
+
+        // Get demand data
+        const { data: demandData } = await supabase
+          .from('market_demand_stats')
+          .select('make, model, demand_ratio');
+        
+        (demandData || []).forEach(d => {
+          const key = `${d.make}-${d.model}`;
+          demandMap[key] = d.demand_ratio;
+        });
+
+        // Get dealer trust data
+        const { data: trustData } = await supabase
+          .from('dealer_trust_stats')
+          .select('dealer_id, fulfillment_rate')
+          .in('dealer_id', dealerIds);
+        
+        (trustData || []).forEach(t => {
+          if (t.dealer_id && t.fulfillment_rate !== null) {
+            trustMap[t.dealer_id] = t.fulfillment_rate;
+          }
+        });
+      } catch (intelligenceError) {
+        console.debug('Intelligence fetch failed silently:', intelligenceError);
+      }
+
+      // Merge intelligence data into vehicles
+      const vehiclesWithIntelligence: VehicleWithIntelligence[] = rawVehicles.map(v => ({
+        ...v,
+        pricing_avg: pricingMap[`${v.make}-${v.model}-${v.year}`] || null,
+        demand_ratio: demandMap[`${v.make}-${v.model}`] || null,
+        fulfillment_rate: trustMap[v.dealer_id] || null,
+      }));
+
+      setVehicles(vehiclesWithIntelligence);
     } catch (error) {
       console.error('Error:', error);
       setVehicles([]);
