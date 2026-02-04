@@ -5,19 +5,25 @@ import { Badge } from '@/components/ui/badge';
 import { cn } from '@/lib/utils';
 import type { MarketplaceVehicle } from '@/pages/Marketplace';
 import { 
-  useMarketPricing, 
-  useMarketDemand, 
-  useDealerTrust,
-  useVehicleRisk,
   getPricePosition,
   getPriceDifferencePercent,
   getDemandLevel,
   calculateConfidenceScore
 } from '@/hooks/useMarketIntelligence';
-import { PricePositionBadge, DemandBadge, VerifiedBadge, TrustIndicator, ConfidenceScoreBadge } from './IntelligenceBadges';
+import { PricePositionBadge, DemandBadge, VerifiedBadge, ConfidenceScoreBadge } from './IntelligenceBadges';
+
+// Extended vehicle type with optional intelligence data
+export interface VehicleWithIntelligence extends MarketplaceVehicle {
+  verification_status?: string;
+  // Pre-fetched intelligence data (optional)
+  pricing_avg?: number | null;
+  demand_ratio?: number | null;
+  fulfillment_rate?: number | null;
+  risk_score?: number | null;
+}
 
 interface VehicleCardProps {
-  vehicle: MarketplaceVehicle & { verification_status?: string };
+  vehicle: VehicleWithIntelligence;
   dealerName: string;
   isFavorited: boolean;
   isLoggedIn: boolean;
@@ -36,29 +42,18 @@ export function VehicleCard({
   const isImported = !!vehicle.import_request_id;
   const isVerified = vehicle.verification_status === 'verified';
   
-  // Market intelligence hooks - silent errors, non-blocking
-  const { data: pricing } = useMarketPricing(vehicle.make, vehicle.model, vehicle.year);
-  const { data: demand } = useMarketDemand(vehicle.make, vehicle.model);
-  const { data: dealerTrust } = useDealerTrust(vehicle.dealer_id);
-  const { data: riskFlags } = useVehicleRisk(vehicle.id);
+  // Use pre-fetched data if available, otherwise calculate with defaults
+  const pricePosition = getPricePosition(vehicle.price, vehicle.pricing_avg);
+  const priceDiff = getPriceDifferencePercent(vehicle.price, vehicle.pricing_avg);
+  const demandLevel = getDemandLevel(vehicle.demand_ratio);
   
-  // Calculate intelligence metrics
-  const pricePosition = getPricePosition(vehicle.price, pricing?.avg_price);
-  const priceDiff = getPriceDifferencePercent(vehicle.price, pricing?.avg_price);
-  const demandLevel = getDemandLevel(demand?.demand_ratio);
-  
-  // Calculate confidence score
+  // Calculate confidence score with available data
   const confidenceScore = calculateConfidenceScore({
     price: vehicle.price,
-    avgPrice: pricing?.avg_price,
-    demandRatio: demand?.demand_ratio,
-    fulfillmentRate: dealerTrust?.fulfillment_rate,
-    riskFlags: riskFlags ? {
-      price_below_market: riskFlags.price_below_market,
-      missing_photos: riskFlags.missing_photos,
-      incomplete_data: riskFlags.incomplete_data,
-      new_dealer: riskFlags.new_dealer,
-    } : undefined,
+    avgPrice: vehicle.pricing_avg,
+    demandRatio: vehicle.demand_ratio,
+    fulfillmentRate: vehicle.fulfillment_rate,
+    riskFlags: undefined, // Skip risk flags for card view to keep it simple
     isVerified,
   });
 
@@ -165,9 +160,6 @@ export function VehicleCard({
             <div className="flex items-center gap-1.5 truncate">
               <Car className="h-4 w-4 flex-shrink-0" />
               <span className="truncate">{dealerName}</span>
-              {dealerTrust?.fulfillment_rate && (
-                <TrustIndicator fulfillmentRate={dealerTrust.fulfillment_rate} />
-              )}
             </div>
           </div>
 
