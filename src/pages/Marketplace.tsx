@@ -26,6 +26,7 @@ export interface MarketplaceVehicle {
   dealer_id: string;
   import_request_id: string | null;
   created_at: string;
+  verification_status?: string | null;
 }
 
 export interface VehicleFiltersState {
@@ -72,7 +73,7 @@ export default function Marketplace() {
     try {
       const { data, error } = await supabase
         .from('vehicles')
-        .select('*')
+        .select('id, make, model, year, price, mileage, fuel_type, transmission, color, condition, description, engine_capacity, negotiable, photos, dealer_id, import_request_id, created_at, verification_status')
         .eq('is_sold', false)
         .order('created_at', { ascending: false });
 
