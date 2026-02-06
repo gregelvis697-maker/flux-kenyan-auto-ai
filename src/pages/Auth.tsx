@@ -175,6 +175,16 @@ const Auth = () => {
               {isLoading ? 'Loading...' : isLogin ? 'Sign In' : 'Sign Up'}
             </Button>
           </form>
+          {isLogin && (
+            <div className="mt-3 text-center">
+              <Link
+                to="/reset-password"
+                className="text-sm text-primary hover:underline"
+              >
+                Forgot Password?
+              </Link>
+            </div>
+          )}
           <div className="mt-4 sm:mt-6 text-center">
             <button
               type="button"
