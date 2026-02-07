@@ -130,7 +130,7 @@ export function SettingsPanel() {
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="space-y-2">
-            <Label htmlFor="fullName" className="flex items-center gap-2">
+            <Label htmlFor="fullName" className="flex items-center gap-2 text-sm">
               <User className="h-4 w-4 text-muted-foreground" />
               Full Name
             </Label>
@@ -139,21 +139,23 @@ export function SettingsPanel() {
               value={profile.full_name || ''}
               onChange={(e) => setProfile({ ...profile, full_name: e.target.value })}
               placeholder="Enter your full name"
-              className="h-11"
+              className="h-11 sm:h-10 text-base sm:text-sm"
             />
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="phone" className="flex items-center gap-2">
+            <Label htmlFor="phone" className="flex items-center gap-2 text-sm">
               <Phone className="h-4 w-4 text-muted-foreground" />
               Phone Number
             </Label>
             <Input
               id="phone"
+              type="tel"
+              inputMode="tel"
               value={profile.phone_number || ''}
               onChange={(e) => setProfile({ ...profile, phone_number: e.target.value })}
               placeholder="Enter your phone number"
-              className="h-11"
+              className="h-11 sm:h-10 text-base sm:text-sm"
             />
             <p className="text-xs text-muted-foreground">
               Phone number storage coming soon
@@ -161,15 +163,16 @@ export function SettingsPanel() {
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="email" className="flex items-center gap-2">
+            <Label htmlFor="email" className="flex items-center gap-2 text-sm">
               <Mail className="h-4 w-4 text-muted-foreground" />
               Email Address
             </Label>
             <Input
               id="email"
+              type="email"
               value={profile.email}
               disabled
-              className="h-11 bg-muted/50"
+              className="h-11 sm:h-10 text-base sm:text-sm bg-muted/50"
             />
             <p className="text-xs text-muted-foreground">
               Email cannot be changed
@@ -177,7 +180,7 @@ export function SettingsPanel() {
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="role" className="flex items-center gap-2">
+            <Label htmlFor="role" className="flex items-center gap-2 text-sm">
               <Shield className="h-4 w-4 text-muted-foreground" />
               Account Role
             </Label>
@@ -185,7 +188,7 @@ export function SettingsPanel() {
               id="role"
               value={getRoleDisplayName(userRole)}
               disabled
-              className="h-11 bg-muted/50"
+              className="h-11 sm:h-10 text-base sm:text-sm bg-muted/50"
             />
             <p className="text-xs text-muted-foreground">
               Role is assigned during registration
@@ -196,7 +199,7 @@ export function SettingsPanel() {
             <Button 
               onClick={handleSave} 
               disabled={saving}
-              className="w-full sm:w-auto"
+              className="w-full sm:w-auto h-11 sm:h-10 text-base sm:text-sm"
             >
               {saving ? (
                 <>
