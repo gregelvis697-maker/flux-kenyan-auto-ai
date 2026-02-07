@@ -6,7 +6,7 @@ import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Plus, Edit, Trash2, Car, Fuel, Settings, DollarSign, Gauge, Palette, Maximize2, Package, ShieldCheck, ShieldX, Shield } from 'lucide-react';
+import { Plus, Edit, Trash2, Car, Fuel, Settings, DollarSign, Gauge, Palette, Maximize2, Package, ShieldCheck, ShieldX, Shield, Loader2 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import {
   Select,
@@ -443,132 +443,135 @@ export function InventoryTab({ onUpdate }: InventoryTabProps) {
             {/* Photo Upload Section */}
             <PhotoUploader photos={photos} onPhotosChange={setPhotos} maxPhotos={10} />
 
-            <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 sm:gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
               <div className="space-y-1.5">
-                <Label htmlFor="make" className="text-xs sm:text-sm">Make *</Label>
+                <Label htmlFor="make" className="text-sm">Make <span className="text-destructive">*</span></Label>
                 <Input
                   id="make"
                   value={formData.make}
                   onChange={(e) => setFormData({ ...formData, make: e.target.value })}
                   required
-                  className="bg-background/50 h-9 sm:h-10 text-sm"
+                  className="bg-background/50 h-11 sm:h-10 text-base sm:text-sm"
                   placeholder="Toyota"
                 />
               </div>
               <div className="space-y-1.5">
-                <Label htmlFor="model" className="text-xs sm:text-sm">Model *</Label>
+                <Label htmlFor="model" className="text-sm">Model <span className="text-destructive">*</span></Label>
                 <Input
                   id="model"
                   value={formData.model}
                   onChange={(e) => setFormData({ ...formData, model: e.target.value })}
                   required
-                  className="bg-background/50 h-9 sm:h-10 text-sm"
+                  className="bg-background/50 h-11 sm:h-10 text-base sm:text-sm"
                   placeholder="Camry"
                 />
               </div>
               <div className="space-y-1.5">
-                <Label htmlFor="year" className="text-xs sm:text-sm">Year *</Label>
+                <Label htmlFor="year" className="text-sm">Year <span className="text-destructive">*</span></Label>
                 <Input
                   id="year"
                   type="number"
+                  inputMode="numeric"
                   value={formData.year}
                   onChange={(e) => setFormData({ ...formData, year: parseInt(e.target.value) })}
                   required
-                  className="bg-background/50 h-9 sm:h-10 text-sm"
+                  className="bg-background/50 h-11 sm:h-10 text-base sm:text-sm"
                 />
               </div>
               <div className="space-y-1.5">
-                <Label htmlFor="condition" className="text-xs sm:text-sm">Condition *</Label>
+                <Label htmlFor="condition" className="text-sm">Condition <span className="text-destructive">*</span></Label>
                 <Select
                   value={formData.condition}
                   onValueChange={(value) => setFormData({ ...formData, condition: value })}
                 >
-                  <SelectTrigger className="bg-background/50 h-9 sm:h-10 text-sm">
+                  <SelectTrigger className="bg-background/50 h-11 sm:h-10 text-base sm:text-sm">
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="new">New</SelectItem>
-                    <SelectItem value="used">Used</SelectItem>
-                    <SelectItem value="certified_pre_owned">Certified Pre-Owned</SelectItem>
+                    <SelectItem value="new" className="text-base sm:text-sm py-2.5 sm:py-2">New</SelectItem>
+                    <SelectItem value="used" className="text-base sm:text-sm py-2.5 sm:py-2">Used</SelectItem>
+                    <SelectItem value="certified_pre_owned" className="text-base sm:text-sm py-2.5 sm:py-2">Certified Pre-Owned</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
               <div className="space-y-1.5">
-                <Label htmlFor="fuel_type" className="text-xs sm:text-sm">Fuel Type *</Label>
+                <Label htmlFor="fuel_type" className="text-sm">Fuel Type <span className="text-destructive">*</span></Label>
                 <Select
                   value={formData.fuel_type}
                   onValueChange={(value) => setFormData({ ...formData, fuel_type: value })}
                 >
-                  <SelectTrigger className="bg-background/50 h-9 sm:h-10 text-sm">
+                  <SelectTrigger className="bg-background/50 h-11 sm:h-10 text-base sm:text-sm">
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="petrol">Petrol</SelectItem>
-                    <SelectItem value="diesel">Diesel</SelectItem>
-                    <SelectItem value="electric">Electric</SelectItem>
-                    <SelectItem value="hybrid">Hybrid</SelectItem>
-                    <SelectItem value="plug_in_hybrid">Plug-in Hybrid</SelectItem>
+                    <SelectItem value="petrol" className="text-base sm:text-sm py-2.5 sm:py-2">Petrol</SelectItem>
+                    <SelectItem value="diesel" className="text-base sm:text-sm py-2.5 sm:py-2">Diesel</SelectItem>
+                    <SelectItem value="electric" className="text-base sm:text-sm py-2.5 sm:py-2">Electric</SelectItem>
+                    <SelectItem value="hybrid" className="text-base sm:text-sm py-2.5 sm:py-2">Hybrid</SelectItem>
+                    <SelectItem value="plug_in_hybrid" className="text-base sm:text-sm py-2.5 sm:py-2">Plug-in Hybrid</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
               <div className="space-y-1.5">
-                <Label htmlFor="engine_capacity" className="text-xs sm:text-sm">Engine *</Label>
+                <Label htmlFor="engine_capacity" className="text-sm">Engine <span className="text-destructive">*</span></Label>
                 <Input
                   id="engine_capacity"
                   value={formData.engine_capacity}
                   onChange={(e) => setFormData({ ...formData, engine_capacity: e.target.value })}
                   placeholder="2.0L"
                   required
-                  className="bg-background/50 h-9 sm:h-10 text-sm"
+                  className="bg-background/50 h-11 sm:h-10 text-base sm:text-sm"
                 />
               </div>
               <div className="space-y-1.5">
-                <Label htmlFor="mileage" className="text-xs sm:text-sm">Mileage (km)</Label>
+                <Label htmlFor="mileage" className="text-sm">Mileage (km)</Label>
                 <Input
                   id="mileage"
                   type="number"
+                  inputMode="numeric"
                   value={formData.mileage}
                   onChange={(e) => setFormData({ ...formData, mileage: e.target.value })}
-                  className="bg-background/50 h-9 sm:h-10 text-sm"
+                  className="bg-background/50 h-11 sm:h-10 text-base sm:text-sm"
                   placeholder="50000"
                 />
               </div>
               <div className="space-y-1.5">
-                <Label htmlFor="color" className="text-xs sm:text-sm">Color</Label>
+                <Label htmlFor="color" className="text-sm">Color</Label>
                 <Input
                   id="color"
                   value={formData.color}
                   onChange={(e) => setFormData({ ...formData, color: e.target.value })}
-                  className="bg-background/50 h-9 sm:h-10 text-sm"
+                  className="bg-background/50 h-11 sm:h-10 text-base sm:text-sm"
                   placeholder="Silver"
                 />
               </div>
               <div className="space-y-1.5">
-                <Label htmlFor="transmission" className="text-xs sm:text-sm">Transmission</Label>
+                <Label htmlFor="transmission" className="text-sm">Transmission</Label>
                 <Select
                   value={formData.transmission}
                   onValueChange={(value) => setFormData({ ...formData, transmission: value })}
                 >
-                  <SelectTrigger className="bg-background/50 h-9 sm:h-10 text-sm">
+                  <SelectTrigger className="bg-background/50 h-11 sm:h-10 text-base sm:text-sm">
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="automatic">Automatic</SelectItem>
-                    <SelectItem value="manual">Manual</SelectItem>
-                    <SelectItem value="cvt">CVT</SelectItem>
+                    <SelectItem value="automatic" className="text-base sm:text-sm py-2.5 sm:py-2">Automatic</SelectItem>
+                    <SelectItem value="manual" className="text-base sm:text-sm py-2.5 sm:py-2">Manual</SelectItem>
+                    <SelectItem value="cvt" className="text-base sm:text-sm py-2.5 sm:py-2">CVT</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
               <div className="space-y-1.5">
-                <Label htmlFor="price" className="text-xs sm:text-sm">Price ($) *</Label>
+                <Label htmlFor="price" className="text-sm">Price ($) <span className="text-destructive">*</span></Label>
                 <Input
                   id="price"
                   type="number"
+                  inputMode="decimal"
                   value={formData.price}
                   onChange={(e) => setFormData({ ...formData, price: e.target.value })}
                   required
                   step="0.01"
-                  className="bg-background/50 h-9 sm:h-10 text-sm"
+                  className="bg-background/50 h-11 sm:h-10 text-base sm:text-sm"
                   placeholder="25000"
                 />
                 {/* Price Guidance - Market Intelligence */}
@@ -585,26 +588,31 @@ export function InventoryTab({ onUpdate }: InventoryTabProps) {
                   checked={formData.negotiable}
                   onCheckedChange={(checked) => setFormData({ ...formData, negotiable: checked })}
                 />
-                <Label htmlFor="negotiable" className="text-xs sm:text-sm">Negotiable</Label>
+                <Label htmlFor="negotiable" className="text-sm">Negotiable</Label>
               </div>
             </div>
             <div className="space-y-1.5">
-              <Label htmlFor="description" className="text-xs sm:text-sm">Description</Label>
+              <Label htmlFor="description" className="text-sm">Description</Label>
               <Textarea
                 id="description"
                 value={formData.description}
                 onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                rows={3}
-                className="bg-background/50 resize-none text-sm"
+                rows={4}
+                className="bg-background/50 resize-none text-base sm:text-sm min-h-[120px]"
                 placeholder="Add any additional details about the vehicle..."
               />
             </div>
             <div className="flex flex-col-reverse sm:flex-row gap-2 pt-2">
-              <Button type="button" variant="outline" onClick={resetForm} className="w-full sm:w-auto h-10">
+              <Button type="button" variant="outline" onClick={resetForm} className="w-full sm:w-auto h-11 sm:h-10 text-base sm:text-sm">
                 Cancel
               </Button>
-              <Button type="submit" disabled={loading} className="w-full sm:w-auto bg-primary hover:bg-primary/90 h-10">
-                {loading ? 'Saving...' : editingVehicle ? 'Update Vehicle' : 'Add Vehicle'}
+              <Button type="submit" disabled={loading} className="w-full sm:w-auto bg-primary hover:bg-primary/90 h-11 sm:h-10 text-base sm:text-sm">
+                {loading ? (
+                  <>
+                    <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                    Saving...
+                  </>
+                ) : editingVehicle ? 'Update Vehicle' : 'Add Vehicle'}
               </Button>
             </div>
           </form>
