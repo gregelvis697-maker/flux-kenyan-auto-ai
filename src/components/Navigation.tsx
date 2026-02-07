@@ -1,11 +1,12 @@
 import React, { useState, useEffect } from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
-import { Menu, X, Home, Users, LogIn, UserPlus, Car } from "lucide-react";
+import { Menu, Home, Car, Users } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/contexts/AuthContext";
 import { motion, AnimatePresence } from "framer-motion";
 import { ProfileDropdown } from "@/components/navbar/ProfileDropdown";
 import { NotificationBell } from "@/components/navbar/NotificationBell";
+import { MobileMenu } from "@/components/mobile/MobileMenu";
 
 export const Navigation = ({ children }: { children?: React.ReactNode }) => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -15,9 +16,7 @@ export const Navigation = ({ children }: { children?: React.ReactNode }) => {
   const location = useLocation();
 
   useEffect(() => {
-    const handleScroll = () => {
-      setIsScrolled(window.scrollY > 20);
-    };
+    const handleScroll = () => setIsScrolled(window.scrollY > 20);
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
@@ -26,18 +25,6 @@ export const Navigation = ({ children }: { children?: React.ReactNode }) => {
   useEffect(() => {
     setMobileMenuOpen(false);
   }, [location.pathname]);
-
-  // Prevent body scroll when mobile menu is open
-  useEffect(() => {
-    if (mobileMenuOpen) {
-      document.body.style.overflow = 'hidden';
-    } else {
-      document.body.style.overflow = 'unset';
-    }
-    return () => {
-      document.body.style.overflow = 'unset';
-    };
-  }, [mobileMenuOpen]);
 
   const isActive = (path: string) => location.pathname === path;
 
@@ -58,11 +45,7 @@ export const Navigation = ({ children }: { children?: React.ReactNode }) => {
       <div className="container mx-auto px-3 sm:px-4 lg:px-8">
         <div className="flex items-center justify-between h-14 sm:h-16">
           {/* Logo */}
-          <Link
-            to="/"
-            className="flex items-center space-x-2 group"
-            onClick={() => setMobileMenuOpen(false)}
-          >
+          <Link to="/" className="flex items-center space-x-2 group">
             <motion.div
               className="text-xl sm:text-2xl font-bold bg-gradient-primary bg-clip-text text-transparent"
               whileHover={{ scale: 1.05 }}
@@ -125,110 +108,27 @@ export const Navigation = ({ children }: { children?: React.ReactNode }) => {
             )}
           </div>
 
-          {/* Mobile Menu Button */}
+          {/* Mobile Hamburger */}
           <motion.button
             whileTap={{ scale: 0.95 }}
-            className="md:hidden p-2.5 rounded-xl hover:bg-accent/50 transition-colors active:bg-accent/70"
+            className="md:hidden w-11 h-11 flex items-center justify-center rounded-xl hover:bg-accent/50 transition-colors active:bg-accent/70"
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-            aria-label="Toggle menu"
+            aria-label={mobileMenuOpen ? "Close menu" : "Open menu"}
           >
-            {mobileMenuOpen ? (
-              <X className="h-5 w-5 sm:h-6 sm:w-6 text-foreground" />
-            ) : (
-              <Menu className="h-5 w-5 sm:h-6 sm:w-6 text-foreground" />
-            )}
+            <Menu className="h-5 w-5 sm:h-6 sm:w-6 text-foreground" />
           </motion.button>
         </div>
       </div>
 
-      {/* Mobile Menu Overlay */}
+      {/* Mobile Menu */}
       <AnimatePresence>
         {mobileMenuOpen && (
-          <>
-            {/* Backdrop */}
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              transition={{ duration: 0.2 }}
-              className="md:hidden fixed inset-0 top-14 sm:top-16 bg-background/80 backdrop-blur-sm z-40"
-              onClick={() => setMobileMenuOpen(false)}
-            />
-            
-            {/* Menu Panel */}
-            <motion.div
-              initial={{ opacity: 0, y: -10 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -10 }}
-              transition={{ type: "spring", damping: 25, stiffness: 300 }}
-              className="md:hidden fixed top-14 sm:top-16 left-0 right-0 bg-card/95 backdrop-blur-xl border-b border-border shadow-2xl z-50 max-h-[calc(100vh-3.5rem)] sm:max-h-[calc(100vh-4rem)] overflow-y-auto"
-            >
-              <div className="px-4 py-4 space-y-2">
-                {/* Navigation Links */}
-                {navLinks.map((link) => {
-                  const IconComponent = link.icon;
-                  return (
-                    <Link
-                      key={link.path}
-                      to={link.path}
-                      onClick={() => setMobileMenuOpen(false)}
-                      className={`flex items-center gap-3 px-4 py-3.5 rounded-xl text-base font-medium transition-all active:scale-[0.98] ${
-                        isActive(link.path)
-                          ? "bg-primary/10 text-primary shadow-sm border border-primary/20"
-                          : "text-foreground hover:bg-accent/50 active:bg-accent/70"
-                      }`}
-                    >
-                      <IconComponent className="h-5 w-5" />
-                      {link.name}
-                    </Link>
-                  );
-                })}
-
-                {/* Divider */}
-                <div className="h-px bg-border my-3" />
-
-                {/* Auth Section */}
-                {user ? (
-                  <div className="space-y-3">
-                    <div className="px-4 py-3 rounded-xl bg-accent/30 border border-border/50">
-                      <p className="text-xs text-muted-foreground mb-0.5">Signed in as</p>
-                      <p className="text-sm font-medium truncate text-foreground">{user.email}</p>
-                    </div>
-                    <div className="flex items-center gap-2 px-2">
-                      {children || <NotificationBell />}
-                      <div className="flex-1">
-                        <ProfileDropdown />
-                      </div>
-                    </div>
-                  </div>
-                ) : (
-                  <div className="space-y-2 pt-2">
-                    <Button
-                      variant="outline"
-                      onClick={() => {
-                        navigate("/auth");
-                        setMobileMenuOpen(false);
-                      }}
-                      className="w-full h-12 text-base justify-start gap-3 px-4"
-                    >
-                      <LogIn className="h-5 w-5" />
-                      Login
-                    </Button>
-                    <Button
-                      onClick={() => {
-                        navigate("/auth");
-                        setMobileMenuOpen(false);
-                      }}
-                      className="w-full h-12 text-base justify-start gap-3 px-4 bg-gradient-primary text-primary-foreground hover:shadow-glow-primary"
-                    >
-                      <UserPlus className="h-5 w-5" />
-                      Create Account
-                    </Button>
-                  </div>
-                )}
-              </div>
-            </motion.div>
-          </>
+          <MobileMenu
+            isOpen={mobileMenuOpen}
+            onClose={() => setMobileMenuOpen(false)}
+            currentPath={location.pathname}
+            onNavigate={navigate}
+          />
         )}
       </AnimatePresence>
     </nav>
