@@ -288,7 +288,7 @@ export default function Marketplace() {
               placeholder="Search by make, model, or year..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="pl-10 h-11 sm:h-10 text-base sm:text-sm bg-card/60 border-border/50"
+              className="pl-10 bg-card/60 border-border/50"
             />
           </div>
 

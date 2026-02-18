@@ -16,8 +16,6 @@ import DealerDashboard from "./pages/DealerDashboard";
 import ImporterDashboard from "./pages/ImporterDashboard";
 import BuyerDashboard from "./pages/BuyerDashboard";
 import Marketplace from "./pages/Marketplace";
-import ResetPassword from "./pages/ResetPassword";
-import UpdatePassword from "./pages/UpdatePassword";
 import NotFound from "./pages/NotFound";
 
 // Create QueryClient with optimized defaults for intelligence layer
@@ -55,8 +53,6 @@ const App = () => {
               <Route path="/marketplace" element={<Marketplace />} />
               <Route path="/waitlist" element={<Waitlist />} />
               <Route path="/auth" element={<Auth />} />
-              <Route path="/reset-password" element={<ResetPassword />} />
-              <Route path="/update-password" element={<UpdatePassword />} />
               <Route path="/pending-approval" element={<PendingApproval />} />
               <Route
                 path="/dashboard/buyer"

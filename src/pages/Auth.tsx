@@ -7,7 +7,7 @@ import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useToast } from '@/hooks/use-toast';
-import { ArrowLeft, Mail, Lock, UserCircle, Loader2 } from 'lucide-react';
+import { ArrowLeft, Mail, Lock, UserCircle } from 'lucide-react';
 import { z } from 'zod';
 
 const authSchema = z.object({
@@ -172,24 +172,9 @@ const Auth = () => {
               className="w-full h-11 sm:h-10 text-base sm:text-sm bg-gradient-primary hover:shadow-glow-primary transition-all" 
               disabled={isLoading}
             >
-              {isLoading ? (
-                <>
-                  <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                  {isLogin ? 'Signing In...' : 'Creating Account...'}
-                </>
-              ) : isLogin ? 'Sign In' : 'Create Account'}
+              {isLoading ? 'Loading...' : isLogin ? 'Sign In' : 'Sign Up'}
             </Button>
           </form>
-          {isLogin && (
-            <div className="mt-3 text-center">
-              <Link
-                to="/reset-password"
-                className="text-sm text-primary hover:underline"
-              >
-                Forgot Password?
-              </Link>
-            </div>
-          )}
           <div className="mt-4 sm:mt-6 text-center">
             <button
               type="button"
