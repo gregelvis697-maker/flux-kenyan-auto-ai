@@ -1,0 +1,241 @@
+import { useEffect, useState } from 'react';
+import { useParams, useNavigate, Link } from 'react-router-dom';
+import { supabase } from '@/lib/supabase';
+import { useAuth } from '@/contexts/AuthContext';
+import { Navigation } from '@/components/Navigation';
+import { VehiclePhotoGallery } from '@/components/vehicle-detail/VehiclePhotoGallery';
+import { VehicleContactCard } from '@/components/vehicle-detail/VehicleContactCard';
+import { VehicleDealerInfo } from '@/components/vehicle-detail/VehicleDealerInfo';
+import { VehicleQuickSpecs } from '@/components/vehicle-detail/VehicleQuickSpecs';
+import { VehicleOverview } from '@/components/vehicle-detail/VehicleOverview';
+import { VehicleFeatures } from '@/components/vehicle-detail/VehicleFeatures';
+import { VehicleTechSpecs } from '@/components/vehicle-detail/VehicleTechSpecs';
+import { MobileStickyBar } from '@/components/vehicle-detail/MobileStickyBar';
+import { Skeleton } from '@/components/ui/skeleton';
+import { ArrowLeft, Car, MessageCircle } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+
+interface VehicleData {
+  id: string;
+  make: string;
+  model: string;
+  year: number;
+  price: number;
+  mileage: number | null;
+  fuel_type: string;
+  transmission: string | null;
+  color: string | null;
+  interior_color: string | null;
+  condition: string;
+  description: string | null;
+  engine_capacity: string;
+  negotiable: boolean;
+  photos: string[] | null;
+  dealer_id: string;
+  verification_status: string | null;
+  body_type: string | null;
+  drive_type: string | null;
+  seating_capacity: number | null;
+  features: string[] | null;
+  location: string | null;
+}
+
+interface DealerData {
+  full_name: string | null;
+  email: string;
+  address: string | null;
+  google_maps_link: string | null;
+  whatsapp_number: string | null;
+  rating: number | null;
+  review_count: number | null;
+}
+
+export default function VehicleDetail() {
+  const { id } = useParams<{ id: string }>();
+  const navigate = useNavigate();
+  const { user } = useAuth();
+  const [vehicle, setVehicle] = useState<VehicleData | null>(null);
+  const [dealer, setDealer] = useState<DealerData | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [notFound, setNotFound] = useState(false);
+
+  useEffect(() => {
+    if (!id) return;
+    fetchVehicle(id);
+  }, [id]);
+
+  const fetchVehicle = async (vehicleId: string) => {
+    setLoading(true);
+    try {
+      const { data, error } = await supabase
+        .from('vehicles')
+        .select('id, make, model, year, price, mileage, fuel_type, transmission, color, interior_color, condition, description, engine_capacity, negotiable, photos, dealer_id, verification_status, body_type, drive_type, seating_capacity, features, location')
+        .eq('id', vehicleId)
+        .eq('is_sold', false)
+        .single();
+
+      if (error || !data) {
+        setNotFound(true);
+        setLoading(false);
+        return;
+      }
+
+      setVehicle(data);
+
+      // Fetch dealer profile
+      const { data: dealerData } = await supabase
+        .from('profiles')
+        .select('full_name, email, address, google_maps_link, whatsapp_number, rating, review_count')
+        .eq('id', data.dealer_id)
+        .single();
+
+      setDealer(dealerData);
+    } catch {
+      setNotFound(true);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Set page title
+  useEffect(() => {
+    if (vehicle) {
+      document.title = `${vehicle.year} ${vehicle.make} ${vehicle.model} for Sale | Flux`;
+    }
+    return () => { document.title = 'Flux'; };
+  }, [vehicle]);
+
+  const handleWhatsAppClick = async () => {
+    if (!vehicle) return;
+    const formattedPrice = `KES ${vehicle.price.toLocaleString()}`;
+    try {
+      if (user) {
+        const { data: profile } = await supabase
+          .from('profiles')
+          .select('full_name, email')
+          .eq('id', user.id)
+          .single();
+        await supabase.from('contact_requests').insert({
+          vehicle_id: vehicle.id,
+          buyer_id: user.id,
+          buyer_name: profile?.full_name || 'Unknown',
+          buyer_email: profile?.email || user.email || '',
+          message: `WhatsApp inquiry for ${vehicle.year} ${vehicle.make} ${vehicle.model}`,
+        });
+      }
+    } catch { /* silent */ }
+
+    const message = encodeURIComponent(
+      `Hi, I'm interested in your ${vehicle.year} ${vehicle.make} ${vehicle.model} listed on Flux for ${formattedPrice}. Is it still available?`
+    );
+    const number = dealer?.whatsapp_number?.replace(/[^0-9]/g, '') || '';
+    window.open(`https://wa.me/${number}?text=${message}`, '_blank');
+  };
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-background">
+        <Navigation />
+        <main className="pt-20 pb-12 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <Skeleton className="h-8 w-48 mb-6" />
+          <div className="grid grid-cols-1 lg:grid-cols-5 gap-8">
+            <div className="lg:col-span-3 space-y-6">
+              <Skeleton className="aspect-video rounded-lg" />
+              <div className="grid grid-cols-4 gap-3">
+                {[1, 2, 3, 4].map(i => <Skeleton key={i} className="h-24 rounded-lg" />)}
+              </div>
+            </div>
+            <div className="lg:col-span-2 space-y-4">
+              <Skeleton className="h-10 w-3/4" />
+              <Skeleton className="h-12 w-1/2" />
+              <Skeleton className="h-12 w-full" />
+              <Skeleton className="h-48 w-full rounded-lg" />
+            </div>
+          </div>
+        </main>
+      </div>
+    );
+  }
+
+  if (notFound || !vehicle) {
+    return (
+      <div className="min-h-screen bg-background">
+        <Navigation />
+        <main className="pt-20 pb-12 flex flex-col items-center justify-center min-h-[60vh]">
+          <Car className="h-20 w-20 text-muted-foreground/30 mb-4" />
+          <h1 className="text-2xl font-bold text-foreground mb-2">Vehicle Not Found</h1>
+          <p className="text-muted-foreground mb-6">This vehicle listing may have been removed or sold.</p>
+          <Button asChild>
+            <Link to="/marketplace">← Back to Marketplace</Link>
+          </Button>
+        </main>
+      </div>
+    );
+  }
+
+  const vehicleAlt = `${vehicle.year} ${vehicle.make} ${vehicle.model}`;
+
+  return (
+    <div className="min-h-screen bg-background">
+      <Navigation />
+
+      <main className="pt-20 pb-24 md:pb-12">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          {/* Breadcrumb */}
+          <button
+            onClick={() => navigate('/marketplace')}
+            className="flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground transition-colors mb-6"
+          >
+            <ArrowLeft className="h-4 w-4" />
+            Back to Marketplace
+          </button>
+
+          {/* Two-Column Layout */}
+          <div className="grid grid-cols-1 lg:grid-cols-5 gap-8">
+            {/* Left Column (60%) */}
+            <div className="lg:col-span-3 space-y-8">
+              <VehiclePhotoGallery
+                photos={vehicle.photos || []}
+                alt={vehicleAlt}
+              />
+
+              {/* Mobile-only: Title & Price */}
+              <div className="lg:hidden">
+                <VehicleContactCard vehicle={vehicle} dealerWhatsapp={dealer?.whatsapp_number || null} />
+              </div>
+
+              {/* Mobile-only: Dealer Info */}
+              <div className="lg:hidden">
+                <VehicleDealerInfo dealer={dealer} />
+              </div>
+
+              <VehicleQuickSpecs
+                fuelType={vehicle.fuel_type}
+                engineCapacity={vehicle.engine_capacity}
+                transmission={vehicle.transmission}
+                driveType={vehicle.drive_type}
+              />
+
+              <VehicleOverview description={vehicle.description} />
+
+              <VehicleFeatures features={vehicle.features} />
+
+              <VehicleTechSpecs vehicle={vehicle} />
+            </div>
+
+            {/* Right Column (40%) - Desktop Only */}
+            <div className="hidden lg:block lg:col-span-2">
+              <div className="sticky top-24 space-y-6">
+                <VehicleContactCard vehicle={vehicle} dealerWhatsapp={dealer?.whatsapp_number || null} />
+                <VehicleDealerInfo dealer={dealer} />
+              </div>
+            </div>
+          </div>
+        </div>
+      </main>
+
+      {/* Mobile Sticky Bar */}
+      <MobileStickyBar price={vehicle.price} onWhatsAppClick={handleWhatsAppClick} />
+    </div>
+  );
+}

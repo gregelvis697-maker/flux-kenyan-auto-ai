@@ -1,3 +1,4 @@
+import { useNavigate } from 'react-router-dom';
 import { Car, Heart, Fuel, Gauge, Calendar } from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -39,6 +40,7 @@ export function VehicleCard({
   onToggleFavorite,
   onViewDetails,
 }: VehicleCardProps) {
+  const navigate = useNavigate();
   const isImported = !!vehicle.import_request_id;
   const isVerified = vehicle.verification_status === 'verified';
   
@@ -167,7 +169,7 @@ export function VehicleCard({
           <Button
             variant="outline"
             className="w-full mt-2"
-            onClick={onViewDetails}
+            onClick={() => navigate(`/vehicles/${vehicle.id}`)}
           >
             View Details
           </Button>

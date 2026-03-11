@@ -288,25 +288,40 @@ export type Database = {
       }
       profiles: {
         Row: {
+          address: string | null
           created_at: string
           email: string
           full_name: string | null
+          google_maps_link: string | null
           id: string
+          rating: number | null
+          review_count: number | null
           updated_at: string
+          whatsapp_number: string | null
         }
         Insert: {
+          address?: string | null
           created_at?: string
           email: string
           full_name?: string | null
+          google_maps_link?: string | null
           id: string
+          rating?: number | null
+          review_count?: number | null
           updated_at?: string
+          whatsapp_number?: string | null
         }
         Update: {
+          address?: string | null
           created_at?: string
           email?: string
           full_name?: string | null
+          google_maps_link?: string | null
           id?: string
+          rating?: number | null
+          review_count?: number | null
           updated_at?: string
+          whatsapp_number?: string | null
         }
         Relationships: []
       }
@@ -366,22 +381,28 @@ export type Database = {
       }
       vehicles: {
         Row: {
+          body_type: string | null
           color: string | null
           condition: Database["public"]["Enums"]["vehicle_condition"]
           created_at: string
           dealer_id: string
           description: string | null
+          drive_type: string | null
           engine_capacity: string
+          features: string[] | null
           fuel_type: Database["public"]["Enums"]["fuel_type"]
           id: string
           import_request_id: string | null
+          interior_color: string | null
           is_sold: boolean
+          location: string | null
           make: string
           mileage: number | null
           model: string
           negotiable: boolean
           photos: string[] | null
           price: number
+          seating_capacity: number | null
           transmission: string | null
           updated_at: string
           verification_notes: string | null
@@ -391,22 +412,28 @@ export type Database = {
           year: number
         }
         Insert: {
+          body_type?: string | null
           color?: string | null
           condition?: Database["public"]["Enums"]["vehicle_condition"]
           created_at?: string
           dealer_id: string
           description?: string | null
+          drive_type?: string | null
           engine_capacity: string
+          features?: string[] | null
           fuel_type: Database["public"]["Enums"]["fuel_type"]
           id?: string
           import_request_id?: string | null
+          interior_color?: string | null
           is_sold?: boolean
+          location?: string | null
           make: string
           mileage?: number | null
           model: string
           negotiable?: boolean
           photos?: string[] | null
           price: number
+          seating_capacity?: number | null
           transmission?: string | null
           updated_at?: string
           verification_notes?: string | null
@@ -416,22 +443,28 @@ export type Database = {
           year: number
         }
         Update: {
+          body_type?: string | null
           color?: string | null
           condition?: Database["public"]["Enums"]["vehicle_condition"]
           created_at?: string
           dealer_id?: string
           description?: string | null
+          drive_type?: string | null
           engine_capacity?: string
+          features?: string[] | null
           fuel_type?: Database["public"]["Enums"]["fuel_type"]
           id?: string
           import_request_id?: string | null
+          interior_color?: string | null
           is_sold?: boolean
+          location?: string | null
           make?: string
           mileage?: number | null
           model?: string
           negotiable?: boolean
           photos?: string[] | null
           price?: number
+          seating_capacity?: number | null
           transmission?: string | null
           updated_at?: string
           verification_notes?: string | null
