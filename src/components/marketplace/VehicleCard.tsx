@@ -40,6 +40,7 @@ export function VehicleCard({
   onToggleFavorite,
   onViewDetails,
 }: VehicleCardProps) {
+  const navigate = useNavigate();
   const isImported = !!vehicle.import_request_id;
   const isVerified = vehicle.verification_status === 'verified';
   
