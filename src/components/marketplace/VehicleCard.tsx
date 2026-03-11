@@ -1,3 +1,4 @@
+import { useNavigate } from 'react-router-dom';
 import { Car, Heart, Fuel, Gauge, Calendar } from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';

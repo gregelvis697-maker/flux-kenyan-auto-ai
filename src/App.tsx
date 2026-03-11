@@ -27,6 +27,7 @@ const App = () => (
         <Routes>
           <Route path="/" element={<Index />} />
           <Route path="/marketplace" element={<Marketplace />} />
+          <Route path="/vehicles/:id" element={<VehicleDetail />} />
           <Route path="/waitlist" element={<Waitlist />} />
           <Route path="/auth" element={<Auth />} />
           <Route path="/pending-approval" element={<PendingApproval />} />
