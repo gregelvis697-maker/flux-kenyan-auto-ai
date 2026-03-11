@@ -77,6 +77,12 @@ export function InventoryTab({ onUpdate }: InventoryTabProps) {
     description: '',
     price: '',
     negotiable: true,
+    body_type: '',
+    drive_type: '',
+    seating_capacity: '',
+    interior_color: '',
+    location: '',
+    features: [] as string[],
   });
 
   const openVehicleGallery = (vehiclePhotos: string[], startIndex = 0) => {
