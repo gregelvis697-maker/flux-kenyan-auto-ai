@@ -173,6 +173,12 @@ export function InventoryTab({ onUpdate }: InventoryTabProps) {
         price: priceValue,
         negotiable: formData.negotiable,
         photos: photos,
+        body_type: formData.body_type || null,
+        drive_type: formData.drive_type || null,
+        seating_capacity: formData.seating_capacity ? parseInt(formData.seating_capacity) : null,
+        interior_color: formData.interior_color?.trim() || null,
+        location: formData.location?.trim() || null,
+        features: formData.features.length > 0 ? formData.features : null,
       };
 
       let error;
