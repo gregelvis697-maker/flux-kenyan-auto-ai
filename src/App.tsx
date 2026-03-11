@@ -15,6 +15,7 @@ import DealerDashboard from "./pages/DealerDashboard";
 import ImporterDashboard from "./pages/ImporterDashboard";
 import BuyerDashboard from "./pages/BuyerDashboard";
 import Marketplace from "./pages/Marketplace";
+import VehicleDetail from "./pages/VehicleDetail";
 import NotFound from "./pages/NotFound";
 
 const App = () => (
