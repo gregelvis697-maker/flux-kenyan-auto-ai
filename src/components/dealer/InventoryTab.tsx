@@ -235,6 +235,12 @@ export function InventoryTab({ onUpdate }: InventoryTabProps) {
       description: vehicle.description || '',
       price: vehicle.price.toString(),
       negotiable: vehicle.negotiable,
+      body_type: (vehicle as any).body_type || '',
+      drive_type: (vehicle as any).drive_type || '',
+      seating_capacity: (vehicle as any).seating_capacity?.toString() || '',
+      interior_color: (vehicle as any).interior_color || '',
+      location: (vehicle as any).location || '',
+      features: (vehicle as any).features || [],
     });
     setShowForm(true);
   };
