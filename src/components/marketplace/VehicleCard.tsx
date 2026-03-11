@@ -169,7 +169,7 @@ export function VehicleCard({
           <Button
             variant="outline"
             className="w-full mt-2"
-            onClick={onViewDetails}
+            onClick={() => navigate(`/vehicles/${vehicle.id}`)}
           >
             View Details
           </Button>
