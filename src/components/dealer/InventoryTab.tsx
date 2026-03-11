@@ -612,6 +612,111 @@ export function InventoryTab({ onUpdate }: InventoryTabProps) {
                 <Label htmlFor="negotiable" className="text-xs sm:text-sm">Negotiable</Label>
               </div>
             </div>
+
+            {/* New Fields Row */}
+            <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 sm:gap-4">
+              <div className="space-y-1.5">
+                <Label htmlFor="body_type" className="text-xs sm:text-sm">Body Type</Label>
+                <Select
+                  value={formData.body_type}
+                  onValueChange={(value) => setFormData({ ...formData, body_type: value })}
+                >
+                  <SelectTrigger className="bg-background/50 h-9 sm:h-10 text-sm">
+                    <SelectValue placeholder="Select" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="sedan">Sedan</SelectItem>
+                    <SelectItem value="suv">SUV</SelectItem>
+                    <SelectItem value="hatchback">Hatchback</SelectItem>
+                    <SelectItem value="coupe">Coupe</SelectItem>
+                    <SelectItem value="wagon">Wagon</SelectItem>
+                    <SelectItem value="van">Van</SelectItem>
+                    <SelectItem value="truck">Truck</SelectItem>
+                    <SelectItem value="convertible">Convertible</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className="space-y-1.5">
+                <Label htmlFor="drive_type" className="text-xs sm:text-sm">Drivetrain</Label>
+                <Select
+                  value={formData.drive_type}
+                  onValueChange={(value) => setFormData({ ...formData, drive_type: value })}
+                >
+                  <SelectTrigger className="bg-background/50 h-9 sm:h-10 text-sm">
+                    <SelectValue placeholder="Select" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="2WD">2WD</SelectItem>
+                    <SelectItem value="4WD">4WD</SelectItem>
+                    <SelectItem value="AWD">AWD</SelectItem>
+                    <SelectItem value="FWD">FWD</SelectItem>
+                    <SelectItem value="RWD">RWD</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className="space-y-1.5">
+                <Label htmlFor="seating_capacity" className="text-xs sm:text-sm">Seats</Label>
+                <Input
+                  id="seating_capacity"
+                  type="number"
+                  value={formData.seating_capacity}
+                  onChange={(e) => setFormData({ ...formData, seating_capacity: e.target.value })}
+                  className="bg-background/50 h-9 sm:h-10 text-sm"
+                  placeholder="5"
+                  min="1"
+                  max="15"
+                />
+              </div>
+              <div className="space-y-1.5">
+                <Label htmlFor="interior_color" className="text-xs sm:text-sm">Interior Color</Label>
+                <Input
+                  id="interior_color"
+                  value={formData.interior_color}
+                  onChange={(e) => setFormData({ ...formData, interior_color: e.target.value })}
+                  className="bg-background/50 h-9 sm:h-10 text-sm"
+                  placeholder="Black"
+                />
+              </div>
+              <div className="space-y-1.5">
+                <Label htmlFor="location" className="text-xs sm:text-sm">Location</Label>
+                <Input
+                  id="location"
+                  value={formData.location}
+                  onChange={(e) => setFormData({ ...formData, location: e.target.value })}
+                  className="bg-background/50 h-9 sm:h-10 text-sm"
+                  placeholder="Nairobi, Westlands"
+                />
+              </div>
+            </div>
+
+            {/* Features */}
+            <div className="space-y-2">
+              <Label className="text-xs sm:text-sm">Features & Options</Label>
+              <div className="grid grid-cols-2 gap-1.5">
+                {[
+                  'Air Conditioning', 'Power Windows', 'Power Steering', 'Central Locking',
+                  'Airbags', 'ABS', 'Alloy Wheels', 'Sunroof', 'Leather Seats',
+                  'Heated Seats', 'Reversing Camera', 'Parking Sensors', 'Bluetooth',
+                  'Navigation System', 'Cruise Control', 'Keyless Entry', 'Push Button Start',
+                ].map((feature) => (
+                  <label key={feature} className="flex items-center gap-2 text-xs sm:text-sm text-foreground cursor-pointer py-0.5">
+                    <input
+                      type="checkbox"
+                      checked={formData.features.includes(feature)}
+                      onChange={(e) => {
+                        if (e.target.checked) {
+                          setFormData({ ...formData, features: [...formData.features, feature] });
+                        } else {
+                          setFormData({ ...formData, features: formData.features.filter(f => f !== feature) });
+                        }
+                      }}
+                      className="rounded border-border accent-primary"
+                    />
+                    {feature}
+                  </label>
+                ))}
+              </div>
+            </div>
             <div className="space-y-1.5">
               <Label htmlFor="description" className="text-xs sm:text-sm">Description</Label>
               <Textarea
