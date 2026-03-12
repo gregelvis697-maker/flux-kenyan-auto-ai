@@ -1,12 +1,21 @@
-import { useEffect, useState, useMemo } from 'react';
+import { useEffect, useState, useMemo, useCallback } from 'react';
+import { useSearchParams, Link } from 'react-router-dom';
 import { supabase } from '@/lib/supabase';
 import { useAuth } from '@/contexts/AuthContext';
 import { Navigation } from '@/components/Navigation';
 import { VehicleCard } from '@/components/marketplace/VehicleCard';
-import { VehicleFilters } from '@/components/marketplace/VehicleFilters';
-import { VehicleDetailModal } from '@/components/marketplace/VehicleDetailModal';
-import { Car, Search } from 'lucide-react';
+import {
+  MarketplaceFiltersSidebar,
+  MarketplaceFiltersMobile,
+  defaultFilters,
+  type MarketplaceFiltersState,
+} from '@/components/marketplace/MarketplaceFilters';
+import { MarketplaceSort, getSortLabel, type SortOption } from '@/components/marketplace/MarketplaceSort';
+import { MarketplacePagination } from '@/components/marketplace/MarketplacePagination';
+import { Car, Search, ChevronRight, Home } from 'lucide-react';
 import { Input } from '@/components/ui/input';
+import { Skeleton } from '@/components/ui/skeleton';
+import { Button } from '@/components/ui/button';
 
 export interface MarketplaceVehicle {
   id: string;
@@ -27,69 +36,119 @@ export interface MarketplaceVehicle {
   import_request_id: string | null;
   created_at: string;
   verification_status?: string | null;
+  body_type?: string | null;
+  seating_capacity?: number | null;
 }
 
-export interface VehicleFiltersState {
-  make: string;
-  model: string;
-  minPrice: string;
-  maxPrice: string;
-  minYear: string;
-  maxYear: string;
-  fuelType: string;
-  sourceType: 'all' | 'dealer_owned' | 'imported';
-}
-
-const initialFilters: VehicleFiltersState = {
-  make: '',
-  model: '',
-  minPrice: '',
-  maxPrice: '',
-  minYear: '',
-  maxYear: '',
-  fuelType: '',
-  sourceType: 'all',
-};
+const ITEMS_PER_PAGE = 20;
 
 export default function Marketplace() {
   const { user } = useAuth();
+  const [searchParams, setSearchParams] = useSearchParams();
+
   const [vehicles, setVehicles] = useState<MarketplaceVehicle[]>([]);
   const [favorites, setFavorites] = useState<Set<string>>(new Set());
   const [loading, setLoading] = useState(true);
-  const [searchQuery, setSearchQuery] = useState('');
-  const [filters, setFilters] = useState<VehicleFiltersState>(initialFilters);
-  const [selectedVehicle, setSelectedVehicle] = useState<MarketplaceVehicle | null>(null);
+  const [error, setError] = useState(false);
   const [dealerNames, setDealerNames] = useState<Record<string, string>>({});
+
+  // Parse state from URL
+  const searchQuery = searchParams.get('q') || '';
+  const currentPage = parseInt(searchParams.get('page') || '1', 10);
+  const sortBy = (searchParams.get('sort') as SortOption) || 'newest';
+
+  const [filters, setFilters] = useState<MarketplaceFiltersState>(() => {
+    const bodyTypes = searchParams.get('body') ? searchParams.get('body')!.split(',') : [];
+    const fuelTypes = searchParams.get('fuel') ? searchParams.get('fuel')!.split(',') : [];
+    return {
+      ...defaultFilters,
+      bodyTypes,
+      fuelTypes,
+      transmission: searchParams.get('trans') || 'all',
+      make: searchParams.get('make') || '',
+      model: searchParams.get('model') || '',
+      minYear: searchParams.get('minYear') || '',
+      maxYear: searchParams.get('maxYear') || '',
+      maxMileage: searchParams.get('maxMileage') || '',
+      minPrice: parseInt(searchParams.get('minPrice') || '0', 10),
+      maxPrice: parseInt(searchParams.get('maxPrice') || '10000000', 10),
+    };
+  });
+
+  // Sync filters to URL
+  const updateSearchParams = useCallback((newFilters: MarketplaceFiltersState, newSort?: SortOption, newPage?: number, newQuery?: string) => {
+    const params = new URLSearchParams();
+    const q = newQuery ?? searchQuery;
+    const sort = newSort ?? sortBy;
+    const page = newPage ?? 1;
+
+    if (q) params.set('q', q);
+    if (sort !== 'newest') params.set('sort', sort);
+    if (page > 1) params.set('page', String(page));
+    if (newFilters.bodyTypes.length) params.set('body', newFilters.bodyTypes.join(','));
+    if (newFilters.fuelTypes.length) params.set('fuel', newFilters.fuelTypes.join(','));
+    if (newFilters.transmission !== 'all') params.set('trans', newFilters.transmission);
+    if (newFilters.make) params.set('make', newFilters.make);
+    if (newFilters.model) params.set('model', newFilters.model);
+    if (newFilters.minYear) params.set('minYear', newFilters.minYear);
+    if (newFilters.maxYear) params.set('maxYear', newFilters.maxYear);
+    if (newFilters.maxMileage) params.set('maxMileage', newFilters.maxMileage);
+    if (newFilters.minPrice > 0) params.set('minPrice', String(newFilters.minPrice));
+    if (newFilters.maxPrice < 10000000) params.set('maxPrice', String(newFilters.maxPrice));
+
+    setSearchParams(params, { replace: true });
+  }, [searchQuery, sortBy, setSearchParams]);
+
+  const handleFiltersChange = useCallback((newFilters: MarketplaceFiltersState) => {
+    setFilters(newFilters);
+    updateSearchParams(newFilters, undefined, 1);
+  }, [updateSearchParams]);
+
+  const handleResetFilters = useCallback(() => {
+    setFilters(defaultFilters);
+    setSearchParams({}, { replace: true });
+  }, [setSearchParams]);
+
+  const handleSortChange = useCallback((sort: SortOption) => {
+    updateSearchParams(filters, sort, 1);
+  }, [filters, updateSearchParams]);
+
+  const handlePageChange = useCallback((page: number) => {
+    updateSearchParams(filters, undefined, page);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }, [filters, updateSearchParams]);
+
+  const handleSearchChange = useCallback((q: string) => {
+    updateSearchParams(filters, undefined, 1, q);
+  }, [filters, updateSearchParams]);
 
   useEffect(() => {
     fetchVehicles();
-    if (user) {
-      fetchFavorites();
-    }
+    if (user) fetchFavorites();
   }, [user]);
 
   const fetchVehicles = async () => {
     setLoading(true);
+    setError(false);
     try {
-      const { data, error } = await supabase
+      const { data, error: err } = await supabase
         .from('vehicles')
-        .select('id, make, model, year, price, mileage, fuel_type, transmission, color, condition, description, engine_capacity, negotiable, photos, dealer_id, import_request_id, created_at, verification_status')
+        .select('id, make, model, year, price, mileage, fuel_type, transmission, color, condition, description, engine_capacity, negotiable, photos, dealer_id, import_request_id, created_at, verification_status, body_type, seating_capacity')
         .eq('is_sold', false)
         .order('created_at', { ascending: false });
 
-      if (error) {
-        console.error('Error fetching vehicles:', error);
+      if (err) {
+        console.error('Error fetching vehicles:', err);
+        setError(true);
         setVehicles([]);
       } else {
         setVehicles(data || []);
-        // Fetch dealer names for all vehicles
         const dealerIds = [...new Set((data || []).map(v => v.dealer_id))];
         if (dealerIds.length > 0) {
           const { data: profiles } = await supabase
             .from('profiles')
             .select('id, full_name, email')
             .in('id', dealerIds);
-          
           const names: Record<string, string> = {};
           (profiles || []).forEach(p => {
             names[p.id] = p.full_name || p.email || 'Dealer';
@@ -97,8 +156,8 @@ export default function Marketplace() {
           setDealerNames(names);
         }
       }
-    } catch (error) {
-      console.error('Error:', error);
+    } catch {
+      setError(true);
       setVehicles([]);
     } finally {
       setLoading(false);
@@ -108,194 +167,235 @@ export default function Marketplace() {
   const fetchFavorites = async () => {
     if (!user) return;
     try {
-      const { data, error } = await supabase
+      const { data, error: err } = await supabase
         .from('favorites')
         .select('vehicle_id')
         .eq('user_id', user.id);
-
-      if (!error && data) {
+      if (!err && data) {
         setFavorites(new Set(data.map(f => f.vehicle_id)));
       }
-    } catch (error) {
-      console.error('Error fetching favorites:', error);
-    }
+    } catch {}
   };
 
   const handleToggleFavorite = async (vehicleId: string) => {
     if (!user) return;
-
     const isFavorited = favorites.has(vehicleId);
-
+    // Optimistic update
+    setFavorites(prev => {
+      const next = new Set(prev);
+      isFavorited ? next.delete(vehicleId) : next.add(vehicleId);
+      return next;
+    });
     try {
       if (isFavorited) {
-        await supabase
-          .from('favorites')
-          .delete()
-          .eq('user_id', user.id)
-          .eq('vehicle_id', vehicleId);
-        
-        setFavorites(prev => {
-          const next = new Set(prev);
-          next.delete(vehicleId);
-          return next;
-        });
+        await supabase.from('favorites').delete().eq('user_id', user.id).eq('vehicle_id', vehicleId);
       } else {
-        await supabase
-          .from('favorites')
-          .insert({ user_id: user.id, vehicle_id: vehicleId });
-        
-        setFavorites(prev => new Set([...prev, vehicleId]));
+        await supabase.from('favorites').insert({ user_id: user.id, vehicle_id: vehicleId });
       }
-    } catch (error) {
-      console.error('Error toggling favorite:', error);
+    } catch {
+      // Revert on error
+      setFavorites(prev => {
+        const next = new Set(prev);
+        isFavorited ? next.add(vehicleId) : next.delete(vehicleId);
+        return next;
+      });
     }
   };
 
+  // Filter + Sort + Paginate
   const filteredVehicles = useMemo(() => {
-    return vehicles.filter(vehicle => {
-      // Search query filter
+    let result = vehicles.filter(vehicle => {
       if (searchQuery) {
-        const query = searchQuery.toLowerCase();
-        const matchesSearch = 
-          vehicle.make.toLowerCase().includes(query) ||
-          vehicle.model.toLowerCase().includes(query) ||
-          vehicle.year.toString().includes(query);
-        if (!matchesSearch) return false;
+        const q = searchQuery.toLowerCase();
+        const matches = vehicle.make.toLowerCase().includes(q) ||
+          vehicle.model.toLowerCase().includes(q) ||
+          vehicle.year.toString().includes(q);
+        if (!matches) return false;
       }
-
-      // Make filter
-      if (filters.make && vehicle.make.toLowerCase() !== filters.make.toLowerCase()) {
-        return false;
-      }
-
-      // Model filter
-      if (filters.model && !vehicle.model.toLowerCase().includes(filters.model.toLowerCase())) {
-        return false;
-      }
-
-      // Price filters
-      if (filters.minPrice && vehicle.price < parseInt(filters.minPrice)) {
-        return false;
-      }
-      if (filters.maxPrice && vehicle.price > parseInt(filters.maxPrice)) {
-        return false;
-      }
-
-      // Year filters
-      if (filters.minYear && vehicle.year < parseInt(filters.minYear)) {
-        return false;
-      }
-      if (filters.maxYear && vehicle.year > parseInt(filters.maxYear)) {
-        return false;
-      }
-
-      // Fuel type filter
-      if (filters.fuelType && vehicle.fuel_type !== filters.fuelType) {
-        return false;
-      }
-
-      // Source type filter
-      if (filters.sourceType === 'dealer_owned' && vehicle.import_request_id) {
-        return false;
-      }
-      if (filters.sourceType === 'imported' && !vehicle.import_request_id) {
-        return false;
-      }
-
+      if (filters.make && vehicle.make.toLowerCase() !== filters.make.toLowerCase()) return false;
+      if (filters.model && !vehicle.model.toLowerCase().includes(filters.model.toLowerCase())) return false;
+      if (vehicle.price < filters.minPrice || vehicle.price > filters.maxPrice) return false;
+      if (filters.minYear && vehicle.year < parseInt(filters.minYear)) return false;
+      if (filters.maxYear && vehicle.year > parseInt(filters.maxYear)) return false;
+      if (filters.fuelTypes.length > 0 && !filters.fuelTypes.includes(vehicle.fuel_type)) return false;
+      if (filters.transmission !== 'all' && vehicle.transmission?.toLowerCase() !== filters.transmission.toLowerCase()) return false;
+      if (filters.bodyTypes.length > 0 && (!vehicle.body_type || !filters.bodyTypes.includes(vehicle.body_type.toLowerCase()))) return false;
+      if (filters.maxMileage && vehicle.mileage && vehicle.mileage > parseInt(filters.maxMileage)) return false;
       return true;
     });
-  }, [vehicles, searchQuery, filters]);
 
-  const uniqueMakes = useMemo(() => {
-    return [...new Set(vehicles.map(v => v.make))].sort();
-  }, [vehicles]);
+    // Sort
+    result.sort((a, b) => {
+      switch (sortBy) {
+        case 'price_asc': return a.price - b.price;
+        case 'price_desc': return b.price - a.price;
+        case 'mileage_asc': return (a.mileage || 999999) - (b.mileage || 999999);
+        case 'year_desc': return b.year - a.year;
+        case 'newest':
+        default: return new Date(b.created_at).getTime() - new Date(a.created_at).getTime();
+      }
+    });
+
+    return result;
+  }, [vehicles, searchQuery, filters, sortBy]);
+
+  const totalPages = Math.max(1, Math.ceil(filteredVehicles.length / ITEMS_PER_PAGE));
+  const safePage = Math.min(currentPage, totalPages);
+  const paginatedVehicles = filteredVehicles.slice(
+    (safePage - 1) * ITEMS_PER_PAGE,
+    safePage * ITEMS_PER_PAGE
+  );
+
+  const uniqueMakes = useMemo(() => [...new Set(vehicles.map(v => v.make))].sort(), [vehicles]);
+
+  const activeFilterCount = useMemo(() => {
+    let count = 0;
+    if (filters.bodyTypes.length) count++;
+    if (filters.fuelTypes.length) count++;
+    if (filters.transmission !== 'all') count++;
+    if (filters.make) count++;
+    if (filters.model) count++;
+    if (filters.minYear || filters.maxYear) count++;
+    if (filters.maxMileage) count++;
+    if (filters.minPrice > 0 || filters.maxPrice < 10000000) count++;
+    return count;
+  }, [filters]);
 
   return (
     <div className="min-h-screen bg-background">
       <Navigation />
-      
+
       <main className="pt-20 pb-12">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          {/* Header */}
-          <div className="mb-8">
-            <h1 className="text-3xl sm:text-4xl font-bold text-foreground">
-              Vehicle Marketplace
-            </h1>
-            <p className="text-muted-foreground mt-2">
-              Browse available vehicles from verified dealers
-            </p>
-          </div>
+          {/* Breadcrumbs */}
+          <nav className="flex items-center gap-1.5 text-xs text-muted-foreground mb-6" aria-label="Breadcrumb">
+            <Link to="/" className="hover:text-foreground transition-colors flex items-center gap-1">
+              <Home className="h-3 w-3" />
+              Home
+            </Link>
+            <ChevronRight className="h-3 w-3" />
+            <span className="text-foreground font-medium">Marketplace</span>
+          </nav>
 
-          {/* Search Bar */}
+          {/* Search */}
           <div className="relative mb-6">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
             <Input
               placeholder="Search by make, model, or year..."
               value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="pl-10 bg-card/60 border-border/50"
+              onChange={(e) => handleSearchChange(e.target.value)}
+              className="pl-10 bg-card border-border/50 h-11"
+              aria-label="Search vehicles"
             />
           </div>
 
-          {/* Filters */}
-          <VehicleFilters
-            filters={filters}
-            onFiltersChange={setFilters}
-            uniqueMakes={uniqueMakes}
-            onReset={() => setFilters(initialFilters)}
-          />
-
-          {/* Results Count */}
-          <div className="mb-4">
-            <p className="text-sm text-muted-foreground">
-              {filteredVehicles.length} vehicle{filteredVehicles.length !== 1 ? 's' : ''} found
-            </p>
+          {/* Mobile Filters */}
+          <div className="flex items-center justify-between mb-4 lg:hidden">
+            <MarketplaceFiltersMobile
+              filters={filters}
+              onFiltersChange={handleFiltersChange}
+              onReset={handleResetFilters}
+              uniqueMakes={uniqueMakes}
+              activeFilterCount={activeFilterCount}
+            />
+            <MarketplaceSort value={sortBy} onChange={handleSortChange} />
           </div>
 
-          {/* Vehicle Grid */}
-          {loading ? (
-            <div className="flex items-center justify-center py-20">
-              <div className="animate-spin rounded-full h-10 w-10 border-2 border-primary border-t-transparent" />
+          {/* Main Layout */}
+          <div className="flex gap-6">
+            {/* Sidebar */}
+            <MarketplaceFiltersSidebar
+              filters={filters}
+              onFiltersChange={handleFiltersChange}
+              onReset={handleResetFilters}
+              uniqueMakes={uniqueMakes}
+              activeFilterCount={activeFilterCount}
+            />
+
+            {/* Results */}
+            <div className="flex-1 min-w-0">
+              {/* Results Header (Desktop) */}
+              <div className="hidden lg:flex items-center justify-between mb-6">
+                <div>
+                  <h1 className="text-2xl font-bold text-foreground">
+                    {filteredVehicles.length.toLocaleString()} Car{filteredVehicles.length !== 1 ? 's' : ''} Found
+                  </h1>
+                  <p className="text-sm text-muted-foreground mt-0.5">
+                    Sorted by: {getSortLabel(sortBy)}
+                  </p>
+                </div>
+                <MarketplaceSort value={sortBy} onChange={handleSortChange} />
+              </div>
+
+              {/* Mobile Results Count */}
+              <div className="lg:hidden mb-4">
+                <p className="text-sm text-muted-foreground">
+                  {filteredVehicles.length.toLocaleString()} car{filteredVehicles.length !== 1 ? 's' : ''} found
+                </p>
+              </div>
+
+              {/* Grid */}
+              {loading ? (
+                <div className="grid gap-5 grid-cols-1 sm:grid-cols-2">
+                  {Array.from({ length: 6 }).map((_, i) => (
+                    <div key={i} className="rounded-lg overflow-hidden border border-border/50">
+                      <Skeleton className="aspect-[16/10] w-full" />
+                      <div className="p-4 space-y-3">
+                        <Skeleton className="h-5 w-3/4" />
+                        <Skeleton className="h-4 w-1/2" />
+                        <Skeleton className="h-4 w-2/3" />
+                        <Skeleton className="h-6 w-1/3" />
+                        <Skeleton className="h-9 w-full" />
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              ) : error ? (
+                <div className="text-center py-20">
+                  <Car className="h-16 w-16 mx-auto text-muted-foreground/30 mb-4" />
+                  <h3 className="text-lg font-medium text-foreground mb-2">Failed to load vehicles</h3>
+                  <p className="text-muted-foreground mb-4">Something went wrong. Please try again.</p>
+                  <Button onClick={fetchVehicles}>Try Again</Button>
+                </div>
+              ) : paginatedVehicles.length > 0 ? (
+                <>
+                  <div className="grid gap-5 grid-cols-1 sm:grid-cols-2">
+                    {paginatedVehicles.map((vehicle) => (
+                      <VehicleCard
+                        key={vehicle.id}
+                        vehicle={vehicle}
+                        dealerName={dealerNames[vehicle.dealer_id] || 'Dealer'}
+                        isFavorited={favorites.has(vehicle.id)}
+                        isLoggedIn={!!user}
+                        onToggleFavorite={() => handleToggleFavorite(vehicle.id)}
+                        onViewDetails={() => {}}
+                      />
+                    ))}
+                  </div>
+                  <MarketplacePagination
+                    currentPage={safePage}
+                    totalPages={totalPages}
+                    onPageChange={handlePageChange}
+                  />
+                </>
+              ) : (
+                <div className="text-center py-20">
+                  <Car className="h-16 w-16 mx-auto text-muted-foreground/30 mb-4" />
+                  <h3 className="text-lg font-medium text-foreground mb-2">No vehicles found</h3>
+                  <p className="text-muted-foreground max-w-md mx-auto mb-4">
+                    {activeFilterCount > 0 || searchQuery
+                      ? 'Try adjusting your filters or search criteria.'
+                      : 'Check back soon for new listings from verified dealers.'}
+                  </p>
+                  {(activeFilterCount > 0 || searchQuery) && (
+                    <Button variant="outline" onClick={handleResetFilters}>Reset Filters</Button>
+                  )}
+                </div>
+              )}
             </div>
-          ) : filteredVehicles.length > 0 ? (
-            <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-              {filteredVehicles.map((vehicle) => (
-                <VehicleCard
-                  key={vehicle.id}
-                  vehicle={vehicle}
-                  dealerName={dealerNames[vehicle.dealer_id] || 'Dealer'}
-                  isFavorited={favorites.has(vehicle.id)}
-                  isLoggedIn={!!user}
-                  onToggleFavorite={() => handleToggleFavorite(vehicle.id)}
-                  onViewDetails={() => setSelectedVehicle(vehicle)}
-                />
-              ))}
-            </div>
-          ) : (
-            <div className="text-center py-20">
-              <Car className="h-16 w-16 mx-auto text-muted-foreground/30 mb-4" />
-              <h3 className="text-lg font-medium text-foreground mb-2">
-                No vehicles found
-              </h3>
-              <p className="text-muted-foreground max-w-md mx-auto">
-                {searchQuery || Object.values(filters).some(v => v && v !== 'all')
-                  ? 'Try adjusting your search or filters to find more vehicles.'
-                  : 'Check back soon for new listings from our verified dealers.'}
-              </p>
-            </div>
-          )}
+          </div>
         </div>
       </main>
-
-      {/* Vehicle Detail Modal */}
-      <VehicleDetailModal
-        vehicle={selectedVehicle}
-        dealerName={selectedVehicle ? dealerNames[selectedVehicle.dealer_id] || 'Dealer' : ''}
-        isFavorited={selectedVehicle ? favorites.has(selectedVehicle.id) : false}
-        isLoggedIn={!!user}
-        onClose={() => setSelectedVehicle(null)}
-        onToggleFavorite={() => selectedVehicle && handleToggleFavorite(selectedVehicle.id)}
-      />
     </div>
   );
 }

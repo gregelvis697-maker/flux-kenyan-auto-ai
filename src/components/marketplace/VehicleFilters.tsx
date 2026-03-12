@@ -15,7 +15,17 @@ import {
   CollapsibleTrigger,
 } from '@/components/ui/collapsible';
 import { useState } from 'react';
-import type { VehicleFiltersState } from '@/pages/Marketplace';
+// Legacy type kept for backward compatibility
+export interface VehicleFiltersState {
+  make: string;
+  model: string;
+  minPrice: string;
+  maxPrice: string;
+  minYear: string;
+  maxYear: string;
+  fuelType: string;
+  sourceType: 'all' | 'dealer_owned' | 'imported';
+}
 
 interface VehicleFiltersProps {
   filters: VehicleFiltersState;
