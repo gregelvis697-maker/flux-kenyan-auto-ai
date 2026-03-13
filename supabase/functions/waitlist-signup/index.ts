@@ -28,26 +28,36 @@ const escapeHtml = (str: string): string => str
   .replace(/"/g, '&quot;')
   .replace(/'/g, '&#039;');
 
-// Simple in-memory rate limiter (for production, use Redis or Supabase)
-const rateLimitMap = new Map<string, { count: number; resetTime: number }>();
-const RATE_LIMIT_WINDOW = 3600000; // 1 hour in milliseconds
-const RATE_LIMIT_MAX = 3; // Maximum 3 submissions per hour
+const RATE_LIMIT_WINDOW_MINUTES = 60;
+const RATE_LIMIT_MAX = 3;
 
-const checkRateLimit = (identifier: string): boolean => {
-  const now = Date.now();
-  const record = rateLimitMap.get(identifier);
+const checkRateLimit = async (identifier: string, supabase: any): Promise<boolean> => {
+  // Count recent requests from this identifier
+  const windowStart = new Date(Date.now() - RATE_LIMIT_WINDOW_MINUTES * 60 * 1000).toISOString();
+  
+  const { count, error } = await supabase
+    .from("rate_limits")
+    .select("*", { count: "exact", head: true })
+    .eq("identifier", identifier)
+    .eq("endpoint", "waitlist-signup")
+    .gte("created_at", windowStart);
 
-  if (!record || now > record.resetTime) {
-    // Create new record or reset expired one
-    rateLimitMap.set(identifier, { count: 1, resetTime: now + RATE_LIMIT_WINDOW });
+  if (error) {
+    // If rate limit check fails, allow the request (fail open for availability)
+    console.error("Rate limit check failed:", error.message);
     return true;
   }
 
-  if (record.count >= RATE_LIMIT_MAX) {
+  if ((count ?? 0) >= RATE_LIMIT_MAX) {
     return false;
   }
 
-  record.count++;
+  // Log this request
+  await supabase.from("rate_limits").insert({
+    identifier,
+    endpoint: "waitlist-signup",
+  });
+
   return true;
 };
 
