@@ -29,6 +29,7 @@ import VehicleDetail from "./pages/VehicleDetail";
 import NotFound from "./pages/NotFound";
 
 const App = () => (
+  <QueryClientProvider client={queryClient}>
   <TooltipProvider>
     <Toaster />
     <Sonner />
