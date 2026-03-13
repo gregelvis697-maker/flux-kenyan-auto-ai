@@ -68,12 +68,15 @@ const handler = async (req: Request): Promise<Response> => {
   }
 
   try {
-    // Rate limiting check
+    // Create Supabase client with service role key
+    const supabase = createClient(supabaseUrl, supabaseServiceKey);
+
+    // Rate limiting check (persistent via database)
     const ip = req.headers.get('x-forwarded-for')?.split(',')[0].trim() || 
                req.headers.get('cf-connecting-ip') || 
                'unknown';
     
-    if (!checkRateLimit(ip)) {
+    if (!(await checkRateLimit(ip, supabase))) {
       return new Response(
         JSON.stringify({ error: "Too many requests. Please try again later." }),
         {
@@ -86,9 +89,6 @@ const handler = async (req: Request): Promise<Response> => {
     // Parse and validate input
     const rawData = await req.json();
     const validatedData = waitlistSchema.parse(rawData);
-
-    // Create Supabase client with service role key
-    const supabase = createClient(supabaseUrl, supabaseServiceKey);
 
     // Insert into waitlist table
     const { data: waitlistEntry, error: dbError } = await supabase
