@@ -22,20 +22,18 @@ export const Navigation = ({ children }: { children?: React.ReactNode }) => {
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
-  // Close mobile menu on route change
   useEffect(() => {
     setMobileMenuOpen(false);
   }, [location.pathname]);
 
-  // Prevent body scroll when mobile menu is open
   useEffect(() => {
     if (mobileMenuOpen) {
-      document.body.style.overflow = 'hidden';
+      document.body.style.overflow = "hidden";
     } else {
-      document.body.style.overflow = 'unset';
+      document.body.style.overflow = "unset";
     }
     return () => {
-      document.body.style.overflow = 'unset';
+      document.body.style.overflow = "unset";
     };
   }, [mobileMenuOpen]);
 
@@ -44,7 +42,7 @@ export const Navigation = ({ children }: { children?: React.ReactNode }) => {
   const navLinks = [
     { name: "Home", path: "/", icon: Home },
     { name: "Marketplace", path: "/marketplace", icon: Car },
-    { name: "Waitlist", path: "/waitlist", icon: Users },
+    { name: "Join Waitlist", path: "/waitlist", icon: Users },
   ];
 
   return (
@@ -79,9 +77,13 @@ export const Navigation = ({ children }: { children?: React.ReactNode }) => {
                 key={link.path}
                 to={link.path}
                 className={`text-sm font-medium transition-all duration-200 relative py-2 ${
-                  isActive(link.path)
-                    ? "text-primary"
-                    : "text-muted-foreground hover:text-foreground"
+                  link.path === "/waitlist"
+                    ? isActive(link.path)
+                      ? "text-primary font-semibold"
+                      : "text-primary hover:text-primary/80"
+                    : isActive(link.path)
+                      ? "text-primary"
+                      : "text-muted-foreground hover:text-foreground"
                 }`}
               >
                 {link.name}
@@ -112,7 +114,7 @@ export const Navigation = ({ children }: { children?: React.ReactNode }) => {
                   onClick={() => navigate("/auth")}
                   className="text-foreground hover:text-primary hover:bg-accent/50 transition-all"
                 >
-                  Login
+                  Sign In
                 </Button>
                 <Button
                   size="sm"
@@ -145,7 +147,6 @@ export const Navigation = ({ children }: { children?: React.ReactNode }) => {
       <AnimatePresence>
         {mobileMenuOpen && (
           <>
-            {/* Backdrop */}
             <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
@@ -154,8 +155,6 @@ export const Navigation = ({ children }: { children?: React.ReactNode }) => {
               className="md:hidden fixed inset-0 top-14 sm:top-16 bg-background/80 backdrop-blur-sm z-40"
               onClick={() => setMobileMenuOpen(false)}
             />
-            
-            {/* Menu Panel */}
             <motion.div
               initial={{ opacity: 0, y: -10 }}
               animate={{ opacity: 1, y: 0 }}
@@ -164,7 +163,6 @@ export const Navigation = ({ children }: { children?: React.ReactNode }) => {
               className="md:hidden fixed top-14 sm:top-16 left-0 right-0 bg-card/95 backdrop-blur-xl border-b border-border shadow-2xl z-50 max-h-[calc(100vh-3.5rem)] sm:max-h-[calc(100vh-4rem)] overflow-y-auto"
             >
               <div className="px-4 py-4 space-y-2">
-                {/* Navigation Links */}
                 {navLinks.map((link) => {
                   const IconComponent = link.icon;
                   return (
@@ -184,15 +182,17 @@ export const Navigation = ({ children }: { children?: React.ReactNode }) => {
                   );
                 })}
 
-                {/* Divider */}
                 <div className="h-px bg-border my-3" />
 
-                {/* Auth Section */}
                 {user ? (
                   <div className="space-y-3">
                     <div className="px-4 py-3 rounded-xl bg-accent/30 border border-border/50">
-                      <p className="text-xs text-muted-foreground mb-0.5">Signed in as</p>
-                      <p className="text-sm font-medium truncate text-foreground">{user.email}</p>
+                      <p className="text-xs text-muted-foreground mb-0.5">
+                        Signed in as
+                      </p>
+                      <p className="text-sm font-medium truncate text-foreground">
+                        {user.email}
+                      </p>
                     </div>
                     <div className="flex items-center gap-2 px-2">
                       {children || <NotificationBell />}
@@ -212,7 +212,7 @@ export const Navigation = ({ children }: { children?: React.ReactNode }) => {
                       className="w-full h-12 text-base justify-start gap-3 px-4"
                     >
                       <LogIn className="h-5 w-5" />
-                      Login
+                      Sign In
                     </Button>
                     <Button
                       onClick={() => {
