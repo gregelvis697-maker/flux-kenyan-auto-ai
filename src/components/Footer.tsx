@@ -1,120 +1,202 @@
 import { motion } from "framer-motion";
-import { Twitter, Instagram } from "lucide-react";
+import { Twitter, Instagram, Facebook, MapPin, Mail, Phone } from "lucide-react";
 import { Link } from "react-router-dom";
+
+const platformLinks = [
+  { label: "Marketplace", href: "/marketplace" },
+  { label: "For Dealers", href: "/auth" },
+  { label: "For Importers", href: "/auth" },
+  { label: "For Buyers", href: "/auth" },
+];
+
+const companyLinks = [
+  { label: "About Us", href: "#" },
+  { label: "Careers", href: "#" },
+  { label: "Press", href: "#" },
+  { label: "Contact", href: "#" },
+];
+
+const resourceLinks = [
+  { label: "Blog", href: "#" },
+  { label: "Help Center", href: "#" },
+  { label: "API Docs", href: "#" },
+  { label: "System Status", href: "#" },
+];
+
+const legalLinks = [
+  { label: "Privacy Policy", href: "#" },
+  { label: "Terms of Service", href: "#" },
+  { label: "Cookie Policy", href: "#" },
+  { label: "GDPR", href: "#" },
+];
 
 export const Footer = () => {
   const currentYear = new Date().getFullYear();
 
+  const LinkList = ({
+    title,
+    links,
+  }: {
+    title: string;
+    links: { label: string; href: string }[];
+  }) => (
+    <div>
+      <h4 className="text-xs sm:text-sm font-semibold mb-3 sm:mb-4 text-foreground uppercase tracking-wider">
+        {title}
+      </h4>
+      <ul className="space-y-1.5 sm:space-y-2">
+        {links.map((link) => (
+          <li key={link.label}>
+            {link.href.startsWith("/") ? (
+              <Link
+                to={link.href}
+                className="text-muted-foreground hover:text-primary transition-colors text-xs sm:text-sm inline-block py-1"
+              >
+                {link.label}
+              </Link>
+            ) : (
+              <a
+                href={link.href}
+                className="text-muted-foreground hover:text-primary transition-colors text-xs sm:text-sm inline-block py-1"
+              >
+                {link.label}
+              </a>
+            )}
+          </li>
+        ))}
+      </ul>
+    </div>
+  );
+
   return (
-    <footer className="relative py-8 sm:py-10 lg:py-12 border-t border-border">
+    <footer className="relative py-10 sm:py-12 lg:py-16 border-t border-border bg-card/30">
       <div className="container mx-auto px-4 sm:px-6">
-        <div className="grid grid-cols-2 md:grid-cols-3 gap-6 sm:gap-8 mb-6 sm:mb-8">
-          {/* Brand */}
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-8 sm:gap-10 mb-8 sm:mb-10">
+          {/* Brand + Contact */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6 }}
+            transition={{ duration: 0.4 }}
             viewport={{ once: true }}
-            className="col-span-2 md:col-span-1"
+            className="col-span-2 md:col-span-3 lg:col-span-1"
           >
-            <h3 className="text-xl sm:text-2xl font-bold mb-2 sm:mb-3 bg-gradient-primary bg-clip-text text-transparent">
+            <h3 className="text-xl sm:text-2xl font-bold mb-3 bg-gradient-primary bg-clip-text text-transparent">
               Flux
             </h3>
-            <p className="text-muted-foreground text-xs sm:text-sm leading-relaxed max-w-xs">
-              Redefining automotive infrastructure in Kenya through trust, AI, and transparency.
+            <p className="text-muted-foreground text-xs sm:text-sm leading-relaxed max-w-xs mb-4">
+              Kenya's first AI-powered automotive platform. Connecting verified
+              dealers, importers, and buyers through trust and transparency.
             </p>
-          </motion.div>
-
-          {/* Quick Links */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 0.1 }}
-            viewport={{ once: true }}
-          >
-            <h4 className="text-xs sm:text-sm font-semibold mb-3 sm:mb-4 text-foreground uppercase tracking-wider">
-              Quick Links
-            </h4>
-            <ul className="space-y-1.5 sm:space-y-2">
-              <li>
-                <a href="#" className="text-muted-foreground hover:text-primary transition-colors text-xs sm:text-sm inline-block py-1">
-                  About
-                </a>
+            <ul className="space-y-2">
+              <li className="flex items-center gap-2 text-muted-foreground text-xs sm:text-sm">
+                <MapPin className="w-3.5 h-3.5 text-primary flex-shrink-0" />
+                Nairobi, Kenya
               </li>
-              <li>
-                <a href="#" className="text-muted-foreground hover:text-primary transition-colors text-xs sm:text-sm inline-block py-1">
-                  Contact
-                </a>
+              <li className="flex items-center gap-2 text-muted-foreground text-xs sm:text-sm">
+                <Mail className="w-3.5 h-3.5 text-primary flex-shrink-0" />
+                hello@flux.co.ke
               </li>
-              <li>
-                <a href="#" className="text-muted-foreground hover:text-primary transition-colors text-xs sm:text-sm inline-block py-1">
-                  Privacy Policy
-                </a>
-              </li>
-              <li>
-                <Link to="/auth" className="text-muted-foreground hover:text-primary transition-colors text-xs sm:text-sm inline-block py-1">
-                  Admin
-                </Link>
+              <li className="flex items-center gap-2 text-muted-foreground text-xs sm:text-sm">
+                <Phone className="w-3.5 h-3.5 text-primary flex-shrink-0" />
+                +254 700 000 000
               </li>
             </ul>
           </motion.div>
 
-          {/* Social */}
+          {/* Link Columns */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 0.2 }}
+            transition={{ duration: 0.4, delay: 0.05 }}
             viewport={{ once: true }}
           >
-            <h4 className="text-xs sm:text-sm font-semibold mb-3 sm:mb-4 text-foreground uppercase tracking-wider">
-              Follow Us
-            </h4>
-            <div className="flex gap-2 sm:gap-3">
-              <a 
-                href="https://tiktok.com" 
-                target="_blank" 
-                rel="noopener noreferrer"
-                className="inline-flex items-center justify-center w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-primary/10 border border-primary/20 hover:bg-primary/20 hover:shadow-glow-primary transition-all duration-300 active:scale-95"
-                aria-label="TikTok"
-              >
-                <svg className="w-4 h-4 sm:w-5 sm:h-5 text-primary" viewBox="0 0 24 24" fill="currentColor">
-                  <path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-5.2 1.74 2.89 2.89 0 0 1 2.31-4.64 2.93 2.93 0 0 1 .88.13V9.4a6.84 6.84 0 0 0-1-.05A6.33 6.33 0 0 0 5 20.1a6.34 6.34 0 0 0 10.86-4.43v-7a8.16 8.16 0 0 0 4.77 1.52v-3.4a4.85 4.85 0 0 1-1-.1z"/>
-                </svg>
-              </a>
-              <a 
-                href="https://twitter.com" 
-                target="_blank" 
-                rel="noopener noreferrer"
-                className="inline-flex items-center justify-center w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-primary/10 border border-primary/20 hover:bg-primary/20 hover:shadow-glow-primary transition-all duration-300 active:scale-95"
-                aria-label="Twitter"
-              >
-                <Twitter className="w-4 h-4 sm:w-5 sm:h-5 text-primary" />
-              </a>
-              <a 
-                href="https://instagram.com" 
-                target="_blank" 
-                rel="noopener noreferrer"
-                className="inline-flex items-center justify-center w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-primary/10 border border-primary/20 hover:bg-primary/20 hover:shadow-glow-primary transition-all duration-300 active:scale-95"
-                aria-label="Instagram"
-              >
-                <Instagram className="w-4 h-4 sm:w-5 sm:h-5 text-primary" />
-              </a>
-            </div>
+            <LinkList title="Platform" links={platformLinks} />
+          </motion.div>
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.4, delay: 0.1 }}
+            viewport={{ once: true }}
+          >
+            <LinkList title="Company" links={companyLinks} />
+          </motion.div>
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.4, delay: 0.15 }}
+            viewport={{ once: true }}
+          >
+            <LinkList title="Resources" links={resourceLinks} />
+          </motion.div>
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.4, delay: 0.2 }}
+            viewport={{ once: true }}
+          >
+            <LinkList title="Legal" links={legalLinks} />
           </motion.div>
         </div>
 
-        {/* Copyright */}
-        <motion.div
-          initial={{ opacity: 0 }}
-          whileInView={{ opacity: 1 }}
-          transition={{ duration: 0.6, delay: 0.3 }}
-          viewport={{ once: true }}
-          className="pt-6 sm:pt-8 border-t border-border text-center"
-        >
-          <p className="text-xs sm:text-sm text-muted-foreground">
-            © {currentYear} Flux Automotive. All rights reserved.
-          </p>
-        </motion.div>
+        {/* Bottom Bar */}
+        <div className="pt-6 sm:pt-8 border-t border-border flex flex-col sm:flex-row items-center justify-between gap-4">
+          <div className="flex items-center gap-3 text-xs sm:text-sm text-muted-foreground">
+            <span>© {currentYear} FLUX Automotive. All rights reserved.</span>
+            <span className="hidden sm:inline">|</span>
+            <Link
+              to="/admin/dashboard"
+              className="text-primary hover:text-primary/80 transition-colors"
+            >
+              Admin Portal
+            </Link>
+          </div>
+
+          {/* Social Icons */}
+          <div className="flex gap-2 sm:gap-3">
+            <a
+              href="https://tiktok.com"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center justify-center w-9 h-9 rounded-full bg-primary/10 border border-primary/20 hover:bg-primary/20 hover:shadow-glow-primary transition-all duration-300 active:scale-95"
+              aria-label="TikTok"
+            >
+              <svg
+                className="w-4 h-4 text-primary"
+                viewBox="0 0 24 24"
+                fill="currentColor"
+              >
+                <path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-5.2 1.74 2.89 2.89 0 0 1 2.31-4.64 2.93 2.93 0 0 1 .88.13V9.4a6.84 6.84 0 0 0-1-.05A6.33 6.33 0 0 0 5 20.1a6.34 6.34 0 0 0 10.86-4.43v-7a8.16 8.16 0 0 0 4.77 1.52v-3.4a4.85 4.85 0 0 1-1-.1z" />
+              </svg>
+            </a>
+            <a
+              href="https://twitter.com"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center justify-center w-9 h-9 rounded-full bg-primary/10 border border-primary/20 hover:bg-primary/20 hover:shadow-glow-primary transition-all duration-300 active:scale-95"
+              aria-label="Twitter"
+            >
+              <Twitter className="w-4 h-4 text-primary" />
+            </a>
+            <a
+              href="https://instagram.com"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center justify-center w-9 h-9 rounded-full bg-primary/10 border border-primary/20 hover:bg-primary/20 hover:shadow-glow-primary transition-all duration-300 active:scale-95"
+              aria-label="Instagram"
+            >
+              <Instagram className="w-4 h-4 text-primary" />
+            </a>
+            <a
+              href="https://facebook.com"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center justify-center w-9 h-9 rounded-full bg-primary/10 border border-primary/20 hover:bg-primary/20 hover:shadow-glow-primary transition-all duration-300 active:scale-95"
+              aria-label="Facebook"
+            >
+              <Facebook className="w-4 h-4 text-primary" />
+            </a>
+          </div>
+        </div>
       </div>
     </footer>
   );
