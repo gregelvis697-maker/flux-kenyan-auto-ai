@@ -27,6 +27,11 @@ import BuyerDashboard from "./pages/BuyerDashboard";
 import Marketplace from "./pages/Marketplace";
 import VehicleDetail from "./pages/VehicleDetail";
 import NotFound from "./pages/NotFound";
+import MarketplacePage from "./pages/products/MarketplacePage";
+import EscrowPage from "./pages/products/EscrowPage";
+import AIIntelligencePage from "./pages/products/AIIntelligencePage";
+import AnalyticsPage from "./pages/products/AnalyticsPage";
+import DealerToolsPage from "./pages/products/DealerToolsPage";
 
 const App = () => (
   <QueryClientProvider client={queryClient}>
