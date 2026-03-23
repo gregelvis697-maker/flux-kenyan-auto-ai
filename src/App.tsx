@@ -27,6 +27,11 @@ import BuyerDashboard from "./pages/BuyerDashboard";
 import Marketplace from "./pages/Marketplace";
 import VehicleDetail from "./pages/VehicleDetail";
 import NotFound from "./pages/NotFound";
+import MarketplacePage from "./pages/products/MarketplacePage";
+import EscrowPage from "./pages/products/EscrowPage";
+import AIIntelligencePage from "./pages/products/AIIntelligencePage";
+import AnalyticsPage from "./pages/products/AnalyticsPage";
+import DealerToolsPage from "./pages/products/DealerToolsPage";
 
 const App = () => (
   <QueryClientProvider client={queryClient}>
@@ -82,6 +87,11 @@ const App = () => (
               </ProtectedRoute>
             }
           />
+          <Route path="/products/marketplace" element={<MarketplacePage />} />
+          <Route path="/products/escrow" element={<EscrowPage />} />
+          <Route path="/products/ai-intelligence" element={<AIIntelligencePage />} />
+          <Route path="/products/analytics" element={<AnalyticsPage />} />
+          <Route path="/products/dealer-tools" element={<DealerToolsPage />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>
