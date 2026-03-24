@@ -176,40 +176,40 @@ const ProductPage: React.FC<ProductPageProps> = ({ data }) => {
 
         {/* Pricing */}
         {data.pricing && (
-          <Section id="pricing" className="py-16 md:py-24 px-4">
+          <Section id="pricing" className="py-10 sm:py-16 md:py-24 px-4">
             <div className="container mx-auto max-w-5xl">
-              <h2 className="text-3xl md:text-4xl font-bold text-center mb-4">
+              <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-center mb-3 sm:mb-4 px-2">
                 {data.pricing.heading.split(" ").slice(0, -1).join(" ")}{" "}
                 <span className="text-primary">{data.pricing.heading.split(" ").slice(-1)}</span>
               </h2>
-              <p className="text-muted-foreground text-center mb-12 max-w-2xl mx-auto">
+              <p className="text-muted-foreground text-center mb-8 sm:mb-12 max-w-2xl mx-auto text-sm sm:text-base px-2">
                 {data.pricing.subtitle}
               </p>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-5 sm:gap-8">
                 {data.pricing.plans.map((plan, i) => (
                   <motion.div
                     key={i}
                     variants={fadeUp}
                     transition={{ delay: i * 0.1 }}
-                    className="p-8 rounded-xl bg-card border border-border/50 hover:border-primary/40 hover:scale-[1.02] transition-all duration-300 flex flex-col"
+                    className="p-5 sm:p-8 rounded-xl bg-card border border-border/50 hover:border-primary/40 hover:scale-[1.02] transition-all duration-300 flex flex-col"
                   >
-                    <h3 className="text-2xl font-bold text-foreground mb-4">{plan.name}</h3>
-                    <div className="mb-3">
-                      <span className="text-4xl md:text-5xl font-bold text-primary">{plan.price}</span>
-                      <span className="text-muted-foreground text-lg ml-1">{plan.period}</span>
+                    <h3 className="text-xl sm:text-2xl font-bold text-foreground mb-3 sm:mb-4">{plan.name}</h3>
+                    <div className="mb-2 sm:mb-3">
+                      <span className="text-3xl sm:text-4xl md:text-5xl font-bold text-primary">{plan.price}</span>
+                      <span className="text-muted-foreground text-base sm:text-lg ml-1">{plan.period}</span>
                     </div>
-                    <p className="text-muted-foreground mb-8">{plan.subtitle}</p>
-                    <ul className="space-y-3 flex-1 mb-8">
+                    <p className="text-muted-foreground text-sm sm:text-base mb-6 sm:mb-8">{plan.subtitle}</p>
+                    <ul className="space-y-2.5 sm:space-y-3 flex-1 mb-6 sm:mb-8">
                       {plan.features.map((feature, j) => (
                         <li key={j}>
-                          <div className="flex items-start gap-3">
-                            <CheckCircle className="w-5 h-5 text-primary flex-shrink-0 mt-0.5" />
-                            <span className="text-foreground text-sm">{feature.text}</span>
+                          <div className="flex items-start gap-2.5 sm:gap-3">
+                            <CheckCircle className="w-4 h-4 sm:w-5 sm:h-5 text-primary flex-shrink-0 mt-0.5" />
+                            <span className="text-foreground text-xs sm:text-sm">{feature.text}</span>
                           </div>
                           {feature.subItems && (
-                            <ul className="ml-8 mt-1.5 space-y-1">
+                            <ul className="ml-6 sm:ml-8 mt-1 sm:mt-1.5 space-y-0.5 sm:space-y-1">
                               {feature.subItems.map((sub, k) => (
-                                <li key={k} className="text-muted-foreground text-xs leading-relaxed">• {sub}</li>
+                                <li key={k} className="text-muted-foreground text-[11px] sm:text-xs leading-relaxed">• {sub}</li>
                               ))}
                             </ul>
                           )}
@@ -221,8 +221,8 @@ const ProductPage: React.FC<ProductPageProps> = ({ data }) => {
                       size="lg"
                       className={
                         plan.highlighted
-                          ? "w-full bg-gradient-primary text-primary-foreground hover:shadow-glow-primary text-base"
-                          : "w-full border-primary/50 text-primary hover:bg-primary/10 text-base"
+                          ? "w-full bg-gradient-primary text-primary-foreground hover:shadow-glow-primary text-sm sm:text-base h-11 sm:h-12"
+                          : "w-full border-primary/50 text-primary hover:bg-primary/10 text-sm sm:text-base h-11 sm:h-12"
                       }
                       variant={plan.highlighted ? "default" : "outline"}
                     >
