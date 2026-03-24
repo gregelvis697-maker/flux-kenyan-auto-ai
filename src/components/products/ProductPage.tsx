@@ -71,9 +71,21 @@ const ProductPage: React.FC<ProductPageProps> = ({ data }) => {
                 <Link to={data.hero.ctaPrimary.href}>{data.hero.ctaPrimary.label}</Link>
               </Button>
               {data.hero.ctaSecondary && (
-                <Button asChild variant="outline" size="lg" className="border-primary/50 text-foreground hover:bg-primary/10 text-base px-8">
-                  <Link to={data.hero.ctaSecondary.href}>{data.hero.ctaSecondary.label}</Link>
-                </Button>
+                data.hero.ctaSecondary.href.startsWith("#") ? (
+                  <Button
+                    variant="outline"
+                    size="lg"
+                    className="border-primary/50 text-foreground hover:bg-primary/10 text-base px-8"
+                    onClick={() => document.querySelector(data.hero.ctaSecondary!.href)?.scrollIntoView({ behavior: "smooth" })}
+                  >
+                    {data.hero.ctaSecondary.label}
+                  </Button>
+                ) : (
+                  <Button asChild variant="outline" size="lg" className="border-primary/50 text-foreground hover:bg-primary/10 text-base px-8">
+                    <Link to={data.hero.ctaSecondary.href}>{data.hero.ctaSecondary.label}</Link>
+                  </Button>
+                )
+              )}
               )}
             </motion.div>
           </div>
