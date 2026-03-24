@@ -28,6 +28,28 @@ export interface ProductFAQItem {
   answer: string;
 }
 
+export interface PricingPlanFeature {
+  text: string;
+  subItems?: string[];
+}
+
+export interface PricingPlan {
+  name: string;
+  price: string;
+  period: string;
+  subtitle: string;
+  features: PricingPlanFeature[];
+  ctaLabel: string;
+  ctaHref: string;
+  highlighted?: boolean;
+}
+
+export interface ProductPricing {
+  heading: string;
+  subtitle: string;
+  plans: PricingPlan[];
+}
+
 export interface ProductData {
   slug: string;
   hero: {
@@ -44,6 +66,7 @@ export interface ProductData {
   };
   features: ProductFeature[];
   howItWorks: ProductStep[];
+  pricing?: ProductPricing;
   benefits: ProductBenefit[];
   faq: ProductFAQItem[];
   finalCta: {
