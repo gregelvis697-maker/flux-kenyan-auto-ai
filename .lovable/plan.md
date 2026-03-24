@@ -1,69 +1,45 @@
 
 
-# Products Dropdown & 5 Product Pages
+# Add Pricing Section to Dealer Tools Page
 
-## Summary
-Add a "Products" dropdown to the navigation bar and create 5 new product pages, each with hero, features, how-it-works, benefits, FAQ accordion, and CTA sections. All pages use the existing dark theme and shared Navigation/Footer.
-
----
+## Approach
+Add an optional `pricing` field to the `ProductData` interface and populate it for the Dealer Tools page. Render the pricing section in `ProductPage.tsx` between "How It Works" and "Benefits" — only when `data.pricing` exists, so other product pages are unaffected.
 
 ## Changes
 
-### 1. Navigation Update
-**File: `src/components/Navigation.tsx`**
-- Add "Products" to `navLinks` array (between Marketplace and Waitlist)
-- On desktop: hover opens a dropdown with 5 items (icon, title, subtitle) linking to `/products/*`
-- On mobile: tap expands an accordion-style sub-menu within the mobile menu
-- Dropdown styled with card background, blur, cyan hover border
-- Uses `NavigationMenu` from Radix or a custom hover dropdown with `onMouseEnter`/`onMouseLeave`
+### 1. `src/components/products/productData.ts`
+- Add optional `pricing` to `ProductData` interface:
+  ```ts
+  pricing?: {
+    heading: string;
+    subtitle: string;
+    plans: Array<{
+      name: string;
+      price: string;
+      period: string;
+      subtitle: string;
+      features: Array<{ text: string; subItems?: string[] }>;
+      ctaLabel: string;
+      ctaHref: string;
+      highlighted?: boolean; // true for Premium (filled button)
+    }>;
+  };
+  ```
+- Add `pricing` data to `dealerToolsData` with Standard (KES 32,000) and Premium (KES 40,000) plans, all features and sub-bullets as specified.
 
-### 2. Routes
-**File: `src/App.tsx`**
-- Add 5 routes before catch-all:
-  - `/products/marketplace`
-  - `/products/escrow`
-  - `/products/ai-intelligence`
-  - `/products/analytics`
-  - `/products/dealer-tools`
-- All use a shared `ProductPage` component with different content props
+### 2. `src/components/products/ProductPage.tsx`
+- After the "How It Works" section (line 164) and before "Benefits" (line 167), add a conditional pricing section:
+  - Heading + subtitle centered
+  - 2-column grid (1-col on mobile) of pricing cards
+  - Each card: plan name, price in cyan, subtitle, feature list with checkmarks and indented sub-items, CTA button
+  - Standard card: outline CTA button; Premium card: filled cyan CTA button
+  - Cards use hover scale(1.02) + cyan border, matching existing card patterns
+  - Uses the same `Section` wrapper and `fadeUp` animations
 
-### 3. Shared Product Page Component
-**New file: `src/components/products/ProductPage.tsx`**
-- Renders: Navigation → Hero → Overview (with stats) → Features grid → How It Works steps → Benefits cards → FAQ accordion → Final CTA → Footer
-- All sections use framer-motion fade-in (400ms, 100ms stagger)
-- Responsive: 3-col → 2-col → 1-col grids
+### Files Modified (2)
+- `src/components/products/productData.ts` — add interface field + dealer tools pricing data
+- `src/components/products/ProductPage.tsx` — render pricing section conditionally
 
-### 4. FAQ Accordion Component
-**New file: `src/components/products/ProductFAQ.tsx`**
-- Uses existing `@radix-ui/react-accordion` (already in project as `src/components/ui/accordion.tsx`)
-- Single-open mode, cyan chevron, dark card styling
-- Accessible: keyboard nav, aria-expanded, prefers-reduced-motion
-
-### 5. Product Page Data
-**New file: `src/components/products/productData.ts`**
-- Exports 5 product config objects (one per page) containing all content: hero text, features, steps, benefits, FAQ Q&As, CTAs
-- Each page component just imports its config and passes to `ProductPage`
-
-### 6. Five Page Files
-**New files:** `src/pages/products/MarketplacePage.tsx`, `EscrowPage.tsx`, `AIIntelligencePage.tsx`, `AnalyticsPage.tsx`, `DealerToolsPage.tsx`
-- Each is a thin wrapper: imports product data + renders `ProductPage`
-
----
-
-## Files Created (8)
-- `src/components/products/ProductPage.tsx` — shared layout
-- `src/components/products/ProductFAQ.tsx` — FAQ accordion
-- `src/components/products/productData.ts` — all content
-- `src/pages/products/MarketplacePage.tsx`
-- `src/pages/products/EscrowPage.tsx`
-- `src/pages/products/AIIntelligencePage.tsx`
-- `src/pages/products/AnalyticsPage.tsx`
-- `src/pages/products/DealerToolsPage.tsx`
-
-## Files Modified (2)
-- `src/components/Navigation.tsx` — add Products dropdown
-- `src/App.tsx` — add 5 routes
-
-## Not Touched
-- All existing pages, auth, database, marketplace, dashboards, Footer
+### Not Touched
+- All other product pages, routes, navigation, auth, database
 
