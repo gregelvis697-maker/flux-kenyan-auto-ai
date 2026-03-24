@@ -91,24 +91,24 @@ const ProductPage: React.FC<ProductPageProps> = ({ data }) => {
         </section>
 
         {/* Overview */}
-        <Section className="py-16 md:py-24 px-4">
+        <Section className="py-10 sm:py-16 md:py-24 px-4">
           <div className="container mx-auto max-w-4xl">
-            <h2 className="text-3xl md:text-4xl font-bold text-center mb-6">
+            <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-center mb-4 sm:mb-6 px-2">
               {data.overview.heading}
             </h2>
-            <p className="text-muted-foreground text-center text-lg max-w-3xl mx-auto mb-12 leading-relaxed">
+            <p className="text-muted-foreground text-center text-base sm:text-lg max-w-3xl mx-auto mb-8 sm:mb-12 leading-relaxed px-2">
               {data.overview.content}
             </p>
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-6">
               {data.overview.stats.map((stat, i) => (
                 <motion.div
                   key={i}
                   variants={fadeUp}
                   transition={{ delay: i * 0.1 }}
-                  className="text-center p-6 rounded-xl bg-card/60 border border-border/50"
+                  className="text-center p-4 sm:p-6 rounded-xl bg-card/60 border border-border/50"
                 >
-                  <div className="text-3xl md:text-4xl font-bold text-primary mb-2">{stat.value}</div>
-                  <div className="text-sm text-muted-foreground">{stat.label}</div>
+                  <div className="text-2xl sm:text-3xl md:text-4xl font-bold text-primary mb-1 sm:mb-2">{stat.value}</div>
+                  <div className="text-xs sm:text-sm text-muted-foreground">{stat.label}</div>
                 </motion.div>
               ))}
             </div>
