@@ -163,6 +163,67 @@ const ProductPage: React.FC<ProductPageProps> = ({ data }) => {
           </div>
         </Section>
 
+        {/* Pricing */}
+        {data.pricing && (
+          <Section className="py-16 md:py-24 px-4">
+            <div className="container mx-auto max-w-5xl">
+              <h2 className="text-3xl md:text-4xl font-bold text-center mb-4">
+                {data.pricing.heading.split(" ").slice(0, -1).join(" ")}{" "}
+                <span className="text-primary">{data.pricing.heading.split(" ").slice(-1)}</span>
+              </h2>
+              <p className="text-muted-foreground text-center mb-12 max-w-2xl mx-auto">
+                {data.pricing.subtitle}
+              </p>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                {data.pricing.plans.map((plan, i) => (
+                  <motion.div
+                    key={i}
+                    variants={fadeUp}
+                    transition={{ delay: i * 0.1 }}
+                    className="p-8 rounded-xl bg-card border border-border/50 hover:border-primary/40 hover:scale-[1.02] transition-all duration-300 flex flex-col"
+                  >
+                    <h3 className="text-2xl font-bold text-foreground mb-4">{plan.name}</h3>
+                    <div className="mb-3">
+                      <span className="text-4xl md:text-5xl font-bold text-primary">{plan.price}</span>
+                      <span className="text-muted-foreground text-lg ml-1">{plan.period}</span>
+                    </div>
+                    <p className="text-muted-foreground mb-8">{plan.subtitle}</p>
+                    <ul className="space-y-3 flex-1 mb-8">
+                      {plan.features.map((feature, j) => (
+                        <li key={j}>
+                          <div className="flex items-start gap-3">
+                            <CheckCircle className="w-5 h-5 text-primary flex-shrink-0 mt-0.5" />
+                            <span className="text-foreground text-sm">{feature.text}</span>
+                          </div>
+                          {feature.subItems && (
+                            <ul className="ml-8 mt-1.5 space-y-1">
+                              {feature.subItems.map((sub, k) => (
+                                <li key={k} className="text-muted-foreground text-xs leading-relaxed">• {sub}</li>
+                              ))}
+                            </ul>
+                          )}
+                        </li>
+                      ))}
+                    </ul>
+                    <Button
+                      asChild
+                      size="lg"
+                      className={
+                        plan.highlighted
+                          ? "w-full bg-gradient-primary text-primary-foreground hover:shadow-glow-primary text-base"
+                          : "w-full border-primary/50 text-primary hover:bg-primary/10 text-base"
+                      }
+                      variant={plan.highlighted ? "default" : "outline"}
+                    >
+                      <Link to={plan.ctaHref}>{plan.ctaLabel}</Link>
+                    </Button>
+                  </motion.div>
+                ))}
+              </div>
+            </div>
+          </Section>
+        )}
+
         {/* Benefits */}
         <Section className="py-16 md:py-24 px-4 bg-card/30">
           <div className="container mx-auto max-w-5xl">

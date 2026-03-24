@@ -28,6 +28,28 @@ export interface ProductFAQItem {
   answer: string;
 }
 
+export interface PricingPlanFeature {
+  text: string;
+  subItems?: string[];
+}
+
+export interface PricingPlan {
+  name: string;
+  price: string;
+  period: string;
+  subtitle: string;
+  features: PricingPlanFeature[];
+  ctaLabel: string;
+  ctaHref: string;
+  highlighted?: boolean;
+}
+
+export interface ProductPricing {
+  heading: string;
+  subtitle: string;
+  plans: PricingPlan[];
+}
+
 export interface ProductData {
   slug: string;
   hero: {
@@ -44,6 +66,7 @@ export interface ProductData {
   };
   features: ProductFeature[];
   howItWorks: ProductStep[];
+  pricing?: ProductPricing;
   benefits: ProductBenefit[];
   faq: ProductFAQItem[];
   finalCta: {
@@ -305,6 +328,47 @@ export const dealerToolsData: ProductData = {
     { title: "Start Selling", description: "Your listings go live instantly. Our AI starts matching you with buyers, analytics track performance, and you get leads delivered to your inbox." },
     { title: "Grow Continuously", description: "Update inventory in real-time, respond to buyer messages, track sales analytics, and watch your dealership grow. We handle the tech, you close the deals." },
   ],
+  pricing: {
+    heading: "Choose Your Plan",
+    subtitle: "Transparent pricing that scales with your dealership",
+    plans: [
+      {
+        name: "Standard",
+        price: "KES 32,000",
+        period: "/month",
+        subtitle: "Perfect for small independent dealers",
+        features: [
+          { text: "Up to 15 active listings" },
+          { text: "Standard listing placement" },
+          { text: "Full escrow protection", subItems: ["Funds released on verified delivery"] },
+          { text: "Basic price trends & fraud alerts" },
+          { text: "Standard transaction reports" },
+          { text: "Email & community support" },
+          { text: "Standard verified badge" },
+        ],
+        ctaLabel: "Choose Standard",
+        ctaHref: "/auth",
+      },
+      {
+        name: "Premium",
+        price: "KES 40,000",
+        period: "/month",
+        subtitle: "Best for established dealerships & showrooms",
+        features: [
+          { text: "Up to 50 active listings" },
+          { text: "Priority visibility", subItems: ["Featured listings + higher search ranking"] },
+          { text: "Priority escrow processing", subItems: ["Same protection + faster dispute resolution"] },
+          { text: "Advanced analytics", subItems: ["Real-time price predictions", "Inventory insights & custom reports"] },
+          { text: "Premium market intelligence" },
+          { text: "Dedicated account manager", subItems: ["Priority WhatsApp/phone support"] },
+          { text: "Premium dealer badge", subItems: ["Builds buyer confidence & faster closes"] },
+        ],
+        ctaLabel: "Choose Premium",
+        ctaHref: "/auth",
+        highlighted: true,
+      },
+    ],
+  },
   benefits: [
     { title: "Sell Faster", description: "AI matching connects you with ready-to-buy prospects instantly. Premium placement puts your vehicles in front of more eyeballs. Inventory turns over 40% faster." },
     { title: "More Qualified Leads", description: "No tire-kickers. Flux buyers are serious, often with financing already arranged and escrow protection enabled. They're ready to close." },
