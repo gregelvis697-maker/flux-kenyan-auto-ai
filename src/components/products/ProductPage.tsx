@@ -236,24 +236,24 @@ const ProductPage: React.FC<ProductPageProps> = ({ data }) => {
         )}
 
         {/* Benefits */}
-        <Section className="py-16 md:py-24 px-4 bg-card/30">
+        <Section className="py-10 sm:py-16 md:py-24 px-4 bg-card/30">
           <div className="container mx-auto max-w-5xl">
-            <h2 className="text-3xl md:text-4xl font-bold text-center mb-12">
+            <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-center mb-8 sm:mb-12 px-2">
               Why Choose <span className="text-primary">Flux</span>
             </h2>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 sm:gap-6">
               {data.benefits.map((benefit, i) => (
                 <motion.div
                   key={i}
                   variants={fadeUp}
                   transition={{ delay: i * 0.1 }}
-                  className="p-8 rounded-xl bg-card border border-border/50 text-center"
+                  className="p-5 sm:p-8 rounded-xl bg-card border border-border/50 text-center"
                 >
-                  <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center mx-auto mb-5">
-                    <CheckCircle className="w-6 h-6 text-primary" />
+                  <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-primary/10 flex items-center justify-center mx-auto mb-4 sm:mb-5">
+                    <CheckCircle className="w-5 h-5 sm:w-6 sm:h-6 text-primary" />
                   </div>
-                  <h3 className="text-xl font-semibold mb-3 text-foreground">{benefit.title}</h3>
-                  <p className="text-sm text-muted-foreground leading-relaxed">{benefit.description}</p>
+                  <h3 className="text-lg sm:text-xl font-semibold mb-2 sm:mb-3 text-foreground">{benefit.title}</h3>
+                  <p className="text-xs sm:text-sm text-muted-foreground leading-relaxed">{benefit.description}</p>
                 </motion.div>
               ))}
             </div>
@@ -264,15 +264,15 @@ const ProductPage: React.FC<ProductPageProps> = ({ data }) => {
         <ProductFAQ items={data.faq} />
 
         {/* Final CTA */}
-        <Section className="py-16 md:py-24 px-4">
-          <div className="container mx-auto max-w-3xl text-center">
-            <h2 className="text-3xl md:text-4xl font-bold mb-8">{data.finalCta.heading}</h2>
-            <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <Button asChild size="lg" className="bg-gradient-primary text-primary-foreground hover:shadow-glow-primary text-base px-8">
+        <Section className="py-10 sm:py-16 md:py-24 px-4">
+          <div className="container mx-auto max-w-3xl text-center px-2">
+            <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold mb-6 sm:mb-8">{data.finalCta.heading}</h2>
+            <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center">
+              <Button asChild size="lg" className="bg-gradient-primary text-primary-foreground hover:shadow-glow-primary text-base px-8 w-full sm:w-auto">
                 <Link to={data.finalCta.ctaPrimary.href}>{data.finalCta.ctaPrimary.label}</Link>
               </Button>
               {data.finalCta.ctaSecondary && (
-                <Button asChild variant="outline" size="lg" className="border-primary/50 text-foreground hover:bg-primary/10 text-base px-8">
+                <Button asChild variant="outline" size="lg" className="border-primary/50 text-foreground hover:bg-primary/10 text-base px-8 w-full sm:w-auto">
                   <Link to={data.finalCta.ctaSecondary.href}>{data.finalCta.ctaSecondary.label}</Link>
                 </Button>
               )}
