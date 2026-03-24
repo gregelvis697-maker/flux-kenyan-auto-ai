@@ -41,14 +41,14 @@ const ProductPage: React.FC<ProductPageProps> = ({ data }) => {
       <Navigation />
       <div className="pt-16">
         {/* Hero */}
-        <section className="relative py-20 md:py-32 px-4 overflow-hidden">
+        <section className="relative py-12 sm:py-20 md:py-32 px-4 overflow-hidden">
           <div className="absolute inset-0 bg-gradient-to-b from-primary/5 via-transparent to-transparent" />
           <div className="container mx-auto max-w-4xl text-center relative z-10">
             <motion.h1
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.4 }}
-              className="text-4xl md:text-6xl font-bold mb-6"
+              className="text-2xl sm:text-4xl md:text-6xl font-bold mb-4 sm:mb-6 px-2"
             >
               {data.hero.title}{" "}
               <span className="bg-gradient-primary bg-clip-text text-transparent">{data.hero.titleAccent}</span>
@@ -57,7 +57,7 @@ const ProductPage: React.FC<ProductPageProps> = ({ data }) => {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.4, delay: 0.15 }}
-              className="text-lg md:text-xl text-muted-foreground mb-10 max-w-2xl mx-auto"
+              className="text-base sm:text-lg md:text-xl text-muted-foreground mb-8 sm:mb-10 max-w-2xl mx-auto px-2"
             >
               {data.hero.subtitle}
             </motion.p>
@@ -65,9 +65,9 @@ const ProductPage: React.FC<ProductPageProps> = ({ data }) => {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.4, delay: 0.3 }}
-              className="flex flex-col sm:flex-row gap-4 justify-center"
+              className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center px-2 sm:px-0"
             >
-              <Button asChild size="lg" className="bg-gradient-primary text-primary-foreground hover:shadow-glow-primary text-base px-8">
+              <Button asChild size="lg" className="bg-gradient-primary text-primary-foreground hover:shadow-glow-primary text-base px-8 w-full sm:w-auto">
                 <Link to={data.hero.ctaPrimary.href}>{data.hero.ctaPrimary.label}</Link>
               </Button>
               {data.hero.ctaSecondary && (
@@ -75,13 +75,13 @@ const ProductPage: React.FC<ProductPageProps> = ({ data }) => {
                   <Button
                     variant="outline"
                     size="lg"
-                    className="border-primary/50 text-foreground hover:bg-primary/10 text-base px-8"
+                    className="border-primary/50 text-foreground hover:bg-primary/10 text-base px-8 w-full sm:w-auto"
                     onClick={() => document.querySelector(data.hero.ctaSecondary!.href)?.scrollIntoView({ behavior: "smooth" })}
                   >
                     {data.hero.ctaSecondary.label}
                   </Button>
                 ) : (
-                  <Button asChild variant="outline" size="lg" className="border-primary/50 text-foreground hover:bg-primary/10 text-base px-8">
+                  <Button asChild variant="outline" size="lg" className="border-primary/50 text-foreground hover:bg-primary/10 text-base px-8 w-full sm:w-auto">
                     <Link to={data.hero.ctaSecondary.href}>{data.hero.ctaSecondary.label}</Link>
                   </Button>
                 )
