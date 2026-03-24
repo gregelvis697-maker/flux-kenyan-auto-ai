@@ -116,15 +116,15 @@ const ProductPage: React.FC<ProductPageProps> = ({ data }) => {
         </Section>
 
         {/* Features */}
-        <Section className="py-16 md:py-24 px-4 bg-card/30">
+        <Section className="py-10 sm:py-16 md:py-24 px-4 bg-card/30">
           <div className="container mx-auto max-w-6xl">
-            <h2 className="text-3xl md:text-4xl font-bold text-center mb-4">
+            <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-center mb-3 sm:mb-4 px-2">
               Key <span className="text-primary">Features</span>
             </h2>
-            <p className="text-muted-foreground text-center mb-12 max-w-2xl mx-auto">
+            <p className="text-muted-foreground text-center mb-8 sm:mb-12 max-w-2xl mx-auto text-sm sm:text-base px-2">
               Everything you need, built into one powerful platform.
             </p>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
               {data.features.map((feature, i) => {
                 const Icon = feature.icon;
                 return (
@@ -132,13 +132,13 @@ const ProductPage: React.FC<ProductPageProps> = ({ data }) => {
                     key={i}
                     variants={fadeUp}
                     transition={{ delay: i * 0.08 }}
-                    className="p-6 rounded-xl bg-card border border-border/50 hover:border-primary/30 hover:scale-[1.02] transition-all duration-300 group"
+                    className="p-5 sm:p-6 rounded-xl bg-card border border-border/50 hover:border-primary/30 hover:scale-[1.02] transition-all duration-300 group"
                   >
-                    <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center mb-4 group-hover:bg-primary/20 transition-colors">
-                      <Icon className="w-6 h-6 text-primary" />
+                    <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-primary/10 flex items-center justify-center mb-3 sm:mb-4 group-hover:bg-primary/20 transition-colors">
+                      <Icon className="w-5 h-5 sm:w-6 sm:h-6 text-primary" />
                     </div>
-                    <h3 className="text-lg font-semibold mb-2 text-foreground">{feature.title}</h3>
-                    <p className="text-sm text-muted-foreground leading-relaxed">{feature.description}</p>
+                    <h3 className="text-base sm:text-lg font-semibold mb-2 text-foreground">{feature.title}</h3>
+                    <p className="text-xs sm:text-sm text-muted-foreground leading-relaxed">{feature.description}</p>
                   </motion.div>
                 );
               })}
