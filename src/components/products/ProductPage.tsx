@@ -86,7 +86,6 @@ const ProductPage: React.FC<ProductPageProps> = ({ data }) => {
                   </Button>
                 )
               )}
-              )}
             </motion.div>
           </div>
         </section>
