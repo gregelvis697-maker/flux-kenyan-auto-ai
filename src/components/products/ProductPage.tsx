@@ -147,26 +147,26 @@ const ProductPage: React.FC<ProductPageProps> = ({ data }) => {
         </Section>
 
         {/* How It Works */}
-        <Section id="how-it-works" className="py-16 md:py-24 px-4">
+        <Section id="how-it-works" className="py-10 sm:py-16 md:py-24 px-4">
           <div className="container mx-auto max-w-4xl">
-            <h2 className="text-3xl md:text-4xl font-bold text-center mb-4">
+            <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-center mb-3 sm:mb-4 px-2">
               How It <span className="text-primary">Works</span>
             </h2>
-            <p className="text-muted-foreground text-center mb-12">Simple steps to get started.</p>
-            <div className="space-y-6">
+            <p className="text-muted-foreground text-center mb-8 sm:mb-12 text-sm sm:text-base">Simple steps to get started.</p>
+            <div className="space-y-4 sm:space-y-6">
               {data.howItWorks.map((step, i) => (
                 <motion.div
                   key={i}
                   variants={fadeUp}
                   transition={{ delay: i * 0.1 }}
-                  className="flex gap-5 items-start p-6 rounded-xl bg-card/60 border border-border/50"
+                  className="flex gap-3 sm:gap-5 items-start p-4 sm:p-6 rounded-xl bg-card/60 border border-border/50"
                 >
-                  <div className="flex-shrink-0 w-10 h-10 rounded-full bg-gradient-primary flex items-center justify-center text-primary-foreground font-bold text-sm">
+                  <div className="flex-shrink-0 w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-gradient-primary flex items-center justify-center text-primary-foreground font-bold text-xs sm:text-sm">
                     {i + 1}
                   </div>
                   <div>
-                    <h3 className="text-lg font-semibold mb-1 text-foreground">{step.title}</h3>
-                    <p className="text-sm text-muted-foreground leading-relaxed">{step.description}</p>
+                    <h3 className="text-base sm:text-lg font-semibold mb-1 text-foreground">{step.title}</h3>
+                    <p className="text-xs sm:text-sm text-muted-foreground leading-relaxed">{step.description}</p>
                   </div>
                 </motion.div>
               ))}
