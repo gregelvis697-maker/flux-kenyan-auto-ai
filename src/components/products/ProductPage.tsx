@@ -41,14 +41,14 @@ const ProductPage: React.FC<ProductPageProps> = ({ data }) => {
       <Navigation />
       <div className="pt-16">
         {/* Hero */}
-        <section className="relative py-20 md:py-32 px-4 overflow-hidden">
+        <section className="relative py-12 sm:py-20 md:py-32 px-4 overflow-hidden">
           <div className="absolute inset-0 bg-gradient-to-b from-primary/5 via-transparent to-transparent" />
           <div className="container mx-auto max-w-4xl text-center relative z-10">
             <motion.h1
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.4 }}
-              className="text-4xl md:text-6xl font-bold mb-6"
+              className="text-2xl sm:text-4xl md:text-6xl font-bold mb-4 sm:mb-6 px-2"
             >
               {data.hero.title}{" "}
               <span className="bg-gradient-primary bg-clip-text text-transparent">{data.hero.titleAccent}</span>
@@ -57,7 +57,7 @@ const ProductPage: React.FC<ProductPageProps> = ({ data }) => {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.4, delay: 0.15 }}
-              className="text-lg md:text-xl text-muted-foreground mb-10 max-w-2xl mx-auto"
+              className="text-base sm:text-lg md:text-xl text-muted-foreground mb-8 sm:mb-10 max-w-2xl mx-auto px-2"
             >
               {data.hero.subtitle}
             </motion.p>
@@ -65,9 +65,9 @@ const ProductPage: React.FC<ProductPageProps> = ({ data }) => {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.4, delay: 0.3 }}
-              className="flex flex-col sm:flex-row gap-4 justify-center"
+              className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center px-2 sm:px-0"
             >
-              <Button asChild size="lg" className="bg-gradient-primary text-primary-foreground hover:shadow-glow-primary text-base px-8">
+              <Button asChild size="lg" className="bg-gradient-primary text-primary-foreground hover:shadow-glow-primary text-base px-8 w-full sm:w-auto">
                 <Link to={data.hero.ctaPrimary.href}>{data.hero.ctaPrimary.label}</Link>
               </Button>
               {data.hero.ctaSecondary && (
@@ -75,13 +75,13 @@ const ProductPage: React.FC<ProductPageProps> = ({ data }) => {
                   <Button
                     variant="outline"
                     size="lg"
-                    className="border-primary/50 text-foreground hover:bg-primary/10 text-base px-8"
+                    className="border-primary/50 text-foreground hover:bg-primary/10 text-base px-8 w-full sm:w-auto"
                     onClick={() => document.querySelector(data.hero.ctaSecondary!.href)?.scrollIntoView({ behavior: "smooth" })}
                   >
                     {data.hero.ctaSecondary.label}
                   </Button>
                 ) : (
-                  <Button asChild variant="outline" size="lg" className="border-primary/50 text-foreground hover:bg-primary/10 text-base px-8">
+                  <Button asChild variant="outline" size="lg" className="border-primary/50 text-foreground hover:bg-primary/10 text-base px-8 w-full sm:w-auto">
                     <Link to={data.hero.ctaSecondary.href}>{data.hero.ctaSecondary.label}</Link>
                   </Button>
                 )
@@ -91,24 +91,24 @@ const ProductPage: React.FC<ProductPageProps> = ({ data }) => {
         </section>
 
         {/* Overview */}
-        <Section className="py-16 md:py-24 px-4">
+        <Section className="py-10 sm:py-16 md:py-24 px-4">
           <div className="container mx-auto max-w-4xl">
-            <h2 className="text-3xl md:text-4xl font-bold text-center mb-6">
+            <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-center mb-4 sm:mb-6 px-2">
               {data.overview.heading}
             </h2>
-            <p className="text-muted-foreground text-center text-lg max-w-3xl mx-auto mb-12 leading-relaxed">
+            <p className="text-muted-foreground text-center text-base sm:text-lg max-w-3xl mx-auto mb-8 sm:mb-12 leading-relaxed px-2">
               {data.overview.content}
             </p>
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-6">
               {data.overview.stats.map((stat, i) => (
                 <motion.div
                   key={i}
                   variants={fadeUp}
                   transition={{ delay: i * 0.1 }}
-                  className="text-center p-6 rounded-xl bg-card/60 border border-border/50"
+                  className="text-center p-4 sm:p-6 rounded-xl bg-card/60 border border-border/50"
                 >
-                  <div className="text-3xl md:text-4xl font-bold text-primary mb-2">{stat.value}</div>
-                  <div className="text-sm text-muted-foreground">{stat.label}</div>
+                  <div className="text-2xl sm:text-3xl md:text-4xl font-bold text-primary mb-1 sm:mb-2">{stat.value}</div>
+                  <div className="text-xs sm:text-sm text-muted-foreground">{stat.label}</div>
                 </motion.div>
               ))}
             </div>
@@ -116,15 +116,15 @@ const ProductPage: React.FC<ProductPageProps> = ({ data }) => {
         </Section>
 
         {/* Features */}
-        <Section className="py-16 md:py-24 px-4 bg-card/30">
+        <Section className="py-10 sm:py-16 md:py-24 px-4 bg-card/30">
           <div className="container mx-auto max-w-6xl">
-            <h2 className="text-3xl md:text-4xl font-bold text-center mb-4">
+            <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-center mb-3 sm:mb-4 px-2">
               Key <span className="text-primary">Features</span>
             </h2>
-            <p className="text-muted-foreground text-center mb-12 max-w-2xl mx-auto">
+            <p className="text-muted-foreground text-center mb-8 sm:mb-12 max-w-2xl mx-auto text-sm sm:text-base px-2">
               Everything you need, built into one powerful platform.
             </p>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
               {data.features.map((feature, i) => {
                 const Icon = feature.icon;
                 return (
@@ -132,13 +132,13 @@ const ProductPage: React.FC<ProductPageProps> = ({ data }) => {
                     key={i}
                     variants={fadeUp}
                     transition={{ delay: i * 0.08 }}
-                    className="p-6 rounded-xl bg-card border border-border/50 hover:border-primary/30 hover:scale-[1.02] transition-all duration-300 group"
+                    className="p-5 sm:p-6 rounded-xl bg-card border border-border/50 hover:border-primary/30 hover:scale-[1.02] transition-all duration-300 group"
                   >
-                    <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center mb-4 group-hover:bg-primary/20 transition-colors">
-                      <Icon className="w-6 h-6 text-primary" />
+                    <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-primary/10 flex items-center justify-center mb-3 sm:mb-4 group-hover:bg-primary/20 transition-colors">
+                      <Icon className="w-5 h-5 sm:w-6 sm:h-6 text-primary" />
                     </div>
-                    <h3 className="text-lg font-semibold mb-2 text-foreground">{feature.title}</h3>
-                    <p className="text-sm text-muted-foreground leading-relaxed">{feature.description}</p>
+                    <h3 className="text-base sm:text-lg font-semibold mb-2 text-foreground">{feature.title}</h3>
+                    <p className="text-xs sm:text-sm text-muted-foreground leading-relaxed">{feature.description}</p>
                   </motion.div>
                 );
               })}
@@ -147,26 +147,26 @@ const ProductPage: React.FC<ProductPageProps> = ({ data }) => {
         </Section>
 
         {/* How It Works */}
-        <Section id="how-it-works" className="py-16 md:py-24 px-4">
+        <Section id="how-it-works" className="py-10 sm:py-16 md:py-24 px-4">
           <div className="container mx-auto max-w-4xl">
-            <h2 className="text-3xl md:text-4xl font-bold text-center mb-4">
+            <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-center mb-3 sm:mb-4 px-2">
               How It <span className="text-primary">Works</span>
             </h2>
-            <p className="text-muted-foreground text-center mb-12">Simple steps to get started.</p>
-            <div className="space-y-6">
+            <p className="text-muted-foreground text-center mb-8 sm:mb-12 text-sm sm:text-base">Simple steps to get started.</p>
+            <div className="space-y-4 sm:space-y-6">
               {data.howItWorks.map((step, i) => (
                 <motion.div
                   key={i}
                   variants={fadeUp}
                   transition={{ delay: i * 0.1 }}
-                  className="flex gap-5 items-start p-6 rounded-xl bg-card/60 border border-border/50"
+                  className="flex gap-3 sm:gap-5 items-start p-4 sm:p-6 rounded-xl bg-card/60 border border-border/50"
                 >
-                  <div className="flex-shrink-0 w-10 h-10 rounded-full bg-gradient-primary flex items-center justify-center text-primary-foreground font-bold text-sm">
+                  <div className="flex-shrink-0 w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-gradient-primary flex items-center justify-center text-primary-foreground font-bold text-xs sm:text-sm">
                     {i + 1}
                   </div>
                   <div>
-                    <h3 className="text-lg font-semibold mb-1 text-foreground">{step.title}</h3>
-                    <p className="text-sm text-muted-foreground leading-relaxed">{step.description}</p>
+                    <h3 className="text-base sm:text-lg font-semibold mb-1 text-foreground">{step.title}</h3>
+                    <p className="text-xs sm:text-sm text-muted-foreground leading-relaxed">{step.description}</p>
                   </div>
                 </motion.div>
               ))}
@@ -176,40 +176,40 @@ const ProductPage: React.FC<ProductPageProps> = ({ data }) => {
 
         {/* Pricing */}
         {data.pricing && (
-          <Section id="pricing" className="py-16 md:py-24 px-4">
+          <Section id="pricing" className="py-10 sm:py-16 md:py-24 px-4">
             <div className="container mx-auto max-w-5xl">
-              <h2 className="text-3xl md:text-4xl font-bold text-center mb-4">
+              <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-center mb-3 sm:mb-4 px-2">
                 {data.pricing.heading.split(" ").slice(0, -1).join(" ")}{" "}
                 <span className="text-primary">{data.pricing.heading.split(" ").slice(-1)}</span>
               </h2>
-              <p className="text-muted-foreground text-center mb-12 max-w-2xl mx-auto">
+              <p className="text-muted-foreground text-center mb-8 sm:mb-12 max-w-2xl mx-auto text-sm sm:text-base px-2">
                 {data.pricing.subtitle}
               </p>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-5 sm:gap-8">
                 {data.pricing.plans.map((plan, i) => (
                   <motion.div
                     key={i}
                     variants={fadeUp}
                     transition={{ delay: i * 0.1 }}
-                    className="p-8 rounded-xl bg-card border border-border/50 hover:border-primary/40 hover:scale-[1.02] transition-all duration-300 flex flex-col"
+                    className="p-5 sm:p-8 rounded-xl bg-card border border-border/50 hover:border-primary/40 hover:scale-[1.02] transition-all duration-300 flex flex-col"
                   >
-                    <h3 className="text-2xl font-bold text-foreground mb-4">{plan.name}</h3>
-                    <div className="mb-3">
-                      <span className="text-4xl md:text-5xl font-bold text-primary">{plan.price}</span>
-                      <span className="text-muted-foreground text-lg ml-1">{plan.period}</span>
+                    <h3 className="text-xl sm:text-2xl font-bold text-foreground mb-3 sm:mb-4">{plan.name}</h3>
+                    <div className="mb-2 sm:mb-3">
+                      <span className="text-3xl sm:text-4xl md:text-5xl font-bold text-primary">{plan.price}</span>
+                      <span className="text-muted-foreground text-base sm:text-lg ml-1">{plan.period}</span>
                     </div>
-                    <p className="text-muted-foreground mb-8">{plan.subtitle}</p>
-                    <ul className="space-y-3 flex-1 mb-8">
+                    <p className="text-muted-foreground text-sm sm:text-base mb-6 sm:mb-8">{plan.subtitle}</p>
+                    <ul className="space-y-2.5 sm:space-y-3 flex-1 mb-6 sm:mb-8">
                       {plan.features.map((feature, j) => (
                         <li key={j}>
-                          <div className="flex items-start gap-3">
-                            <CheckCircle className="w-5 h-5 text-primary flex-shrink-0 mt-0.5" />
-                            <span className="text-foreground text-sm">{feature.text}</span>
+                          <div className="flex items-start gap-2.5 sm:gap-3">
+                            <CheckCircle className="w-4 h-4 sm:w-5 sm:h-5 text-primary flex-shrink-0 mt-0.5" />
+                            <span className="text-foreground text-xs sm:text-sm">{feature.text}</span>
                           </div>
                           {feature.subItems && (
-                            <ul className="ml-8 mt-1.5 space-y-1">
+                            <ul className="ml-6 sm:ml-8 mt-1 sm:mt-1.5 space-y-0.5 sm:space-y-1">
                               {feature.subItems.map((sub, k) => (
-                                <li key={k} className="text-muted-foreground text-xs leading-relaxed">• {sub}</li>
+                                <li key={k} className="text-muted-foreground text-[11px] sm:text-xs leading-relaxed">• {sub}</li>
                               ))}
                             </ul>
                           )}
@@ -221,8 +221,8 @@ const ProductPage: React.FC<ProductPageProps> = ({ data }) => {
                       size="lg"
                       className={
                         plan.highlighted
-                          ? "w-full bg-gradient-primary text-primary-foreground hover:shadow-glow-primary text-base"
-                          : "w-full border-primary/50 text-primary hover:bg-primary/10 text-base"
+                          ? "w-full bg-gradient-primary text-primary-foreground hover:shadow-glow-primary text-sm sm:text-base h-11 sm:h-12"
+                          : "w-full border-primary/50 text-primary hover:bg-primary/10 text-sm sm:text-base h-11 sm:h-12"
                       }
                       variant={plan.highlighted ? "default" : "outline"}
                     >
@@ -236,24 +236,24 @@ const ProductPage: React.FC<ProductPageProps> = ({ data }) => {
         )}
 
         {/* Benefits */}
-        <Section className="py-16 md:py-24 px-4 bg-card/30">
+        <Section className="py-10 sm:py-16 md:py-24 px-4 bg-card/30">
           <div className="container mx-auto max-w-5xl">
-            <h2 className="text-3xl md:text-4xl font-bold text-center mb-12">
+            <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-center mb-8 sm:mb-12 px-2">
               Why Choose <span className="text-primary">Flux</span>
             </h2>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 sm:gap-6">
               {data.benefits.map((benefit, i) => (
                 <motion.div
                   key={i}
                   variants={fadeUp}
                   transition={{ delay: i * 0.1 }}
-                  className="p-8 rounded-xl bg-card border border-border/50 text-center"
+                  className="p-5 sm:p-8 rounded-xl bg-card border border-border/50 text-center"
                 >
-                  <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center mx-auto mb-5">
-                    <CheckCircle className="w-6 h-6 text-primary" />
+                  <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-primary/10 flex items-center justify-center mx-auto mb-4 sm:mb-5">
+                    <CheckCircle className="w-5 h-5 sm:w-6 sm:h-6 text-primary" />
                   </div>
-                  <h3 className="text-xl font-semibold mb-3 text-foreground">{benefit.title}</h3>
-                  <p className="text-sm text-muted-foreground leading-relaxed">{benefit.description}</p>
+                  <h3 className="text-lg sm:text-xl font-semibold mb-2 sm:mb-3 text-foreground">{benefit.title}</h3>
+                  <p className="text-xs sm:text-sm text-muted-foreground leading-relaxed">{benefit.description}</p>
                 </motion.div>
               ))}
             </div>
@@ -264,15 +264,15 @@ const ProductPage: React.FC<ProductPageProps> = ({ data }) => {
         <ProductFAQ items={data.faq} />
 
         {/* Final CTA */}
-        <Section className="py-16 md:py-24 px-4">
-          <div className="container mx-auto max-w-3xl text-center">
-            <h2 className="text-3xl md:text-4xl font-bold mb-8">{data.finalCta.heading}</h2>
-            <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <Button asChild size="lg" className="bg-gradient-primary text-primary-foreground hover:shadow-glow-primary text-base px-8">
+        <Section className="py-10 sm:py-16 md:py-24 px-4">
+          <div className="container mx-auto max-w-3xl text-center px-2">
+            <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold mb-6 sm:mb-8">{data.finalCta.heading}</h2>
+            <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center">
+              <Button asChild size="lg" className="bg-gradient-primary text-primary-foreground hover:shadow-glow-primary text-base px-8 w-full sm:w-auto">
                 <Link to={data.finalCta.ctaPrimary.href}>{data.finalCta.ctaPrimary.label}</Link>
               </Button>
               {data.finalCta.ctaSecondary && (
-                <Button asChild variant="outline" size="lg" className="border-primary/50 text-foreground hover:bg-primary/10 text-base px-8">
+                <Button asChild variant="outline" size="lg" className="border-primary/50 text-foreground hover:bg-primary/10 text-base px-8 w-full sm:w-auto">
                   <Link to={data.finalCta.ctaSecondary.href}>{data.finalCta.ctaSecondary.label}</Link>
                 </Button>
               )}
