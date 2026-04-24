@@ -621,6 +621,36 @@ export function InventoryTab({ onUpdate }: InventoryTabProps) {
               </div>
             </div>
 
+            {/* Price visibility & availability — Kenya market patterns */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
+              <div className="flex items-center space-x-2 rounded-md border border-border/40 bg-background/30 px-3 py-2">
+                <Switch
+                  id="price_on_request"
+                  checked={formData.price_on_request}
+                  onCheckedChange={(checked) => setFormData({ ...formData, price_on_request: checked })}
+                />
+                <Label htmlFor="price_on_request" className="text-xs sm:text-sm cursor-pointer">
+                  Show as "Call for Price"
+                </Label>
+              </div>
+              <div className="space-y-1.5">
+                <Label htmlFor="availability_status" className="text-xs sm:text-sm">Availability</Label>
+                <Select
+                  value={formData.availability_status}
+                  onValueChange={(value) => setFormData({ ...formData, availability_status: value })}
+                >
+                  <SelectTrigger id="availability_status" className="bg-background/50 h-9 sm:h-10 text-sm">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="available">Locally Available</SelectItem>
+                    <SelectItem value="in_transit">In Transit</SelectItem>
+                    <SelectItem value="reserved">Reserved</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
+
             {/* New Fields Row */}
             <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 sm:gap-4">
               <div className="space-y-1.5">
