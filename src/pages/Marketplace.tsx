@@ -129,6 +129,27 @@ export default function Marketplace() {
     updateSearchParams(filters, undefined, 1, q);
   }, [filters, updateSearchParams]);
 
+  const handleAvailabilityChange = useCallback((avail: 'all' | 'available' | 'in_transit') => {
+    updateSearchParams(filters, undefined, 1, undefined, avail);
+  }, [filters, updateSearchParams]);
+
+  const handleQuickMake = useCallback((make: string) => {
+    const next = { ...filters, make: filters.make.toLowerCase() === make.toLowerCase() ? '' : make };
+    setFilters(next);
+    updateSearchParams(next, undefined, 1);
+  }, [filters, updateSearchParams]);
+
+  const handleQuickBodyType = useCallback((bt: string) => {
+    const lower = bt.toLowerCase();
+    const has = filters.bodyTypes.includes(lower);
+    const next = {
+      ...filters,
+      bodyTypes: has ? filters.bodyTypes.filter(b => b !== lower) : [...filters.bodyTypes, lower],
+    };
+    setFilters(next);
+    updateSearchParams(next, undefined, 1);
+  }, [filters, updateSearchParams]);
+
   useEffect(() => {
     fetchVehicles();
     if (user) fetchFavorites();
