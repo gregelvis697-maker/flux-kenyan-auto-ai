@@ -60,6 +60,7 @@ export default function Marketplace() {
   const searchQuery = searchParams.get('q') || '';
   const currentPage = parseInt(searchParams.get('page') || '1', 10);
   const sortBy = (searchParams.get('sort') as SortOption) || 'newest';
+  const availability = (searchParams.get('avail') as 'all' | 'available' | 'in_transit') || 'all';
 
   const [filters, setFilters] = useState<MarketplaceFiltersState>(() => {
     const bodyTypes = searchParams.get('body') ? searchParams.get('body')!.split(',') : [];
@@ -80,15 +81,17 @@ export default function Marketplace() {
   });
 
   // Sync filters to URL
-  const updateSearchParams = useCallback((newFilters: MarketplaceFiltersState, newSort?: SortOption, newPage?: number, newQuery?: string) => {
+  const updateSearchParams = useCallback((newFilters: MarketplaceFiltersState, newSort?: SortOption, newPage?: number, newQuery?: string, newAvail?: string) => {
     const params = new URLSearchParams();
     const q = newQuery ?? searchQuery;
     const sort = newSort ?? sortBy;
     const page = newPage ?? 1;
+    const avail = newAvail ?? availability;
 
     if (q) params.set('q', q);
     if (sort !== 'newest') params.set('sort', sort);
     if (page > 1) params.set('page', String(page));
+    if (avail && avail !== 'all') params.set('avail', avail);
     if (newFilters.bodyTypes.length) params.set('body', newFilters.bodyTypes.join(','));
     if (newFilters.fuelTypes.length) params.set('fuel', newFilters.fuelTypes.join(','));
     if (newFilters.transmission !== 'all') params.set('trans', newFilters.transmission);
@@ -101,7 +104,7 @@ export default function Marketplace() {
     if (newFilters.maxPrice < 10000000) params.set('maxPrice', String(newFilters.maxPrice));
 
     setSearchParams(params, { replace: true });
-  }, [searchQuery, sortBy, setSearchParams]);
+  }, [searchQuery, sortBy, availability, setSearchParams]);
 
   const handleFiltersChange = useCallback((newFilters: MarketplaceFiltersState) => {
     setFilters(newFilters);
