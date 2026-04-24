@@ -137,8 +137,7 @@ export default function Marketplace() {
     try {
       const { data, error: err } = await supabase
         .from('vehicles')
-        .select('id, make, model, year, price, mileage, fuel_type, transmission, color, condition, description, engine_capacity, negotiable, photos, dealer_id, import_request_id, created_at, verification_status, body_type, seating_capacity')
-        .eq('is_sold', false)
+        .select('id, make, model, year, price, mileage, fuel_type, transmission, color, condition, description, engine_capacity, negotiable, photos, dealer_id, import_request_id, created_at, verification_status, body_type, seating_capacity, price_on_request, availability_status, is_sold')
         .order('created_at', { ascending: false });
 
       if (err) {
