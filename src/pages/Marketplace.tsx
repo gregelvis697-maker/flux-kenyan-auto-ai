@@ -249,6 +249,16 @@ export default function Marketplace() {
       if (filters.transmission !== 'all' && vehicle.transmission?.toLowerCase() !== filters.transmission.toLowerCase()) return false;
       if (filters.bodyTypes.length > 0 && (!vehicle.body_type || !filters.bodyTypes.includes(vehicle.body_type.toLowerCase()))) return false;
       if (filters.maxMileage && vehicle.mileage && vehicle.mileage > parseInt(filters.maxMileage)) return false;
+      // Availability tab filter
+      if (availability !== 'all') {
+        const vAvail = (vehicle.availability_status || '').toLowerCase();
+        if (availability === 'in_transit') {
+          if (vAvail !== 'in_transit') return false;
+        } else if (availability === 'available') {
+          // "Locally Available": treat null/empty/'available' as available; exclude in_transit/reserved
+          if (vAvail === 'in_transit' || vAvail === 'reserved') return false;
+        }
+      }
       return true;
     });
 
@@ -265,7 +275,7 @@ export default function Marketplace() {
     });
 
     return result;
-  }, [vehicles, searchQuery, filters, sortBy]);
+  }, [vehicles, searchQuery, filters, sortBy, availability]);
 
   const totalPages = Math.max(1, Math.ceil(filteredVehicles.length / ITEMS_PER_PAGE));
   const safePage = Math.min(currentPage, totalPages);
