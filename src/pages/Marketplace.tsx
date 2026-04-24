@@ -316,7 +316,7 @@ export default function Marketplace() {
           </nav>
 
           {/* Search */}
-          <div className="relative mb-6">
+          <div className="relative mb-4">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
             <Input
               placeholder="Search by make, model, or year..."
@@ -326,6 +326,98 @@ export default function Marketplace() {
               aria-label="Search vehicles"
             />
           </div>
+
+          {/* Availability Tabs */}
+          <div className="mb-3 -mx-4 sm:mx-0 px-4 sm:px-0 overflow-x-auto scrollbar-hide">
+            <div className="inline-flex items-center gap-1 p-1 rounded-full bg-card/60 border border-border/50">
+              {([
+                { key: 'all', label: 'All' },
+                { key: 'available', label: 'Locally Available' },
+                { key: 'in_transit', label: 'In Transit' },
+              ] as const).map(tab => (
+                <button
+                  key={tab.key}
+                  onClick={() => handleAvailabilityChange(tab.key)}
+                  className={cn(
+                    'px-4 py-2 text-xs sm:text-sm font-medium rounded-full transition-all whitespace-nowrap',
+                    availability === tab.key
+                      ? 'bg-primary text-primary-foreground shadow-sm'
+                      : 'text-muted-foreground hover:text-foreground'
+                  )}
+                >
+                  {tab.label}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {/* Brand Pills */}
+          {uniqueMakes.length > 0 && (
+            <div className="mb-3 -mx-4 sm:mx-0 px-4 sm:px-0 overflow-x-auto scrollbar-hide">
+              <div className="flex items-center gap-2 pb-1 min-w-min">
+                <button
+                  onClick={() => handleQuickMake('')}
+                  className={cn(
+                    'px-3.5 py-1.5 text-xs font-semibold rounded-full border whitespace-nowrap transition-all',
+                    !filters.make
+                      ? 'bg-primary/10 border-primary text-primary'
+                      : 'bg-card border-border/60 text-muted-foreground hover:text-foreground hover:border-border'
+                  )}
+                >
+                  All Brands
+                </button>
+                {uniqueMakes.map(make => {
+                  const active = filters.make.toLowerCase() === make.toLowerCase();
+                  return (
+                    <button
+                      key={make}
+                      onClick={() => handleQuickMake(make)}
+                      className={cn(
+                        'px-3.5 py-1.5 text-xs font-semibold rounded-full border whitespace-nowrap transition-all uppercase tracking-wide',
+                        active
+                          ? 'bg-primary/10 border-primary text-primary'
+                          : 'bg-card border-border/60 text-muted-foreground hover:text-foreground hover:border-border'
+                      )}
+                    >
+                      {make}
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+          )}
+
+          {/* Body Type Quick Filters */}
+          <div className="mb-5 -mx-4 sm:mx-0 px-4 sm:px-0 overflow-x-auto scrollbar-hide">
+            <div className="flex items-center gap-2 pb-1 min-w-min">
+              {[
+                { key: 'suv', label: 'SUV', Icon: Car },
+                { key: 'sedan', label: 'Sedan', Icon: CarFront },
+                { key: 'hatchback', label: 'Hatchback', Icon: Car },
+                { key: 'pickup', label: 'Pickup', Icon: Truck },
+                { key: 'coupe', label: 'Performance', Icon: Zap },
+                { key: 'motorcycle', label: 'Motorcycle', Icon: Bike },
+              ].map(({ key, label, Icon }) => {
+                const active = filters.bodyTypes.includes(key);
+                return (
+                  <button
+                    key={key}
+                    onClick={() => handleQuickBodyType(key)}
+                    className={cn(
+                      'flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-full border whitespace-nowrap transition-all',
+                      active
+                        ? 'bg-primary text-primary-foreground border-primary'
+                        : 'bg-card border-border/60 text-muted-foreground hover:text-foreground hover:border-border'
+                    )}
+                  >
+                    <Icon className="h-3.5 w-3.5" />
+                    {label}
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+
 
           {/* Mobile Filters */}
           <div className="flex items-center justify-between mb-4 lg:hidden">
