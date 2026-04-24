@@ -402,6 +402,7 @@ export type Database = {
       }
       vehicles: {
         Row: {
+          availability_status: string | null
           body_type: string | null
           color: string | null
           condition: Database["public"]["Enums"]["vehicle_condition"]
@@ -423,6 +424,7 @@ export type Database = {
           negotiable: boolean
           photos: string[] | null
           price: number
+          price_on_request: boolean
           seating_capacity: number | null
           transmission: string | null
           updated_at: string
@@ -433,6 +435,7 @@ export type Database = {
           year: number
         }
         Insert: {
+          availability_status?: string | null
           body_type?: string | null
           color?: string | null
           condition?: Database["public"]["Enums"]["vehicle_condition"]
@@ -454,6 +457,7 @@ export type Database = {
           negotiable?: boolean
           photos?: string[] | null
           price: number
+          price_on_request?: boolean
           seating_capacity?: number | null
           transmission?: string | null
           updated_at?: string
@@ -464,6 +468,7 @@ export type Database = {
           year: number
         }
         Update: {
+          availability_status?: string | null
           body_type?: string | null
           color?: string | null
           condition?: Database["public"]["Enums"]["vehicle_condition"]
@@ -485,6 +490,7 @@ export type Database = {
           negotiable?: boolean
           photos?: string[] | null
           price?: number
+          price_on_request?: boolean
           seating_capacity?: number | null
           transmission?: string | null
           updated_at?: string

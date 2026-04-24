@@ -77,6 +77,8 @@ export function InventoryTab({ onUpdate }: InventoryTabProps) {
     description: '',
     price: '',
     negotiable: true,
+    price_on_request: false,
+    availability_status: 'available',
     body_type: '',
     drive_type: '',
     seating_capacity: '',
@@ -172,6 +174,8 @@ export function InventoryTab({ onUpdate }: InventoryTabProps) {
         description: formData.description?.trim() || null,
         price: priceValue,
         negotiable: formData.negotiable,
+        price_on_request: formData.price_on_request,
+        availability_status: formData.availability_status || null,
         photos: photos,
         body_type: formData.body_type || null,
         drive_type: formData.drive_type || null,
@@ -235,6 +239,8 @@ export function InventoryTab({ onUpdate }: InventoryTabProps) {
       description: vehicle.description || '',
       price: vehicle.price.toString(),
       negotiable: vehicle.negotiable,
+      price_on_request: (vehicle as any).price_on_request || false,
+      availability_status: (vehicle as any).availability_status || 'available',
       body_type: (vehicle as any).body_type || '',
       drive_type: (vehicle as any).drive_type || '',
       seating_capacity: (vehicle as any).seating_capacity?.toString() || '',
@@ -363,6 +369,8 @@ export function InventoryTab({ onUpdate }: InventoryTabProps) {
       description: '',
       price: '',
       negotiable: true,
+      price_on_request: false,
+      availability_status: 'available',
       body_type: '',
       drive_type: '',
       seating_capacity: '',
@@ -610,6 +618,36 @@ export function InventoryTab({ onUpdate }: InventoryTabProps) {
                   onCheckedChange={(checked) => setFormData({ ...formData, negotiable: checked })}
                 />
                 <Label htmlFor="negotiable" className="text-xs sm:text-sm">Negotiable</Label>
+              </div>
+            </div>
+
+            {/* Price visibility & availability — Kenya market patterns */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
+              <div className="flex items-center space-x-2 rounded-md border border-border/40 bg-background/30 px-3 py-2">
+                <Switch
+                  id="price_on_request"
+                  checked={formData.price_on_request}
+                  onCheckedChange={(checked) => setFormData({ ...formData, price_on_request: checked })}
+                />
+                <Label htmlFor="price_on_request" className="text-xs sm:text-sm cursor-pointer">
+                  Show as "Call for Price"
+                </Label>
+              </div>
+              <div className="space-y-1.5">
+                <Label htmlFor="availability_status" className="text-xs sm:text-sm">Availability</Label>
+                <Select
+                  value={formData.availability_status}
+                  onValueChange={(value) => setFormData({ ...formData, availability_status: value })}
+                >
+                  <SelectTrigger id="availability_status" className="bg-background/50 h-9 sm:h-10 text-sm">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="available">Locally Available</SelectItem>
+                    <SelectItem value="in_transit">In Transit</SelectItem>
+                    <SelectItem value="reserved">Reserved</SelectItem>
+                  </SelectContent>
+                </Select>
               </div>
             </div>
 
