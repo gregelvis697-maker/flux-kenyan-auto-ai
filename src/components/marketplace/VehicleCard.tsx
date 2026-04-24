@@ -1,5 +1,5 @@
 import { useNavigate } from 'react-router-dom';
-import { Car, Heart, Fuel, Gauge, Calendar, Settings, Users, ArrowRight, ShieldCheck } from 'lucide-react';
+import { Car, Heart, Fuel, Gauge, Calendar, Settings, Users, ArrowRight, ShieldCheck, Phone } from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -10,6 +10,9 @@ export interface VehicleWithIntelligence extends MarketplaceVehicle {
   verification_status?: string;
   body_type?: string | null;
   seating_capacity?: number | null;
+  price_on_request?: boolean | null;
+  availability_status?: string | null;
+  is_sold?: boolean;
   pricing_avg?: number | null;
   demand_ratio?: number | null;
   fulfillment_rate?: number | null;
@@ -25,6 +28,22 @@ interface VehicleCardProps {
   onViewDetails: () => void;
 }
 
+type Availability = 'available' | 'in_transit' | 'reserved' | 'sold';
+
+function getAvailability(v: VehicleWithIntelligence): Availability {
+  if (v.is_sold) return 'sold';
+  const s = (v.availability_status || '').toLowerCase();
+  if (s === 'in_transit' || s === 'reserved' || s === 'available') return s as Availability;
+  return 'available';
+}
+
+const statusStyles: Record<Availability, { label: string; className: string }> = {
+  available: { label: 'AVAILABLE', className: 'bg-emerald-500/95 text-white border-emerald-400' },
+  in_transit: { label: 'IN TRANSIT', className: 'bg-amber-500/95 text-white border-amber-400' },
+  reserved: { label: 'RESERVED', className: 'bg-slate-500/95 text-white border-slate-400' },
+  sold: { label: 'SOLD', className: 'bg-rose-600/95 text-white border-rose-500' },
+};
+
 export function VehicleCard({
   vehicle,
   dealerName,
@@ -35,27 +54,42 @@ export function VehicleCard({
 }: VehicleCardProps) {
   const navigate = useNavigate();
   const isVerified = vehicle.verification_status === 'verified';
+  const availability = getAvailability(vehicle);
+  const isSold = availability === 'sold';
+  const callForPrice = !!vehicle.price_on_request || !vehicle.price || vehicle.price <= 0;
+  const status = statusStyles[availability];
 
-  const formatPrice = (price: number) => {
-    return `KES ${price.toLocaleString()}`;
-  };
-
-  const formatMileage = (mileage: number | null) => {
-    if (!mileage) return 'N/A';
-    return `${mileage.toLocaleString()} km`;
-  };
-
-  const formatFuelType = (fuelType: string) => {
-    return fuelType.replace('_', ' ').replace(/\b\w/g, c => c.toUpperCase());
-  };
+  const formatPrice = (price: number) => `KES ${price.toLocaleString()}`;
+  const formatMileage = (mileage: number | null) =>
+    !mileage ? 'N/A' : `${mileage.toLocaleString()} km`;
+  const formatFuelType = (fuelType: string) =>
+    fuelType.replace('_', ' ').replace(/\b\w/g, c => c.toUpperCase());
 
   const handleCardClick = () => {
+    if (isSold) {
+      // For sold cars, default click takes them to similar (Get Similar pattern)
+      navigate(`/marketplace?make=${encodeURIComponent(vehicle.make)}`);
+    } else {
+      navigate(`/vehicles/${vehicle.id}`);
+    }
+  };
+
+  const handleGetSimilar = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    navigate(`/marketplace?make=${encodeURIComponent(vehicle.make)}`);
+  };
+
+  const handleViewDetails = (e: React.MouseEvent) => {
+    e.stopPropagation();
     navigate(`/vehicles/${vehicle.id}`);
   };
 
   return (
     <Card
-      className="bg-card border-border/50 shadow-card hover:shadow-elevated transition-all duration-300 group overflow-hidden cursor-pointer"
+      className={cn(
+        'bg-card border-border/50 shadow-card hover:shadow-elevated transition-all duration-300 group overflow-hidden cursor-pointer',
+        isSold && 'opacity-95'
+      )}
       onClick={handleCardClick}
     >
       {/* Image */}
@@ -64,7 +98,10 @@ export function VehicleCard({
           <img
             src={vehicle.photos[0]}
             alt={`${vehicle.year} ${vehicle.make} ${vehicle.model}`}
-            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+            className={cn(
+              'w-full h-full object-cover group-hover:scale-105 transition-transform duration-300',
+              isSold && 'grayscale-[30%]'
+            )}
             loading="lazy"
           />
         ) : (
@@ -76,12 +113,24 @@ export function VehicleCard({
         {/* Verified Badge - Top Left */}
         {isVerified && (
           <div className="absolute top-3 left-3 z-10">
-            <Badge className="bg-primary/90 text-primary-foreground gap-1 text-xs font-semibold">
+            <Badge className="bg-primary/90 text-primary-foreground gap-1 text-[10px] sm:text-xs font-semibold">
               <ShieldCheck className="h-3 w-3" />
               FLUX VERIFIED
             </Badge>
           </div>
         )}
+
+        {/* Prominent Status Badge - Top Right */}
+        <div className="absolute top-3 right-3 z-10 pointer-events-none">
+          <span
+            className={cn(
+              'inline-flex items-center px-2.5 py-1 rounded-full text-[10px] sm:text-xs font-bold tracking-wide border shadow-lg',
+              status.className
+            )}
+          >
+            {status.label}
+          </span>
+        </div>
 
         {/* Photo Count */}
         {vehicle.photos && vehicle.photos.length > 1 && (
@@ -92,11 +141,11 @@ export function VehicleCard({
           </div>
         )}
 
-        {/* Favorite Button - Top Right */}
+        {/* Favorite Button - Bottom Right */}
         {isLoggedIn && (
           <button
             className={cn(
-              'absolute top-3 right-3 z-10 h-9 w-9 rounded-full flex items-center justify-center bg-background/60 backdrop-blur-sm hover:bg-background/80 transition-all',
+              'absolute bottom-3 right-3 z-10 h-9 w-9 rounded-full flex items-center justify-center bg-background/70 backdrop-blur-sm hover:bg-background/90 transition-all',
               isFavorited && 'text-rose-500'
             )}
             onClick={(e) => {
@@ -127,7 +176,7 @@ export function VehicleCard({
         </div>
 
         {/* Specs Row */}
-        <div className="flex items-center gap-3 text-xs text-muted-foreground">
+        <div className="flex items-center gap-3 text-xs text-muted-foreground flex-wrap">
           {vehicle.transmission && (
             <span className="flex items-center gap-1">
               <Settings className="h-3 w-3" />
@@ -146,26 +195,43 @@ export function VehicleCard({
           )}
         </div>
 
-        {/* Price */}
-        <p className="text-lg font-bold text-primary">
-          {formatPrice(vehicle.price)}
-          {vehicle.negotiable && (
-            <span className="text-xs font-normal text-muted-foreground ml-1">(Negotiable)</span>
-          )}
-        </p>
+        {/* Price or Call for Price */}
+        {isSold ? (
+          <p className="text-lg font-bold text-rose-500">SOLD</p>
+        ) : callForPrice ? (
+          <p className="text-lg font-bold text-primary flex items-center gap-1.5">
+            <Phone className="h-4 w-4" />
+            Call for Price
+          </p>
+        ) : (
+          <p className="text-lg font-bold text-primary">
+            {formatPrice(vehicle.price)}
+            {vehicle.negotiable && (
+              <span className="text-xs font-normal text-muted-foreground ml-1">(Negotiable)</span>
+            )}
+          </p>
+        )}
 
-        {/* View Details */}
-        <Button
-          variant="outline"
-          className="w-full gap-2 group/btn"
-          onClick={(e) => {
-            e.stopPropagation();
-            navigate(`/vehicles/${vehicle.id}`);
-          }}
-        >
-          View Details
-          <ArrowRight className="h-4 w-4 group-hover/btn:translate-x-0.5 transition-transform" />
-        </Button>
+        {/* CTA */}
+        {isSold ? (
+          <Button
+            variant="outline"
+            className="w-full gap-2 group/btn border-primary/40 text-primary hover:bg-primary/10"
+            onClick={handleGetSimilar}
+          >
+            Get Similar
+            <ArrowRight className="h-4 w-4 group-hover/btn:translate-x-0.5 transition-transform" />
+          </Button>
+        ) : (
+          <Button
+            variant="outline"
+            className="w-full gap-2 group/btn"
+            onClick={handleViewDetails}
+          >
+            View Details
+            <ArrowRight className="h-4 w-4 group-hover/btn:translate-x-0.5 transition-transform" />
+          </Button>
+        )}
       </CardContent>
     </Card>
   );
