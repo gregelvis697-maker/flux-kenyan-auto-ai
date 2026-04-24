@@ -12,7 +12,8 @@ import {
 } from '@/components/marketplace/MarketplaceFilters';
 import { MarketplaceSort, getSortLabel, type SortOption } from '@/components/marketplace/MarketplaceSort';
 import { MarketplacePagination } from '@/components/marketplace/MarketplacePagination';
-import { Car, Search, ChevronRight, Home } from 'lucide-react';
+import { Car, Search, ChevronRight, Home, Truck, CarFront, Zap, Bike } from 'lucide-react';
+import { cn } from '@/lib/utils';
 import { Input } from '@/components/ui/input';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Button } from '@/components/ui/button';
@@ -38,6 +39,9 @@ export interface MarketplaceVehicle {
   verification_status?: string | null;
   body_type?: string | null;
   seating_capacity?: number | null;
+  price_on_request?: boolean | null;
+  availability_status?: string | null;
+  is_sold?: boolean;
 }
 
 const ITEMS_PER_PAGE = 20;
