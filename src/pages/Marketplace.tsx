@@ -519,6 +519,35 @@ export default function Marketplace() {
                     onPageChange={handlePageChange}
                   />
                 </>
+              ) : availability === 'sold' ? (
+                <div className="rounded-2xl border border-border/60 bg-card/40 p-8 sm:p-12 text-center">
+                  <div className="mx-auto h-14 w-14 rounded-full bg-primary/10 flex items-center justify-center mb-5">
+                    <Car className="h-7 w-7 text-primary" />
+                  </div>
+                  <h3 className="text-xl font-semibold text-foreground mb-2">
+                    Looking for a sold model?
+                  </h3>
+                  <p className="text-muted-foreground max-w-md mx-auto mb-6 text-sm sm:text-base">
+                    These cars have already found owners. Tell us what you're after and our verified dealers will source it for you — usually within 14 days.
+                  </p>
+                  <div className="flex flex-col sm:flex-row gap-3 justify-center">
+                    <Button
+                      className="gap-2"
+                      onClick={() => {
+                        const msg = encodeURIComponent(
+                          "Hi Flux, I'm looking for a specific car that's been sold. Can you help me source a similar one?"
+                        );
+                        window.open(`https://wa.me/254700000000?text=${msg}`, '_blank');
+                      }}
+                    >
+                      <MessageCircle className="h-4 w-4" />
+                      Request Availability
+                    </Button>
+                    <Button variant="outline" onClick={() => handleAvailabilityChange('all')}>
+                      Browse Available
+                    </Button>
+                  </div>
+                </div>
               ) : (
                 <div className="text-center py-20">
                   <Car className="h-16 w-16 mx-auto text-muted-foreground/30 mb-4" />
