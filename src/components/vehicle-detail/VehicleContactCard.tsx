@@ -1,8 +1,10 @@
-import { BadgeCheck, MessageCircle, MapPin, Gauge } from 'lucide-react';
+import { BadgeCheck, MessageCircle, MapPin, Gauge, Phone } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { supabase } from '@/lib/supabase';
 import { useAuth } from '@/contexts/AuthContext';
+import { isCallForPrice, getAvailability, statusStyles } from '@/lib/vehicle-display';
+import { cn } from '@/lib/utils';
 
 interface VehicleContactCardProps {
   vehicle: {
@@ -16,6 +18,9 @@ interface VehicleContactCardProps {
     negotiable: boolean;
     verification_status: string | null;
     dealer_id: string;
+    price_on_request?: boolean | null;
+    availability_status?: string | null;
+    is_sold?: boolean | null;
   };
   dealerWhatsapp: string | null;
 }
@@ -23,11 +28,16 @@ interface VehicleContactCardProps {
 export function VehicleContactCard({ vehicle, dealerWhatsapp }: VehicleContactCardProps) {
   const { user } = useAuth();
   const isVerified = vehicle.verification_status === 'verified';
+  const callForPrice = isCallForPrice(vehicle);
+  const availability = getAvailability(vehicle);
+  const isSold = availability === 'sold';
+  const status = statusStyles[availability];
 
-  const formattedPrice = `KES ${vehicle.price.toLocaleString()}`;
+  const formattedPrice = callForPrice
+    ? 'Call for Price'
+    : `KES ${vehicle.price.toLocaleString()}`;
 
   const handleWhatsAppClick = async () => {
-    // Log inquiry silently
     try {
       if (user) {
         const { data: profile } = await supabase
@@ -48,8 +58,9 @@ export function VehicleContactCard({ vehicle, dealerWhatsapp }: VehicleContactCa
       // Silent fail
     }
 
+    const priceLine = callForPrice ? '' : ` listed on Flux for ${formattedPrice}`;
     const message = encodeURIComponent(
-      `Hi, I'm interested in your ${vehicle.year} ${vehicle.make} ${vehicle.model} listed on Flux for ${formattedPrice}. Is it still available?`
+      `Hi, I'm interested in your ${vehicle.year} ${vehicle.make} ${vehicle.model}${priceLine}. Is it still available?`
     );
     const number = dealerWhatsapp?.replace(/[^0-9]/g, '') || '';
     window.open(`https://wa.me/${number}?text=${message}`, '_blank');
@@ -59,9 +70,19 @@ export function VehicleContactCard({ vehicle, dealerWhatsapp }: VehicleContactCa
     <div className="space-y-4">
       {/* Title */}
       <div>
-        <h1 className="text-2xl lg:text-3xl font-bold text-foreground">
-          {vehicle.year} {vehicle.make} {vehicle.model}
-        </h1>
+        <div className="flex items-start justify-between gap-3">
+          <h1 className="text-2xl lg:text-3xl font-bold text-foreground">
+            {vehicle.year} {vehicle.make} {vehicle.model}
+          </h1>
+          <span
+            className={cn(
+              'inline-flex items-center px-2.5 py-1 rounded-full text-[10px] sm:text-xs font-bold tracking-wide border shadow-sm shrink-0',
+              status.className
+            )}
+          >
+            {status.label}
+          </span>
+        </div>
         <div className="flex items-center gap-2 mt-1 text-muted-foreground text-sm">
           {vehicle.mileage && (
             <span className="flex items-center gap-1">
@@ -81,9 +102,18 @@ export function VehicleContactCard({ vehicle, dealerWhatsapp }: VehicleContactCa
 
       {/* Price */}
       <div>
-        <p className="text-3xl font-bold text-primary">{formattedPrice}</p>
-        {vehicle.negotiable && (
-          <p className="text-sm text-muted-foreground mt-0.5">Negotiable</p>
+        {callForPrice ? (
+          <p className="text-3xl font-bold text-primary flex items-center gap-2">
+            <Phone className="h-6 w-6" />
+            Call for Price
+          </p>
+        ) : (
+          <>
+            <p className="text-3xl font-bold text-primary">{formattedPrice}</p>
+            {vehicle.negotiable && (
+              <p className="text-sm text-muted-foreground mt-0.5">Negotiable</p>
+            )}
+          </>
         )}
       </div>
 
@@ -100,9 +130,10 @@ export function VehicleContactCard({ vehicle, dealerWhatsapp }: VehicleContactCa
         className="w-full h-12 text-base font-semibold gap-2"
         style={{ backgroundColor: '#25D366', color: 'white' }}
         onClick={handleWhatsAppClick}
+        disabled={isSold}
       >
         <MessageCircle className="h-5 w-5" />
-        Contact on WhatsApp
+        {isSold ? 'This vehicle is sold' : 'Contact on WhatsApp'}
       </Button>
     </div>
   );
