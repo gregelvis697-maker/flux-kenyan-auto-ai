@@ -178,6 +178,7 @@ export default function VehicleDetail() {
   }
 
   const vehicleAlt = `${vehicle.year} ${vehicle.make} ${vehicle.model}`;
+  const isSold = getAvailability(vehicle) === 'sold';
 
   return (
     <div className="min-h-screen bg-background">
@@ -193,6 +194,25 @@ export default function VehicleDetail() {
             <ArrowLeft className="h-4 w-4" />
             Back to Marketplace
           </button>
+
+          {/* Sold Banner */}
+          {isSold && (
+            <div className="mb-6 rounded-xl border border-rose-500/30 bg-rose-500/5 p-4 sm:p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+              <div>
+                <p className="text-base font-semibold text-foreground">This vehicle has been sold</p>
+                <p className="text-sm text-muted-foreground mt-0.5">
+                  Browse similar {vehicle.make} listings or request availability from our dealers.
+                </p>
+              </div>
+              <Button
+                className="gap-2 shrink-0"
+                onClick={() => navigate(`/marketplace?make=${encodeURIComponent(vehicle.make)}`)}
+              >
+                Get Similar
+                <ArrowRight className="h-4 w-4" />
+              </Button>
+            </div>
+          )}
 
           {/* Two-Column Layout */}
           <div className="grid grid-cols-1 lg:grid-cols-5 gap-8">
@@ -239,7 +259,13 @@ export default function VehicleDetail() {
       </main>
 
       {/* Mobile Sticky Bar */}
-      <MobileStickyBar price={vehicle.price} onWhatsAppClick={handleWhatsAppClick} />
+      {!isSold && (
+        <MobileStickyBar
+          price={vehicle.price}
+          priceOnRequest={vehicle.price_on_request}
+          onWhatsAppClick={handleWhatsAppClick}
+        />
+      )}
     </div>
   );
 }
