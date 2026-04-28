@@ -154,17 +154,26 @@ export default function Marketplace() {
   useEffect(() => {
     fetchVehicles();
     if (user) fetchFavorites();
-  }, [user]);
+  }, [user, availability]);
 
   const fetchVehicles = async () => {
     setLoading(true);
     setError(false);
     try {
-      const { data, error: err } = await supabase
+      const baseSelect = 'id, make, model, year, price, mileage, fuel_type, transmission, color, condition, description, engine_capacity, negotiable, photos, dealer_id, import_request_id, created_at, verification_status, body_type, seating_capacity, price_on_request, availability_status, is_sold';
+
+      let query = supabase
         .from('vehicles')
-        .select('id, make, model, year, price, mileage, fuel_type, transmission, color, condition, description, engine_capacity, negotiable, photos, dealer_id, import_request_id, created_at, verification_status, body_type, seating_capacity, price_on_request, availability_status, is_sold')
-        .eq('is_sold', false)
-        .order('created_at', { ascending: false });
+        .select(baseSelect);
+
+      if (availability === 'sold') {
+        // Sold tab: fetch sold units (RLS may return [] for anonymous users — handled in UI)
+        query = query.eq('is_sold', true).order('updated_at', { ascending: false }).limit(48);
+      } else {
+        query = query.eq('is_sold', false).order('created_at', { ascending: false });
+      }
+
+      const { data, error: err } = await query;
 
       if (err) {
         console.error('Error fetching vehicles:', err);
@@ -250,14 +259,14 @@ export default function Marketplace() {
       if (filters.transmission !== 'all' && vehicle.transmission?.toLowerCase() !== filters.transmission.toLowerCase()) return false;
       if (filters.bodyTypes.length > 0 && (!vehicle.body_type || !filters.bodyTypes.includes(vehicle.body_type.toLowerCase()))) return false;
       if (filters.maxMileage && vehicle.mileage && vehicle.mileage > parseInt(filters.maxMileage)) return false;
-      // Availability tab filter
+      // Availability tab filter — uses shared resolver so it honors both is_sold and availability_status
       if (availability !== 'all') {
-        const vAvail = (vehicle.availability_status || '').toLowerCase();
-        if (availability === 'in_transit') {
-          if (vAvail !== 'in_transit') return false;
-        } else if (availability === 'available') {
-          // "Locally Available": treat null/empty/'available' as available; exclude in_transit/reserved
-          if (vAvail === 'in_transit' || vAvail === 'reserved') return false;
+        const resolved = getAvailability(vehicle);
+        if (availability === 'sold' && resolved !== 'sold') return false;
+        if (availability === 'in_transit' && resolved !== 'in_transit') return false;
+        if (availability === 'available') {
+          // "Locally Available" = available only (exclude in_transit/reserved/sold)
+          if (resolved !== 'available') return false;
         }
       }
       return true;
