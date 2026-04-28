@@ -12,11 +12,12 @@ import {
 } from '@/components/marketplace/MarketplaceFilters';
 import { MarketplaceSort, getSortLabel, type SortOption } from '@/components/marketplace/MarketplaceSort';
 import { MarketplacePagination } from '@/components/marketplace/MarketplacePagination';
-import { Car, Search, ChevronRight, Home, Truck, CarFront, Zap, Bike } from 'lucide-react';
+import { Car, Search, ChevronRight, Home, Truck, CarFront, Zap, Bike, MessageCircle } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Input } from '@/components/ui/input';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Button } from '@/components/ui/button';
+import { getAvailability } from '@/lib/vehicle-display';
 
 export interface MarketplaceVehicle {
   id: string;
@@ -60,7 +61,7 @@ export default function Marketplace() {
   const searchQuery = searchParams.get('q') || '';
   const currentPage = parseInt(searchParams.get('page') || '1', 10);
   const sortBy = (searchParams.get('sort') as SortOption) || 'newest';
-  const availability = (searchParams.get('avail') as 'all' | 'available' | 'in_transit') || 'all';
+  const availability = (searchParams.get('avail') as 'all' | 'available' | 'in_transit' | 'sold') || 'all';
 
   const [filters, setFilters] = useState<MarketplaceFiltersState>(() => {
     const bodyTypes = searchParams.get('body') ? searchParams.get('body')!.split(',') : [];
@@ -129,7 +130,7 @@ export default function Marketplace() {
     updateSearchParams(filters, undefined, 1, q);
   }, [filters, updateSearchParams]);
 
-  const handleAvailabilityChange = useCallback((avail: 'all' | 'available' | 'in_transit') => {
+  const handleAvailabilityChange = useCallback((avail: 'all' | 'available' | 'in_transit' | 'sold') => {
     updateSearchParams(filters, undefined, 1, undefined, avail);
   }, [filters, updateSearchParams]);
 
