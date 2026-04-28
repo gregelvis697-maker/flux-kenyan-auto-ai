@@ -12,8 +12,9 @@ import { VehicleFeatures } from '@/components/vehicle-detail/VehicleFeatures';
 import { VehicleTechSpecs } from '@/components/vehicle-detail/VehicleTechSpecs';
 import { MobileStickyBar } from '@/components/vehicle-detail/MobileStickyBar';
 import { Skeleton } from '@/components/ui/skeleton';
-import { ArrowLeft, Car, MessageCircle } from 'lucide-react';
+import { ArrowLeft, Car, MessageCircle, ArrowRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { isCallForPrice, getAvailability } from '@/lib/vehicle-display';
 
 interface VehicleData {
   id: string;
@@ -38,6 +39,9 @@ interface VehicleData {
   seating_capacity: number | null;
   features: string[] | null;
   location: string | null;
+  price_on_request: boolean | null;
+  availability_status: string | null;
+  is_sold: boolean;
 }
 
 interface DealerData {
@@ -69,10 +73,9 @@ export default function VehicleDetail() {
     try {
       const { data, error } = await supabase
         .from('vehicles')
-        .select('id, make, model, year, price, mileage, fuel_type, transmission, color, interior_color, condition, description, engine_capacity, negotiable, photos, dealer_id, verification_status, body_type, drive_type, seating_capacity, features, location')
+        .select('id, make, model, year, price, mileage, fuel_type, transmission, color, interior_color, condition, description, engine_capacity, negotiable, photos, dealer_id, verification_status, body_type, drive_type, seating_capacity, features, location, price_on_request, availability_status, is_sold')
         .eq('id', vehicleId)
-        .eq('is_sold', false)
-        .single();
+        .maybeSingle();
 
       if (error || !data) {
         setNotFound(true);
@@ -107,7 +110,8 @@ export default function VehicleDetail() {
 
   const handleWhatsAppClick = async () => {
     if (!vehicle) return;
-    const formattedPrice = `KES ${vehicle.price.toLocaleString()}`;
+    const callForPrice = isCallForPrice(vehicle);
+    const formattedPrice = callForPrice ? '' : ` listed on Flux for KES ${vehicle.price.toLocaleString()}`;
     try {
       if (user) {
         const { data: profile } = await supabase
@@ -126,7 +130,7 @@ export default function VehicleDetail() {
     } catch { /* silent */ }
 
     const message = encodeURIComponent(
-      `Hi, I'm interested in your ${vehicle.year} ${vehicle.make} ${vehicle.model} listed on Flux for ${formattedPrice}. Is it still available?`
+      `Hi, I'm interested in your ${vehicle.year} ${vehicle.make} ${vehicle.model}${formattedPrice}. Is it still available?`
     );
     const number = dealer?.whatsapp_number?.replace(/[^0-9]/g, '') || '';
     window.open(`https://wa.me/${number}?text=${message}`, '_blank');
@@ -174,6 +178,7 @@ export default function VehicleDetail() {
   }
 
   const vehicleAlt = `${vehicle.year} ${vehicle.make} ${vehicle.model}`;
+  const isSold = getAvailability(vehicle) === 'sold';
 
   return (
     <div className="min-h-screen bg-background">
@@ -189,6 +194,25 @@ export default function VehicleDetail() {
             <ArrowLeft className="h-4 w-4" />
             Back to Marketplace
           </button>
+
+          {/* Sold Banner */}
+          {isSold && (
+            <div className="mb-6 rounded-xl border border-rose-500/30 bg-rose-500/5 p-4 sm:p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+              <div>
+                <p className="text-base font-semibold text-foreground">This vehicle has been sold</p>
+                <p className="text-sm text-muted-foreground mt-0.5">
+                  Browse similar {vehicle.make} listings or request availability from our dealers.
+                </p>
+              </div>
+              <Button
+                className="gap-2 shrink-0"
+                onClick={() => navigate(`/marketplace?make=${encodeURIComponent(vehicle.make)}`)}
+              >
+                Get Similar
+                <ArrowRight className="h-4 w-4" />
+              </Button>
+            </div>
+          )}
 
           {/* Two-Column Layout */}
           <div className="grid grid-cols-1 lg:grid-cols-5 gap-8">
@@ -235,7 +259,13 @@ export default function VehicleDetail() {
       </main>
 
       {/* Mobile Sticky Bar */}
-      <MobileStickyBar price={vehicle.price} onWhatsAppClick={handleWhatsAppClick} />
+      {!isSold && (
+        <MobileStickyBar
+          price={vehicle.price}
+          priceOnRequest={vehicle.price_on_request}
+          onWhatsAppClick={handleWhatsAppClick}
+        />
+      )}
     </div>
   );
 }

@@ -4,6 +4,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { cn } from '@/lib/utils';
+import { getAvailability, isCallForPrice, statusStyles } from '@/lib/vehicle-display';
 import type { MarketplaceVehicle } from '@/pages/Marketplace';
 
 export interface VehicleWithIntelligence extends MarketplaceVehicle {
@@ -28,22 +29,6 @@ interface VehicleCardProps {
   onViewDetails: () => void;
 }
 
-type Availability = 'available' | 'in_transit' | 'reserved' | 'sold';
-
-function getAvailability(v: VehicleWithIntelligence): Availability {
-  if (v.is_sold) return 'sold';
-  const s = (v.availability_status || '').toLowerCase();
-  if (s === 'in_transit' || s === 'reserved' || s === 'available') return s as Availability;
-  return 'available';
-}
-
-const statusStyles: Record<Availability, { label: string; className: string }> = {
-  available: { label: 'AVAILABLE', className: 'bg-emerald-500/95 text-white border-emerald-400' },
-  in_transit: { label: 'IN TRANSIT', className: 'bg-amber-500/95 text-white border-amber-400' },
-  reserved: { label: 'RESERVED', className: 'bg-slate-500/95 text-white border-slate-400' },
-  sold: { label: 'SOLD', className: 'bg-rose-600/95 text-white border-rose-500' },
-};
-
 export function VehicleCard({
   vehicle,
   dealerName,
@@ -56,7 +41,7 @@ export function VehicleCard({
   const isVerified = vehicle.verification_status === 'verified';
   const availability = getAvailability(vehicle);
   const isSold = availability === 'sold';
-  const callForPrice = !!vehicle.price_on_request || !vehicle.price || vehicle.price <= 0;
+  const callForPrice = isCallForPrice(vehicle);
   const status = statusStyles[availability];
 
   const formatPrice = (price: number) => `KES ${price.toLocaleString()}`;

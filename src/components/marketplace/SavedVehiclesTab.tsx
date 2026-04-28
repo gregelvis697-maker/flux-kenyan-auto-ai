@@ -3,8 +3,10 @@ import { supabase } from '@/lib/supabase';
 import { useAuth } from '@/contexts/AuthContext';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Heart, Car, Trash2, ExternalLink } from 'lucide-react';
+import { Heart, Car, Trash2, ExternalLink, Phone } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import { isCallForPrice, getAvailability, statusStyles } from '@/lib/vehicle-display';
+import { cn } from '@/lib/utils';
 
 interface SavedVehicle {
   id: string;
@@ -18,6 +20,8 @@ interface SavedVehicle {
     price: number;
     photos: string[] | null;
     is_sold: boolean;
+    price_on_request: boolean | null;
+    availability_status: string | null;
   } | null;
 }
 
@@ -50,7 +54,9 @@ export function SavedVehiclesTab() {
             year,
             price,
             photos,
-            is_sold
+            is_sold,
+            price_on_request,
+            availability_status
           )
         `)
         .eq('user_id', user.id)
@@ -112,10 +118,14 @@ export function SavedVehiclesTab() {
           {savedVehicles.map((saved) => {
             const vehicle = saved.vehicle;
             if (!vehicle) return null;
+            const callForPrice = isCallForPrice(vehicle);
+            const availability = getAvailability(vehicle);
+            const status = statusStyles[availability];
+            const isSold = availability === 'sold';
 
             return (
-              <Card 
-                key={saved.id} 
+              <Card
+                key={saved.id}
                 className="bg-card/60 backdrop-blur-lg border-border/50 shadow-card hover:shadow-elevated transition-all duration-300 group overflow-hidden"
               >
                 <div className="aspect-video bg-muted/30 relative overflow-hidden">
@@ -123,7 +133,10 @@ export function SavedVehiclesTab() {
                     <img
                       src={vehicle.photos[0]}
                       alt={`${vehicle.make} ${vehicle.model}`}
-                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                      className={cn(
+                        'w-full h-full object-cover group-hover:scale-105 transition-transform duration-300',
+                        isSold && 'grayscale-[30%]'
+                      )}
                     />
                   ) : (
                     <div className="w-full h-full flex items-center justify-center">
@@ -131,20 +144,32 @@ export function SavedVehiclesTab() {
                     </div>
                   )}
 
-                  {vehicle.is_sold && (
-                    <div className="absolute inset-0 bg-background/80 flex items-center justify-center">
-                      <span className="text-lg font-bold text-muted-foreground">SOLD</span>
-                    </div>
-                  )}
+                  <div className="absolute top-2 right-2 z-10">
+                    <span
+                      className={cn(
+                        'inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold tracking-wide border shadow-sm',
+                        status.className
+                      )}
+                    >
+                      {status.label}
+                    </span>
+                  </div>
                 </div>
 
                 <CardContent className="p-4">
                   <h3 className="font-semibold text-foreground">
                     {vehicle.year} {vehicle.make} {vehicle.model}
                   </h3>
-                  <p className="text-lg font-bold text-primary mt-1">
-                    ${vehicle.price.toLocaleString()}
-                  </p>
+                  {callForPrice ? (
+                    <p className="text-lg font-bold text-primary mt-1 flex items-center gap-1.5">
+                      <Phone className="h-4 w-4" />
+                      Call for Price
+                    </p>
+                  ) : (
+                    <p className="text-lg font-bold text-primary mt-1">
+                      KES {vehicle.price.toLocaleString()}
+                    </p>
+                  )}
                   <p className="text-xs text-muted-foreground mt-1">
                     Saved on {new Date(saved.created_at).toLocaleDateString()}
                   </p>
@@ -154,11 +179,10 @@ export function SavedVehiclesTab() {
                       variant="outline"
                       size="sm"
                       className="flex-1 gap-1"
-                      onClick={() => navigate('/marketplace')}
-                      disabled={vehicle.is_sold}
+                      onClick={() => navigate(`/vehicles/${vehicle.id}`)}
                     >
                       <ExternalLink className="h-4 w-4" />
-                      View
+                      {isSold ? 'View Sold' : 'View'}
                     </Button>
                     <Button
                       variant="ghost"

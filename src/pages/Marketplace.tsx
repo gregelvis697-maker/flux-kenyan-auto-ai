@@ -12,11 +12,12 @@ import {
 } from '@/components/marketplace/MarketplaceFilters';
 import { MarketplaceSort, getSortLabel, type SortOption } from '@/components/marketplace/MarketplaceSort';
 import { MarketplacePagination } from '@/components/marketplace/MarketplacePagination';
-import { Car, Search, ChevronRight, Home, Truck, CarFront, Zap, Bike } from 'lucide-react';
+import { Car, Search, ChevronRight, Home, Truck, CarFront, Zap, Bike, MessageCircle } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Input } from '@/components/ui/input';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Button } from '@/components/ui/button';
+import { getAvailability } from '@/lib/vehicle-display';
 
 export interface MarketplaceVehicle {
   id: string;
@@ -60,7 +61,7 @@ export default function Marketplace() {
   const searchQuery = searchParams.get('q') || '';
   const currentPage = parseInt(searchParams.get('page') || '1', 10);
   const sortBy = (searchParams.get('sort') as SortOption) || 'newest';
-  const availability = (searchParams.get('avail') as 'all' | 'available' | 'in_transit') || 'all';
+  const availability = (searchParams.get('avail') as 'all' | 'available' | 'in_transit' | 'sold') || 'all';
 
   const [filters, setFilters] = useState<MarketplaceFiltersState>(() => {
     const bodyTypes = searchParams.get('body') ? searchParams.get('body')!.split(',') : [];
@@ -129,7 +130,7 @@ export default function Marketplace() {
     updateSearchParams(filters, undefined, 1, q);
   }, [filters, updateSearchParams]);
 
-  const handleAvailabilityChange = useCallback((avail: 'all' | 'available' | 'in_transit') => {
+  const handleAvailabilityChange = useCallback((avail: 'all' | 'available' | 'in_transit' | 'sold') => {
     updateSearchParams(filters, undefined, 1, undefined, avail);
   }, [filters, updateSearchParams]);
 
@@ -153,17 +154,26 @@ export default function Marketplace() {
   useEffect(() => {
     fetchVehicles();
     if (user) fetchFavorites();
-  }, [user]);
+  }, [user, availability]);
 
   const fetchVehicles = async () => {
     setLoading(true);
     setError(false);
     try {
-      const { data, error: err } = await supabase
+      const baseSelect = 'id, make, model, year, price, mileage, fuel_type, transmission, color, condition, description, engine_capacity, negotiable, photos, dealer_id, import_request_id, created_at, verification_status, body_type, seating_capacity, price_on_request, availability_status, is_sold';
+
+      let query = supabase
         .from('vehicles')
-        .select('id, make, model, year, price, mileage, fuel_type, transmission, color, condition, description, engine_capacity, negotiable, photos, dealer_id, import_request_id, created_at, verification_status, body_type, seating_capacity, price_on_request, availability_status, is_sold')
-        .eq('is_sold', false)
-        .order('created_at', { ascending: false });
+        .select(baseSelect);
+
+      if (availability === 'sold') {
+        // Sold tab: fetch sold units (RLS may return [] for anonymous users — handled in UI)
+        query = query.eq('is_sold', true).order('updated_at', { ascending: false }).limit(48);
+      } else {
+        query = query.eq('is_sold', false).order('created_at', { ascending: false });
+      }
+
+      const { data, error: err } = await query;
 
       if (err) {
         console.error('Error fetching vehicles:', err);
@@ -249,14 +259,14 @@ export default function Marketplace() {
       if (filters.transmission !== 'all' && vehicle.transmission?.toLowerCase() !== filters.transmission.toLowerCase()) return false;
       if (filters.bodyTypes.length > 0 && (!vehicle.body_type || !filters.bodyTypes.includes(vehicle.body_type.toLowerCase()))) return false;
       if (filters.maxMileage && vehicle.mileage && vehicle.mileage > parseInt(filters.maxMileage)) return false;
-      // Availability tab filter
+      // Availability tab filter — uses shared resolver so it honors both is_sold and availability_status
       if (availability !== 'all') {
-        const vAvail = (vehicle.availability_status || '').toLowerCase();
-        if (availability === 'in_transit') {
-          if (vAvail !== 'in_transit') return false;
-        } else if (availability === 'available') {
-          // "Locally Available": treat null/empty/'available' as available; exclude in_transit/reserved
-          if (vAvail === 'in_transit' || vAvail === 'reserved') return false;
+        const resolved = getAvailability(vehicle);
+        if (availability === 'sold' && resolved !== 'sold') return false;
+        if (availability === 'in_transit' && resolved !== 'in_transit') return false;
+        if (availability === 'available') {
+          // "Locally Available" = available only (exclude in_transit/reserved/sold)
+          if (resolved !== 'available') return false;
         }
       }
       return true;
@@ -334,6 +344,7 @@ export default function Marketplace() {
                 { key: 'all', label: 'All' },
                 { key: 'available', label: 'Locally Available' },
                 { key: 'in_transit', label: 'In Transit' },
+                { key: 'sold', label: 'Sold Units' },
               ] as const).map(tab => (
                 <button
                   key={tab.key}
@@ -508,6 +519,35 @@ export default function Marketplace() {
                     onPageChange={handlePageChange}
                   />
                 </>
+              ) : availability === 'sold' ? (
+                <div className="rounded-2xl border border-border/60 bg-card/40 p-8 sm:p-12 text-center">
+                  <div className="mx-auto h-14 w-14 rounded-full bg-primary/10 flex items-center justify-center mb-5">
+                    <Car className="h-7 w-7 text-primary" />
+                  </div>
+                  <h3 className="text-xl font-semibold text-foreground mb-2">
+                    Looking for a sold model?
+                  </h3>
+                  <p className="text-muted-foreground max-w-md mx-auto mb-6 text-sm sm:text-base">
+                    These cars have already found owners. Tell us what you're after and our verified dealers will source it for you — usually within 14 days.
+                  </p>
+                  <div className="flex flex-col sm:flex-row gap-3 justify-center">
+                    <Button
+                      className="gap-2"
+                      onClick={() => {
+                        const msg = encodeURIComponent(
+                          "Hi Flux, I'm looking for a specific car that's been sold. Can you help me source a similar one?"
+                        );
+                        window.open(`https://wa.me/254700000000?text=${msg}`, '_blank');
+                      }}
+                    >
+                      <MessageCircle className="h-4 w-4" />
+                      Request Availability
+                    </Button>
+                    <Button variant="outline" onClick={() => handleAvailabilityChange('all')}>
+                      Browse Available
+                    </Button>
+                  </div>
+                </div>
               ) : (
                 <div className="text-center py-20">
                   <Car className="h-16 w-16 mx-auto text-muted-foreground/30 mb-4" />

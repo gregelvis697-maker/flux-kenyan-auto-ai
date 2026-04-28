@@ -1,4 +1,4 @@
-import { Heart, Car, Fuel, Gauge, Calendar, Palette, Settings, User } from 'lucide-react';
+import { Heart, Car, Fuel, Gauge, Calendar, Palette, Settings, User, Phone } from 'lucide-react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -8,6 +8,7 @@ import { useState } from 'react';
 import type { MarketplaceVehicle } from '@/pages/Marketplace';
 import { MarketInsightsPanel } from './MarketInsightsPanel';
 import { VerifiedBadge } from './IntelligenceBadges';
+import { isCallForPrice, getAvailability, statusStyles } from '@/lib/vehicle-display';
 
 interface VehicleDetailModalProps {
   vehicle: (MarketplaceVehicle & { verification_status?: string }) | null;
@@ -33,12 +34,15 @@ export function VehicleDetailModal({
   const isImported = !!vehicle.import_request_id;
   const isVerified = vehicle.verification_status === 'verified';
   const photos = vehicle.photos || [];
+  const callForPrice = isCallForPrice(vehicle);
+  const availability = getAvailability(vehicle);
+  const status = statusStyles[availability];
 
   const formatPrice = (price: number, negotiable: boolean) => {
     if (negotiable) {
-      return `$${price.toLocaleString()} (Negotiable)`;
+      return `KES ${price.toLocaleString()} (Negotiable)`;
     }
-    return `$${price.toLocaleString()}`;
+    return `KES ${price.toLocaleString()}`;
   };
 
   const formatMileage = (mileage: number | null) => {
@@ -87,6 +91,14 @@ export function VehicleDetailModal({
                   {formatCondition(vehicle.condition)}
                 </Badge>
                 <VerifiedBadge isVerified={isVerified} size="md" />
+                <span
+                  className={cn(
+                    'inline-flex items-center px-2.5 py-1 rounded-full text-[10px] font-bold tracking-wide border',
+                    status.className
+                  )}
+                >
+                  {status.label}
+                </span>
               </div>
             </div>
           </div>
@@ -136,9 +148,16 @@ export function VehicleDetailModal({
           {/* Price & Actions */}
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-4 bg-muted/30 rounded-lg">
             <div>
-              <p className="text-3xl font-bold text-primary">
-                {formatPrice(vehicle.price, vehicle.negotiable)}
-              </p>
+              {callForPrice ? (
+                <p className="text-3xl font-bold text-primary flex items-center gap-2">
+                  <Phone className="h-6 w-6" />
+                  Call for Price
+                </p>
+              ) : (
+                <p className="text-3xl font-bold text-primary">
+                  {formatPrice(vehicle.price, vehicle.negotiable)}
+                </p>
+              )}
             </div>
             {isLoggedIn && (
               <Button
