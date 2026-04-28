@@ -148,9 +148,16 @@ export function VehicleDetailModal({
           {/* Price & Actions */}
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-4 bg-muted/30 rounded-lg">
             <div>
-              <p className="text-3xl font-bold text-primary">
-                {formatPrice(vehicle.price, vehicle.negotiable)}
-              </p>
+              {callForPrice ? (
+                <p className="text-3xl font-bold text-primary flex items-center gap-2">
+                  <Phone className="h-6 w-6" />
+                  Call for Price
+                </p>
+              ) : (
+                <p className="text-3xl font-bold text-primary">
+                  {formatPrice(vehicle.price, vehicle.negotiable)}
+                </p>
+              )}
             </div>
             {isLoggedIn && (
               <Button
