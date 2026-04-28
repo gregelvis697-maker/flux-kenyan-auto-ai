@@ -91,6 +91,14 @@ export function VehicleDetailModal({
                   {formatCondition(vehicle.condition)}
                 </Badge>
                 <VerifiedBadge isVerified={isVerified} size="md" />
+                <span
+                  className={cn(
+                    'inline-flex items-center px-2.5 py-1 rounded-full text-[10px] font-bold tracking-wide border',
+                    status.className
+                  )}
+                >
+                  {status.label}
+                </span>
               </div>
             </div>
           </div>
