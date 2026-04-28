@@ -344,6 +344,7 @@ export default function Marketplace() {
                 { key: 'all', label: 'All' },
                 { key: 'available', label: 'Locally Available' },
                 { key: 'in_transit', label: 'In Transit' },
+                { key: 'sold', label: 'Sold Units' },
               ] as const).map(tab => (
                 <button
                   key={tab.key}
