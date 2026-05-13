@@ -11,6 +11,7 @@ import { VehicleOverview } from '@/components/vehicle-detail/VehicleOverview';
 import { VehicleFeatures } from '@/components/vehicle-detail/VehicleFeatures';
 import { VehicleTechSpecs } from '@/components/vehicle-detail/VehicleTechSpecs';
 import { MobileStickyBar } from '@/components/vehicle-detail/MobileStickyBar';
+import { RequestAvailabilityModal } from '@/components/marketplace/RequestAvailabilityModal';
 import { Skeleton } from '@/components/ui/skeleton';
 import { ArrowLeft, Car, MessageCircle, ArrowRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -62,6 +63,7 @@ export default function VehicleDetail() {
   const [dealer, setDealer] = useState<DealerData | null>(null);
   const [loading, setLoading] = useState(true);
   const [notFound, setNotFound] = useState(false);
+  const [requestModalOpen, setRequestModalOpen] = useState(false);
 
   useEffect(() => {
     if (!id) return;
@@ -201,16 +203,32 @@ export default function VehicleDetail() {
               <div>
                 <p className="text-base font-semibold text-foreground">This vehicle has been sold</p>
                 <p className="text-sm text-muted-foreground mt-0.5">
-                  Browse similar {vehicle.make} listings or request availability from our dealers.
+                  Browse similar {vehicle.make} {vehicle.model} listings or request availability from our dealers.
                 </p>
               </div>
-              <Button
-                className="gap-2 shrink-0"
-                onClick={() => navigate(`/marketplace?make=${encodeURIComponent(vehicle.make)}`)}
-              >
-                Get Similar
-                <ArrowRight className="h-4 w-4" />
-              </Button>
+              <div className="flex flex-col sm:flex-row gap-2 shrink-0">
+                <Button
+                  variant="outline"
+                  className="gap-2"
+                  onClick={() => setRequestModalOpen(true)}
+                >
+                  <MessageCircle className="h-4 w-4" />
+                  Request Availability
+                </Button>
+                <Button
+                  className="gap-2"
+                  onClick={() => {
+                    const params = new URLSearchParams();
+                    params.set('make', vehicle.make);
+                    if (vehicle.model) params.set('model', vehicle.model);
+                    if (vehicle.body_type) params.set('body', vehicle.body_type.toLowerCase());
+                    navigate(`/marketplace?${params.toString()}`);
+                  }}
+                >
+                  Get Similar
+                  <ArrowRight className="h-4 w-4" />
+                </Button>
+              </div>
             </div>
           )}
 
@@ -266,6 +284,12 @@ export default function VehicleDetail() {
           onWhatsAppClick={handleWhatsAppClick}
         />
       )}
+
+      <RequestAvailabilityModal
+        open={requestModalOpen}
+        onOpenChange={setRequestModalOpen}
+        prefill={{ make: vehicle.make, model: vehicle.model, year: vehicle.year }}
+      />
     </div>
   );
 }

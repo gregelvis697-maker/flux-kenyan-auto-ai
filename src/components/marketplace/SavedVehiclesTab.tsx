@@ -5,7 +5,8 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/com
 import { Button } from '@/components/ui/button';
 import { Heart, Car, Trash2, ExternalLink, Phone } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
-import { isCallForPrice, getAvailability, statusStyles } from '@/lib/vehicle-display';
+import { isCallForPrice, getAvailability, statusStyles, CALL_FOR_PRICE_TOOLTIP } from '@/lib/vehicle-display';
+import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 import { cn } from '@/lib/utils';
 
 interface SavedVehicle {
@@ -161,10 +162,21 @@ export function SavedVehiclesTab() {
                     {vehicle.year} {vehicle.make} {vehicle.model}
                   </h3>
                   {callForPrice ? (
-                    <p className="text-lg font-bold text-primary mt-1 flex items-center gap-1.5">
-                      <Phone className="h-4 w-4" />
-                      Call for Price
-                    </p>
+                    <Tooltip delayDuration={0}>
+                      <TooltipTrigger asChild>
+                        <button
+                          type="button"
+                          className="text-lg font-bold text-primary mt-1 flex items-center gap-1.5 cursor-help underline-offset-4 decoration-dotted hover:underline"
+                          aria-label="Why is the price hidden?"
+                        >
+                          <Phone className="h-4 w-4" />
+                          Call for Price
+                        </button>
+                      </TooltipTrigger>
+                      <TooltipContent side="top" className="max-w-xs text-xs leading-relaxed">
+                        {CALL_FOR_PRICE_TOOLTIP}
+                      </TooltipContent>
+                    </Tooltip>
                   ) : (
                     <p className="text-lg font-bold text-primary mt-1">
                       KES {vehicle.price.toLocaleString()}

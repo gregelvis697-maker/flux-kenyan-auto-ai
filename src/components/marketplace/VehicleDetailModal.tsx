@@ -8,7 +8,8 @@ import { useState } from 'react';
 import type { MarketplaceVehicle } from '@/pages/Marketplace';
 import { MarketInsightsPanel } from './MarketInsightsPanel';
 import { VerifiedBadge } from './IntelligenceBadges';
-import { isCallForPrice, getAvailability, statusStyles } from '@/lib/vehicle-display';
+import { isCallForPrice, getAvailability, statusStyles, CALL_FOR_PRICE_TOOLTIP } from '@/lib/vehicle-display';
+import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 
 interface VehicleDetailModalProps {
   vehicle: (MarketplaceVehicle & { verification_status?: string }) | null;
@@ -149,10 +150,21 @@ export function VehicleDetailModal({
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-4 bg-muted/30 rounded-lg">
             <div>
               {callForPrice ? (
-                <p className="text-3xl font-bold text-primary flex items-center gap-2">
-                  <Phone className="h-6 w-6" />
-                  Call for Price
-                </p>
+                <Tooltip delayDuration={0}>
+                  <TooltipTrigger asChild>
+                    <button
+                      type="button"
+                      className="text-3xl font-bold text-primary flex items-center gap-2 cursor-help underline-offset-4 decoration-dotted hover:underline text-left"
+                      aria-label="Why is the price hidden?"
+                    >
+                      <Phone className="h-6 w-6" />
+                      Call for Price
+                    </button>
+                  </TooltipTrigger>
+                  <TooltipContent side="top" className="max-w-xs text-xs leading-relaxed">
+                    {CALL_FOR_PRICE_TOOLTIP}
+                  </TooltipContent>
+                </Tooltip>
               ) : (
                 <p className="text-3xl font-bold text-primary">
                   {formatPrice(vehicle.price, vehicle.negotiable)}

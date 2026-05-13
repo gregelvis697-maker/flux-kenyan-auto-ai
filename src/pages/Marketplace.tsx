@@ -18,6 +18,7 @@ import { Input } from '@/components/ui/input';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Button } from '@/components/ui/button';
 import { getAvailability } from '@/lib/vehicle-display';
+import { RequestAvailabilityModal } from '@/components/marketplace/RequestAvailabilityModal';
 
 export interface MarketplaceVehicle {
   id: string;
@@ -56,6 +57,7 @@ export default function Marketplace() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
   const [dealerNames, setDealerNames] = useState<Record<string, string>>({});
+  const [requestModalOpen, setRequestModalOpen] = useState(false);
 
   // Parse state from URL
   const searchQuery = searchParams.get('q') || '';
@@ -533,12 +535,7 @@ export default function Marketplace() {
                   <div className="flex flex-col sm:flex-row gap-3 justify-center">
                     <Button
                       className="gap-2"
-                      onClick={() => {
-                        const msg = encodeURIComponent(
-                          "Hi Flux, I'm looking for a specific car that's been sold. Can you help me source a similar one?"
-                        );
-                        window.open(`https://wa.me/254700000000?text=${msg}`, '_blank');
-                      }}
+                      onClick={() => setRequestModalOpen(true)}
                     >
                       <MessageCircle className="h-4 w-4" />
                       Request Availability
@@ -566,6 +563,11 @@ export default function Marketplace() {
           </div>
         </div>
       </main>
+
+      <RequestAvailabilityModal
+        open={requestModalOpen}
+        onOpenChange={setRequestModalOpen}
+      />
     </div>
   );
 }

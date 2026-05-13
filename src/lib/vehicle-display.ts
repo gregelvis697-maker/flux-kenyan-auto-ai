@@ -50,6 +50,13 @@ export const statusStyles: Record<Availability, StatusStyle> = {
   sold: { label: 'SOLD', className: 'bg-rose-600/95 text-white border-rose-500' },
 };
 
+/**
+ * Tooltip copy for the "Call for Price" badge — kept here so wording stays
+ * identical wherever the badge renders (cards, detail page, modals, saved tab).
+ */
+export const CALL_FOR_PRICE_TOOLTIP =
+  "Pricing isn't listed publicly — the dealer prefers to discuss the final number directly. Tap to contact them on WhatsApp.";
+
 export function formatPriceDisplay(v: VehicleDisplayInput): string {
   if (isCallForPrice(v)) return 'Call for Price';
   return `KES ${Number(v.price).toLocaleString()}`;
