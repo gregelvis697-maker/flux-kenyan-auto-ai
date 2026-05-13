@@ -3,8 +3,9 @@ import { Car, Heart, Fuel, Gauge, Calendar, Settings, Users, ArrowRight, ShieldC
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
+import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 import { cn } from '@/lib/utils';
-import { getAvailability, isCallForPrice, statusStyles } from '@/lib/vehicle-display';
+import { getAvailability, isCallForPrice, statusStyles, CALL_FOR_PRICE_TOOLTIP } from '@/lib/vehicle-display';
 import type { MarketplaceVehicle } from '@/pages/Marketplace';
 
 export interface VehicleWithIntelligence extends MarketplaceVehicle {
@@ -50,10 +51,18 @@ export function VehicleCard({
   const formatFuelType = (fuelType: string) =>
     fuelType.replace('_', ' ').replace(/\b\w/g, c => c.toUpperCase());
 
+  const buildSimilarUrl = () => {
+    const params = new URLSearchParams();
+    params.set('make', vehicle.make);
+    if (vehicle.model) params.set('model', vehicle.model);
+    if (vehicle.body_type) params.set('body', vehicle.body_type.toLowerCase());
+    return `/marketplace?${params.toString()}`;
+  };
+
   const handleCardClick = () => {
     if (isSold) {
       // For sold cars, default click takes them to similar (Get Similar pattern)
-      navigate(`/marketplace?make=${encodeURIComponent(vehicle.make)}`);
+      navigate(buildSimilarUrl());
     } else {
       navigate(`/vehicles/${vehicle.id}`);
     }
@@ -61,7 +70,7 @@ export function VehicleCard({
 
   const handleGetSimilar = (e: React.MouseEvent) => {
     e.stopPropagation();
-    navigate(`/marketplace?make=${encodeURIComponent(vehicle.make)}`);
+    navigate(buildSimilarUrl());
   };
 
   const handleViewDetails = (e: React.MouseEvent) => {
@@ -184,10 +193,22 @@ export function VehicleCard({
         {isSold ? (
           <p className="text-lg font-bold text-rose-500">SOLD</p>
         ) : callForPrice ? (
-          <p className="text-lg font-bold text-primary flex items-center gap-1.5">
-            <Phone className="h-4 w-4" />
-            Call for Price
-          </p>
+          <Tooltip delayDuration={0}>
+            <TooltipTrigger asChild>
+              <button
+                type="button"
+                onClick={(e) => e.stopPropagation()}
+                className="text-lg font-bold text-primary flex items-center gap-1.5 cursor-help underline-offset-4 decoration-dotted hover:underline"
+                aria-label="Why is the price hidden?"
+              >
+                <Phone className="h-4 w-4" />
+                Call for Price
+              </button>
+            </TooltipTrigger>
+            <TooltipContent side="top" className="max-w-xs text-xs leading-relaxed">
+              {CALL_FOR_PRICE_TOOLTIP}
+            </TooltipContent>
+          </Tooltip>
         ) : (
           <p className="text-lg font-bold text-primary">
             {formatPrice(vehicle.price)}
