@@ -75,14 +75,14 @@ export function RequestAvailabilityModal({
         try {
           const { data } = await supabase
             .from('profiles')
-            .select('full_name, phone_number')
+            .select('full_name, whatsapp_number')
             .eq('id', user.id)
             .single();
           if (data) {
             setForm(prev => ({
               ...prev,
               buyerName: prev.buyerName || data.full_name || '',
-              buyerPhone: prev.buyerPhone || data.phone_number || '',
+              buyerPhone: prev.buyerPhone || data.whatsapp_number || '',
             }));
           }
         } catch {
