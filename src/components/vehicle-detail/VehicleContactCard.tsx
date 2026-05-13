@@ -1,9 +1,10 @@
 import { BadgeCheck, MessageCircle, MapPin, Gauge, Phone } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
+import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 import { supabase } from '@/lib/supabase';
 import { useAuth } from '@/contexts/AuthContext';
-import { isCallForPrice, getAvailability, statusStyles } from '@/lib/vehicle-display';
+import { isCallForPrice, getAvailability, statusStyles, CALL_FOR_PRICE_TOOLTIP } from '@/lib/vehicle-display';
 import { cn } from '@/lib/utils';
 
 interface VehicleContactCardProps {
@@ -103,10 +104,22 @@ export function VehicleContactCard({ vehicle, dealerWhatsapp }: VehicleContactCa
       {/* Price */}
       <div>
         {callForPrice ? (
-          <p className="text-3xl font-bold text-primary flex items-center gap-2">
-            <Phone className="h-6 w-6" />
-            Call for Price
-          </p>
+          <Tooltip delayDuration={0}>
+            <TooltipTrigger asChild>
+              <button
+                type="button"
+                onClick={handleWhatsAppClick}
+                className="text-3xl font-bold text-primary flex items-center gap-2 cursor-pointer underline-offset-4 decoration-dotted hover:underline text-left"
+                aria-label="Why is the price hidden? Tap to contact dealer"
+              >
+                <Phone className="h-6 w-6" />
+                Call for Price
+              </button>
+            </TooltipTrigger>
+            <TooltipContent side="top" className="max-w-xs text-xs leading-relaxed">
+              {CALL_FOR_PRICE_TOOLTIP}
+            </TooltipContent>
+          </Tooltip>
         ) : (
           <>
             <p className="text-3xl font-bold text-primary">{formattedPrice}</p>
