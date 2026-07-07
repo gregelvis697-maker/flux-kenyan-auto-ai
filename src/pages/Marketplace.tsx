@@ -186,12 +186,12 @@ export default function Marketplace() {
         const dealerIds = [...new Set((data || []).map(v => v.dealer_id))];
         if (dealerIds.length > 0) {
           const { data: profiles } = await supabase
-            .from('profiles')
-            .select('id, full_name, email')
+            .from('public_dealer_profiles')
+            .select('id, full_name')
             .in('id', dealerIds);
           const names: Record<string, string> = {};
           (profiles || []).forEach(p => {
-            names[p.id] = p.full_name || p.email || 'Dealer';
+            if (p.id) names[p.id] = p.full_name || 'Dealer';
           });
           setDealerNames(names);
         }
