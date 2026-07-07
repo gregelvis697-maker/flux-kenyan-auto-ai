@@ -5,7 +5,7 @@ import { Separator } from '@/components/ui/separator';
 
 interface DealerProfile {
   full_name: string | null;
-  email: string;
+  whatsapp_number?: string | null;
   address: string | null;
   google_maps_link: string | null;
   rating: number | null;
