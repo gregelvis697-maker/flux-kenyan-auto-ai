@@ -1,8 +1,18 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import { Resend } from "https://esm.sh/resend@4.0.0";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.75.1";
+import { z } from "https://esm.sh/zod@3.23.8";
 
 const resend = new Resend(Deno.env.get("RESEND_API_KEY"));
+
+const RequestSchema = z.object({
+  recipientEmail: z.string().trim().email().max(255),
+  recipientName: z.string().trim().max(200).optional().default(""),
+  recipientUserId: z.string().uuid(),
+  role: z.enum(["buyer", "dealer", "importer", "admin"]),
+  action: z.enum(["approved", "rejected"]),
+  rejectionReason: z.string().trim().max(1000).optional(),
+});
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
