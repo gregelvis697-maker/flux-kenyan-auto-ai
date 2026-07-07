@@ -86,12 +86,12 @@ export default function VehicleDetail() {
 
       setVehicle(data);
 
-      // Fetch dealer profile
+      // Fetch dealer public profile (safe fields only, no email/PII)
       const { data: dealerData } = await supabase
-        .from('profiles')
-        .select('full_name, email, address, google_maps_link, whatsapp_number, rating, review_count')
+        .from('public_dealer_profiles')
+        .select('full_name, address, google_maps_link, whatsapp_number, rating, review_count')
         .eq('id', data.dealer_id)
-        .single();
+        .maybeSingle();
 
       setDealer(dealerData);
     } catch {
