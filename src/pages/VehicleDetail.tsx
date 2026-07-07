@@ -47,7 +47,6 @@ interface VehicleData {
 
 interface DealerData {
   full_name: string | null;
-  email: string;
   address: string | null;
   google_maps_link: string | null;
   whatsapp_number: string | null;
