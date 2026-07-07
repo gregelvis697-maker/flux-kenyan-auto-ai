@@ -58,6 +58,13 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
+            foreignKeyName: "approval_audit_performed_by_profiles_fkey"
+            columns: ["performed_by"]
+            isOneToOne: false
+            referencedRelation: "public_dealer_profiles"
+            referencedColumns: ["id"]
+          },
+          {
             foreignKeyName: "approval_audit_user_id_profiles_fkey"
             columns: ["user_id"]
             isOneToOne: false
@@ -69,6 +76,13 @@ export type Database = {
             columns: ["user_id"]
             isOneToOne: false
             referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "approval_audit_user_id_profiles_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "public_dealer_profiles"
             referencedColumns: ["id"]
           },
         ]
@@ -216,6 +230,13 @@ export type Database = {
             columns: ["recipient_user_id"]
             isOneToOne: false
             referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "email_logs_recipient_user_id_fkey"
+            columns: ["recipient_user_id"]
+            isOneToOne: false
+            referencedRelation: "public_dealer_profiles"
             referencedColumns: ["id"]
           },
         ]
@@ -398,6 +419,13 @@ export type Database = {
             referencedRelation: "profiles"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "user_roles_user_id_profiles_fkey"
+            columns: ["user_id"]
+            isOneToOne: true
+            referencedRelation: "public_dealer_profiles"
+            referencedColumns: ["id"]
+          },
         ]
       }
       vehicles: {
@@ -573,6 +601,36 @@ export type Database = {
           price_stddev: number | null
           vehicle_count: number | null
           year: number | null
+        }
+        Relationships: []
+      }
+      public_dealer_profiles: {
+        Row: {
+          address: string | null
+          full_name: string | null
+          google_maps_link: string | null
+          id: string | null
+          rating: number | null
+          review_count: number | null
+          whatsapp_number: string | null
+        }
+        Insert: {
+          address?: string | null
+          full_name?: string | null
+          google_maps_link?: string | null
+          id?: string | null
+          rating?: number | null
+          review_count?: number | null
+          whatsapp_number?: string | null
+        }
+        Update: {
+          address?: string | null
+          full_name?: string | null
+          google_maps_link?: string | null
+          id?: string | null
+          rating?: number | null
+          review_count?: number | null
+          whatsapp_number?: string | null
         }
         Relationships: []
       }
