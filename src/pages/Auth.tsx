@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
+import { useNavigate, Link, useSearchParams } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -32,14 +32,20 @@ const Auth = () => {
   const { signIn, signUp, user, userRole, approvalStatus } = useAuth();
   const { toast } = useToast();
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const nextRaw = searchParams.get('next');
+  // Only allow same-origin relative paths.
+  const next = nextRaw && nextRaw.startsWith('/') && !nextRaw.startsWith('//') ? nextRaw : null;
 
   useEffect(() => {
     if (user && approvalStatus === 'pending') {
       navigate('/pending-approval', { replace: true });
     } else if (user && userRole && approvalStatus === 'approved') {
-      navigate(`/dashboard/${userRole}`, { replace: true });
+      navigate(next ?? `/dashboard/${userRole}`, { replace: true });
+    } else if (user && next) {
+      navigate(next, { replace: true });
     }
-  }, [user, userRole, approvalStatus, navigate]);
+  }, [user, userRole, approvalStatus, navigate, next]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
