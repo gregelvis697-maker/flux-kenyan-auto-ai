@@ -32,6 +32,7 @@ import EscrowPage from "./pages/products/EscrowPage";
 import AIIntelligencePage from "./pages/products/AIIntelligencePage";
 import AnalyticsPage from "./pages/products/AnalyticsPage";
 import DealerToolsPage from "./pages/products/DealerToolsPage";
+import OAuthConsent from "./pages/OAuthConsent";
 
 const App = () => (
   <QueryClientProvider client={queryClient}>
@@ -92,6 +93,7 @@ const App = () => (
           <Route path="/products/ai-intelligence" element={<AIIntelligencePage />} />
           <Route path="/products/analytics" element={<AnalyticsPage />} />
           <Route path="/products/dealer-tools" element={<DealerToolsPage />} />
+          <Route path="/.lovable/oauth/consent" element={<OAuthConsent />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>

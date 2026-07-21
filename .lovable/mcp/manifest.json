@@ -1,0 +1,177 @@
+{
+  "version": 1,
+  "sdk_version": "0.24.0",
+  "path": "/functions/v1/mcp",
+  "auth": {
+    "type": "oauth",
+    "issuer": "https://jrieqgrdiwwroliehlhn.supabase.co/auth/v1",
+    "accepted_audiences": [
+      "authenticated"
+    ]
+  },
+  "mcp": {
+    "server": {
+      "name": "flux-mcp",
+      "version": "0.1.0",
+      "title": "Flux Marketplace"
+    },
+    "tools": [
+      {
+        "name": "search_vehicles",
+        "title": "Search vehicles",
+        "description": "Search the Flux marketplace for available vehicles. Filter by make, model, year range, price range, body type, or fuel type. Returns up to 25 non-sold, available listings.",
+        "annotations": {
+          "readOnlyHint": true,
+          "idempotentHint": true,
+          "openWorldHint": false
+        },
+        "inputSchema": {
+          "type": "object",
+          "properties": {
+            "make": {
+              "type": "string",
+              "description": "Make filter (case-insensitive contains)."
+            },
+            "model": {
+              "type": "string",
+              "description": "Model filter (case-insensitive contains)."
+            },
+            "body_type": {
+              "type": "string"
+            },
+            "fuel_type": {
+              "type": "string"
+            },
+            "min_year": {
+              "type": "integer"
+            },
+            "max_year": {
+              "type": "integer"
+            },
+            "max_price_kes": {
+              "type": "integer"
+            },
+            "limit": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 25,
+              "description": "Max results, default 10."
+            }
+          },
+          "additionalProperties": false,
+          "$schema": "http://json-schema.org/draft-07/schema#"
+        },
+        "outputSchema": null
+      },
+      {
+        "name": "get_vehicle",
+        "title": "Get vehicle details",
+        "description": "Fetch full details for a single vehicle listing by id, including dealer contact info exposed by RLS.",
+        "annotations": {
+          "readOnlyHint": true,
+          "idempotentHint": true,
+          "openWorldHint": false
+        },
+        "inputSchema": {
+          "type": "object",
+          "properties": {
+            "id": {
+              "type": "string",
+              "format": "uuid",
+              "description": "The vehicle UUID."
+            }
+          },
+          "required": [
+            "id"
+          ],
+          "additionalProperties": false,
+          "$schema": "http://json-schema.org/draft-07/schema#"
+        },
+        "outputSchema": null
+      },
+      {
+        "name": "list_my_favorites",
+        "title": "List my saved vehicles",
+        "description": "List the signed-in buyer's saved (favorited) vehicles.",
+        "annotations": {
+          "readOnlyHint": true,
+          "idempotentHint": true,
+          "openWorldHint": false
+        },
+        "inputSchema": {
+          "$schema": "http://json-schema.org/draft-07/schema#",
+          "type": "object",
+          "properties": {}
+        },
+        "outputSchema": null
+      },
+      {
+        "name": "add_favorite",
+        "title": "Save a vehicle",
+        "description": "Add a vehicle to the signed-in buyer's saved list.",
+        "annotations": {
+          "readOnlyHint": false,
+          "idempotentHint": true,
+          "openWorldHint": false
+        },
+        "inputSchema": {
+          "type": "object",
+          "properties": {
+            "vehicle_id": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          "required": [
+            "vehicle_id"
+          ],
+          "additionalProperties": false,
+          "$schema": "http://json-schema.org/draft-07/schema#"
+        },
+        "outputSchema": null
+      },
+      {
+        "name": "remove_favorite",
+        "title": "Unsave a vehicle",
+        "description": "Remove a vehicle from the signed-in buyer's saved list.",
+        "annotations": {
+          "readOnlyHint": false,
+          "destructiveHint": true,
+          "idempotentHint": true,
+          "openWorldHint": false
+        },
+        "inputSchema": {
+          "type": "object",
+          "properties": {
+            "vehicle_id": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          "required": [
+            "vehicle_id"
+          ],
+          "additionalProperties": false,
+          "$schema": "http://json-schema.org/draft-07/schema#"
+        },
+        "outputSchema": null
+      },
+      {
+        "name": "list_my_inventory",
+        "title": "List my dealer inventory",
+        "description": "List all vehicles owned by the signed-in dealer, including sold and unlisted ones. Non-dealers will see an empty list per RLS.",
+        "annotations": {
+          "readOnlyHint": true,
+          "idempotentHint": true,
+          "openWorldHint": false
+        },
+        "inputSchema": {
+          "$schema": "http://json-schema.org/draft-07/schema#",
+          "type": "object",
+          "properties": {}
+        },
+        "outputSchema": null
+      }
+    ]
+  }
+}
