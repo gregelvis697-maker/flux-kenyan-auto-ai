@@ -63,7 +63,6 @@ export function InventoryTab({ onUpdate }: InventoryTabProps) {
   const [showUpgrade, setShowUpgrade] = useState(false);
   const { user } = useAuth();
   const { tier, limit, listingCount } = useSubscription(user?.id);
-  const limitReached = listingCount >= limit && !editingVehicle;
   const [editingVehicle, setEditingVehicle] = useState<Vehicle | null>(null);
   const [loading, setLoading] = useState(false);
   const [photos, setPhotos] = useState<string[]>([]);
