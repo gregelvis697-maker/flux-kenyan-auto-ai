@@ -315,8 +315,16 @@ export type Database = {
           full_name: string | null
           google_maps_link: string | null
           id: string
+          monthly_listing_limit: number
+          paystack_authorization_code: string | null
+          paystack_customer_code: string | null
           rating: number | null
           review_count: number | null
+          subscription_auto_renew: boolean
+          subscription_expires_at: string | null
+          subscription_started_at: string | null
+          subscription_status: Database["public"]["Enums"]["subscription_status"]
+          subscription_tier: Database["public"]["Enums"]["subscription_tier"]
           updated_at: string
           whatsapp_number: string | null
         }
@@ -327,8 +335,16 @@ export type Database = {
           full_name?: string | null
           google_maps_link?: string | null
           id: string
+          monthly_listing_limit?: number
+          paystack_authorization_code?: string | null
+          paystack_customer_code?: string | null
           rating?: number | null
           review_count?: number | null
+          subscription_auto_renew?: boolean
+          subscription_expires_at?: string | null
+          subscription_started_at?: string | null
+          subscription_status?: Database["public"]["Enums"]["subscription_status"]
+          subscription_tier?: Database["public"]["Enums"]["subscription_tier"]
           updated_at?: string
           whatsapp_number?: string | null
         }
@@ -339,8 +355,16 @@ export type Database = {
           full_name?: string | null
           google_maps_link?: string | null
           id?: string
+          monthly_listing_limit?: number
+          paystack_authorization_code?: string | null
+          paystack_customer_code?: string | null
           rating?: number | null
           review_count?: number | null
+          subscription_auto_renew?: boolean
+          subscription_expires_at?: string | null
+          subscription_started_at?: string | null
+          subscription_status?: Database["public"]["Enums"]["subscription_status"]
+          subscription_tier?: Database["public"]["Enums"]["subscription_tier"]
           updated_at?: string
           whatsapp_number?: string | null
         }
@@ -366,6 +390,166 @@ export type Database = {
           identifier?: string
         }
         Relationships: []
+      }
+      subscription_events: {
+        Row: {
+          created_at: string
+          dealer_id: string
+          event_type: string
+          id: string
+          metadata: Json | null
+          new_status: Database["public"]["Enums"]["subscription_status"] | null
+          new_tier: Database["public"]["Enums"]["subscription_tier"] | null
+          previous_status:
+            | Database["public"]["Enums"]["subscription_status"]
+            | null
+          previous_tier: Database["public"]["Enums"]["subscription_tier"] | null
+        }
+        Insert: {
+          created_at?: string
+          dealer_id: string
+          event_type: string
+          id?: string
+          metadata?: Json | null
+          new_status?: Database["public"]["Enums"]["subscription_status"] | null
+          new_tier?: Database["public"]["Enums"]["subscription_tier"] | null
+          previous_status?:
+            | Database["public"]["Enums"]["subscription_status"]
+            | null
+          previous_tier?:
+            | Database["public"]["Enums"]["subscription_tier"]
+            | null
+        }
+        Update: {
+          created_at?: string
+          dealer_id?: string
+          event_type?: string
+          id?: string
+          metadata?: Json | null
+          new_status?: Database["public"]["Enums"]["subscription_status"] | null
+          new_tier?: Database["public"]["Enums"]["subscription_tier"] | null
+          previous_status?:
+            | Database["public"]["Enums"]["subscription_status"]
+            | null
+          previous_tier?:
+            | Database["public"]["Enums"]["subscription_tier"]
+            | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "subscription_events_dealer_id_fkey"
+            columns: ["dealer_id"]
+            isOneToOne: false
+            referencedRelation: "dealer_trust_stats"
+            referencedColumns: ["dealer_id"]
+          },
+          {
+            foreignKeyName: "subscription_events_dealer_id_fkey"
+            columns: ["dealer_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "subscription_events_dealer_id_fkey"
+            columns: ["dealer_id"]
+            isOneToOne: false
+            referencedRelation: "public_dealer_profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      subscription_transactions: {
+        Row: {
+          amount: number
+          created_at: string
+          currency: string
+          dealer_id: string
+          id: string
+          is_downgrade: boolean
+          is_upgrade: boolean
+          paid_at: string | null
+          payment_method: string | null
+          paystack_authorization_code: string | null
+          paystack_customer_code: string | null
+          paystack_reference: string
+          paystack_transaction_id: string | null
+          period_end: string | null
+          period_start: string | null
+          previous_tier: Database["public"]["Enums"]["subscription_tier"] | null
+          status: string
+          tier: Database["public"]["Enums"]["subscription_tier"]
+          updated_at: string
+        }
+        Insert: {
+          amount: number
+          created_at?: string
+          currency?: string
+          dealer_id: string
+          id?: string
+          is_downgrade?: boolean
+          is_upgrade?: boolean
+          paid_at?: string | null
+          payment_method?: string | null
+          paystack_authorization_code?: string | null
+          paystack_customer_code?: string | null
+          paystack_reference: string
+          paystack_transaction_id?: string | null
+          period_end?: string | null
+          period_start?: string | null
+          previous_tier?:
+            | Database["public"]["Enums"]["subscription_tier"]
+            | null
+          status?: string
+          tier: Database["public"]["Enums"]["subscription_tier"]
+          updated_at?: string
+        }
+        Update: {
+          amount?: number
+          created_at?: string
+          currency?: string
+          dealer_id?: string
+          id?: string
+          is_downgrade?: boolean
+          is_upgrade?: boolean
+          paid_at?: string | null
+          payment_method?: string | null
+          paystack_authorization_code?: string | null
+          paystack_customer_code?: string | null
+          paystack_reference?: string
+          paystack_transaction_id?: string | null
+          period_end?: string | null
+          period_start?: string | null
+          previous_tier?:
+            | Database["public"]["Enums"]["subscription_tier"]
+            | null
+          status?: string
+          tier?: Database["public"]["Enums"]["subscription_tier"]
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "subscription_transactions_dealer_id_fkey"
+            columns: ["dealer_id"]
+            isOneToOne: false
+            referencedRelation: "dealer_trust_stats"
+            referencedColumns: ["dealer_id"]
+          },
+          {
+            foreignKeyName: "subscription_transactions_dealer_id_fkey"
+            columns: ["dealer_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "subscription_transactions_dealer_id_fkey"
+            columns: ["dealer_id"]
+            isOneToOne: false
+            referencedRelation: "public_dealer_profiles"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       user_roles: {
         Row: {
@@ -688,6 +872,8 @@ export type Database = {
         | "cleared"
         | "delivered"
         | "received"
+      subscription_status: "inactive" | "active" | "past_due" | "cancelled"
+      subscription_tier: "free" | "standard" | "premium"
       vehicle_condition: "new" | "used" | "certified_pre_owned"
     }
     CompositeTypes: {
@@ -827,6 +1013,8 @@ export const Constants = {
         "delivered",
         "received",
       ],
+      subscription_status: ["inactive", "active", "past_due", "cancelled"],
+      subscription_tier: ["free", "standard", "premium"],
       vehicle_condition: ["new", "used", "certified_pre_owned"],
     },
   },

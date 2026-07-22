@@ -3,13 +3,17 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/lib/supabase';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Package, TrendingUp, Car, FileText, Truck, LayoutGrid, LayoutDashboard, Settings } from 'lucide-react';
+import { Package, TrendingUp, Car, FileText, Truck, LayoutGrid, LayoutDashboard, Settings, CreditCard } from 'lucide-react';
 import { Navigation } from '@/components/Navigation';
 import { ImportRequestsTab } from '@/components/dealer/ImportRequestsTab';
 import { MyImportsTab } from '@/components/dealer/MyImportsTab';
 import { InventoryTab } from '@/components/dealer/InventoryTab';
+import { SubscriptionCard } from '@/components/dealer/SubscriptionCard';
 import { DashboardSidebar, MenuItem } from '@/components/dashboard/DashboardSidebar';
 import { SettingsPanel } from '@/components/dashboard/SettingsPanel';
+import { useSubscription } from '@/hooks/useSubscription';
+import { verifyPaystackReference } from '@/services/paystackService';
+import { toast } from 'sonner';
 import { cn } from '@/lib/utils';
 
 const dealerMenuItems: MenuItem[] = [
@@ -17,6 +21,7 @@ const dealerMenuItems: MenuItem[] = [
   { id: 'requests', label: 'Import Requests', icon: FileText },
   { id: 'imports', label: 'My Imports', icon: Truck },
   { id: 'inventory', label: 'Inventory', icon: LayoutGrid },
+  { id: 'subscription', label: 'Subscription', icon: CreditCard },
   { id: 'settings', label: 'Settings', icon: Settings },
 ];
 
@@ -30,6 +35,34 @@ export default function DealerDashboard() {
     delivered: 0,
     inventory: 0,
   });
+  const subscription = useSubscription(user?.id);
+
+  // Handle Paystack redirect callback
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const ref = params.get('paystack_ref');
+    if (!ref || !user) return;
+    (async () => {
+      try {
+        const res = await verifyPaystackReference(ref);
+        if (res.success) {
+          toast.success(`Subscription activated${res.tier ? ` — ${res.tier} plan` : ''}`);
+          await subscription.refresh();
+        } else {
+          toast.error(res.message ?? 'Payment could not be verified');
+        }
+      } catch (err) {
+        console.error(err);
+        toast.error('Payment verification failed');
+      } finally {
+        params.delete('paystack_ref');
+        const next = params.toString();
+        window.history.replaceState({}, '', `/dashboard/dealer${next ? `?${next}` : ''}`);
+        setActiveTab('subscription');
+      }
+    })();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [user?.id]);
 
   useEffect(() => {
     if (!loading) {
@@ -193,6 +226,9 @@ export default function DealerDashboard() {
 
       case 'inventory':
         return <InventoryTab onUpdate={fetchMetrics} />;
+
+      case 'subscription':
+        return <SubscriptionCard subscription={subscription} />;
 
       case 'settings':
         return <SettingsPanel />;
