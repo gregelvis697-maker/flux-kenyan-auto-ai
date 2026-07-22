@@ -25,6 +25,9 @@ import {
 import { PhotoUploader } from './PhotoUploader';
 import { PhotoGallery } from './PhotoGallery';
 import { PriceGuidance } from '@/components/marketplace/PriceGuidance';
+import { useAuth } from '@/contexts/AuthContext';
+import { useSubscription } from '@/hooks/useSubscription';
+import { UpgradeModal } from '@/components/modals/UpgradeModal';
 
 interface Vehicle {
   id: string;
@@ -57,6 +60,10 @@ export function InventoryTab({ onUpdate }: InventoryTabProps) {
   const { toast } = useToast();
   const [vehicles, setVehicles] = useState<Vehicle[]>([]);
   const [showForm, setShowForm] = useState(false);
+  const [showUpgrade, setShowUpgrade] = useState(false);
+  const { user } = useAuth();
+  const { tier, limit, listingCount } = useSubscription(user?.id);
+  const limitReached = listingCount >= limit && !editingVehicle;
   const [editingVehicle, setEditingVehicle] = useState<Vehicle | null>(null);
   const [loading, setLoading] = useState(false);
   const [photos, setPhotos] = useState<string[]>([]);
@@ -422,7 +429,13 @@ export function InventoryTab({ onUpdate }: InventoryTabProps) {
           </p>
         </div>
         <Button
-          onClick={() => setShowForm(true)}
+          onClick={() => {
+            if (limitReached) {
+              setShowUpgrade(true);
+              return;
+            }
+            setShowForm(true);
+          }}
           className="w-full sm:w-auto bg-primary hover:bg-primary/90 shadow-[0_0_20px_hsl(var(--primary)/0.3)] hover:shadow-[0_0_30px_hsl(var(--primary)/0.4)] transition-all"
         >
           <Plus className="h-4 w-4 mr-2" />
