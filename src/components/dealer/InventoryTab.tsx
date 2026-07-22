@@ -981,6 +981,15 @@ export function InventoryTab({ onUpdate }: InventoryTabProps) {
         open={galleryOpen}
         onOpenChange={setGalleryOpen}
       />
+
+      <UpgradeModal
+        isOpen={showUpgrade}
+        onClose={() => setShowUpgrade(false)}
+        feature="More vehicle listings"
+        featureDescription={`You've reached your ${limit}-listing limit on the ${tier} plan. Upgrade for more inventory slots.`}
+        requiredTier={tier === 'free' ? 'standard' : 'premium'}
+        currentTier={tier}
+      />
     </div>
   );
 }
