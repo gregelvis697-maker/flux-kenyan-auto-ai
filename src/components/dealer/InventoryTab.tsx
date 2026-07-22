@@ -429,7 +429,13 @@ export function InventoryTab({ onUpdate }: InventoryTabProps) {
         </div>
         <Button
           onClick={() => {
+            const limitReached = listingCount >= limit && !editingVehicle;
             if (limitReached) {
+              setShowUpgrade(true);
+              return;
+            }
+            setShowForm(true);
+          }}
               setShowUpgrade(true);
               return;
             }
