@@ -2,3 +2,9 @@ project_id = "jrieqgrdiwwroliehlhn"
 
 [functions.waitlist-signup]
 verify_jwt = false
+
+[functions.paystack-webhook]
+verify_jwt = false
+
+[functions.paystack-charge-renewals]
+verify_jwt = false
