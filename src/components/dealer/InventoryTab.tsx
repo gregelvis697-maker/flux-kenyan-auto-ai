@@ -435,6 +435,7 @@ export function InventoryTab({ onUpdate }: InventoryTabProps) {
               return;
             }
             setShowForm(true);
+          }}
           className="w-full sm:w-auto bg-primary hover:bg-primary/90 shadow-[0_0_20px_hsl(var(--primary)/0.3)] hover:shadow-[0_0_30px_hsl(var(--primary)/0.4)] transition-all"
         >
           <Plus className="h-4 w-4 mr-2" />
