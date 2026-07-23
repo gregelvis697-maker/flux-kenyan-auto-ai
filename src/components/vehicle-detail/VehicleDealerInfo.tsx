@@ -2,6 +2,7 @@ import { Star, MapPin, ExternalLink, User } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
+import { DealerLocationMap } from '@/components/maps/DealerLocationMap';
 
 interface DealerProfile {
   full_name: string | null;
@@ -10,6 +11,10 @@ interface DealerProfile {
   google_maps_link: string | null;
   rating: number | null;
   review_count: number | null;
+  street_address?: string | null;
+  city?: string | null;
+  location_latitude?: number | null;
+  location_longitude?: number | null;
 }
 
 interface VehicleDealerInfoProps {
@@ -49,10 +54,21 @@ export function VehicleDealerInfo({ dealer }: VehicleDealerInfoProps) {
     );
   };
 
+  const displayAddress =
+    [dealer.street_address, dealer.city].filter(Boolean).join(', ') || dealer.address || '';
+
+  const hasCoords =
+    typeof dealer.location_latitude === 'number' &&
+    typeof dealer.location_longitude === 'number' &&
+    !(dealer.location_latitude === 0 && dealer.location_longitude === 0);
+
+  const directionsUrl = hasCoords
+    ? `https://www.openstreetmap.org/directions?to=${dealer.location_latitude},${dealer.location_longitude}`
+    : null;
+
   return (
     <Card className="bg-card/60 border-border/50">
       <CardContent className="p-5 space-y-4">
-        {/* Dealer Name & Rating */}
         <div>
           <h3 className="font-semibold text-lg text-foreground">
             {dealer.full_name || 'Dealer'}
@@ -71,91 +87,37 @@ export function VehicleDealerInfo({ dealer }: VehicleDealerInfoProps) {
 
         <Separator className="bg-border/30" />
 
-        {/* Seller Location */}
         <div>
           <h4 className="font-medium text-sm text-foreground mb-3 flex items-center gap-2">
             <MapPin className="h-4 w-4 text-primary" />
             Seller Location
           </h4>
 
-          {(() => {
-            // SECURITY: Only allow embedding from trusted Google Maps hostnames.
-            // Dealer-supplied URLs could otherwise be used for phishing/clickjacking.
-            const ALLOWED_HOSTS = new Set([
-              'www.google.com',
-              'maps.google.com',
-              'www.google.co.ke',
-              'google.com',
-            ]);
-            let safeEmbedUrl: string | null = null;
-            let safeExternalUrl: string | null = null;
-            if (dealer.google_maps_link) {
-              try {
-                const u = new URL(dealer.google_maps_link);
-                if (u.protocol === 'https:' && ALLOWED_HOSTS.has(u.hostname)) {
-                  safeExternalUrl = u.toString();
-                  if (u.pathname.includes('/maps/embed')) {
-                    safeEmbedUrl = u.toString();
-                  }
-                }
-              } catch {
-                /* invalid URL — treat as missing */
-              }
-            }
+          <div className="space-y-3">
+            <DealerLocationMap
+              dealerName={dealer.full_name || 'Dealer'}
+              latitude={dealer.location_latitude ?? null}
+              longitude={dealer.location_longitude ?? null}
+              address={dealer.street_address || dealer.address}
+              city={dealer.city}
+            />
 
-            if (safeEmbedUrl) {
-              return (
-                <div className="space-y-3">
-                  <div className="rounded-lg overflow-hidden border border-border/30">
-                    <iframe
-                      src={safeEmbedUrl}
-                      width="100%"
-                      height="300"
-                      style={{ border: 0 }}
-                      allowFullScreen
-                      loading="lazy"
-                      referrerPolicy="no-referrer-when-downgrade"
-                      sandbox="allow-scripts allow-same-origin allow-popups"
-                      title="Dealer location"
-                      className="w-full h-[250px] md:h-[300px]"
-                    />
-                  </div>
-                  {dealer.address && (
-                    <p className="text-sm text-muted-foreground">{dealer.address}</p>
-                  )}
-                  {safeExternalUrl && (
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      className="w-full gap-2"
-                      onClick={() => window.open(safeExternalUrl!, '_blank', 'noopener,noreferrer')}
-                    >
-                      <ExternalLink className="h-4 w-4" />
-                      Get Directions
-                    </Button>
-                  )}
-                </div>
-              );
-            }
+            {displayAddress && (
+              <p className="text-sm text-muted-foreground">{displayAddress}</p>
+            )}
 
-            return (
-              <div className="text-center py-6 text-muted-foreground text-sm space-y-3">
-                <MapPin className="h-8 w-8 mx-auto mb-2 opacity-30" />
-                <p>{dealer.address || 'Location not provided'}</p>
-                {safeExternalUrl && (
-                  <a
-                    href={safeExternalUrl}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="inline-flex items-center gap-1 text-primary hover:underline"
-                  >
-                    <ExternalLink className="h-3.5 w-3.5" />
-                    View on Google Maps
-                  </a>
-                )}
-              </div>
-            );
-          })()}
+            {directionsUrl && (
+              <Button
+                variant="outline"
+                size="sm"
+                className="w-full gap-2"
+                onClick={() => window.open(directionsUrl, '_blank', 'noopener,noreferrer')}
+              >
+                <ExternalLink className="h-4 w-4" />
+                Get Directions
+              </Button>
+            )}
+          </div>
         </div>
       </CardContent>
     </Card>
