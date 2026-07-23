@@ -34,17 +34,6 @@ export const Hero = () => {
           transition={{ duration: 0.4 }}
         >
           {/* Badge */}
-          <motion.div
-            initial={{ opacity: 0, scale: 0.9 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ delay: 0.1, duration: 0.4 }}
-            className="inline-flex items-center gap-1.5 sm:gap-2 px-3 sm:px-4 py-1.5 sm:py-2 rounded-full bg-card/50 backdrop-blur-sm border border-primary/20 mb-6 sm:mb-8"
-          >
-            <Sparkles className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-primary" />
-            <span className="text-xs sm:text-sm font-medium text-foreground uppercase tracking-wider">
-              Kenya's First AI-Powered Automotive Platform
-            </span>
-          </motion.div>
 
           {/* Main headline */}
           <motion.h1
