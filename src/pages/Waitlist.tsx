@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { toast } from "sonner";
-import { Rocket, User, Mail, Phone, Briefcase } from "lucide-react";
+import { User, Mail, Phone, Briefcase } from "lucide-react";
 import { supabase } from "@/lib/supabase";
 import { Navigation } from "@/components/Navigation";
 
@@ -63,10 +63,6 @@ const Waitlist = () => {
             transition={{ duration: 0.6 }}
           >
             <div className="text-center mb-8 sm:mb-12">
-              <div className="inline-flex items-center gap-1.5 sm:gap-2 px-3 sm:px-4 py-1.5 sm:py-2 rounded-full bg-primary/10 border border-primary/20 mb-4 sm:mb-6">
-                <Rocket className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-primary" />
-                <span className="text-xs sm:text-sm font-medium text-primary">Limited Early Access</span>
-              </div>
 
               <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold mb-4 sm:mb-6 px-2">
                 <span className="text-foreground">Join the </span>
