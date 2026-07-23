@@ -310,16 +310,22 @@ export type Database = {
       profiles: {
         Row: {
           address: string | null
+          city: string | null
           created_at: string
           email: string
           full_name: string | null
           google_maps_link: string | null
           id: string
+          location_geocode_error: string | null
+          location_geocoded_at: string | null
+          location_latitude: number | null
+          location_longitude: number | null
           monthly_listing_limit: number
           paystack_authorization_code: string | null
           paystack_customer_code: string | null
           rating: number | null
           review_count: number | null
+          street_address: string | null
           subscription_auto_renew: boolean
           subscription_expires_at: string | null
           subscription_started_at: string | null
@@ -330,16 +336,22 @@ export type Database = {
         }
         Insert: {
           address?: string | null
+          city?: string | null
           created_at?: string
           email: string
           full_name?: string | null
           google_maps_link?: string | null
           id: string
+          location_geocode_error?: string | null
+          location_geocoded_at?: string | null
+          location_latitude?: number | null
+          location_longitude?: number | null
           monthly_listing_limit?: number
           paystack_authorization_code?: string | null
           paystack_customer_code?: string | null
           rating?: number | null
           review_count?: number | null
+          street_address?: string | null
           subscription_auto_renew?: boolean
           subscription_expires_at?: string | null
           subscription_started_at?: string | null
@@ -350,16 +362,22 @@ export type Database = {
         }
         Update: {
           address?: string | null
+          city?: string | null
           created_at?: string
           email?: string
           full_name?: string | null
           google_maps_link?: string | null
           id?: string
+          location_geocode_error?: string | null
+          location_geocoded_at?: string | null
+          location_latitude?: number | null
+          location_longitude?: number | null
           monthly_listing_limit?: number
           paystack_authorization_code?: string | null
           paystack_customer_code?: string | null
           rating?: number | null
           review_count?: number | null
+          street_address?: string | null
           subscription_auto_renew?: boolean
           subscription_expires_at?: string | null
           subscription_started_at?: string | null
@@ -791,29 +809,41 @@ export type Database = {
       public_dealer_profiles: {
         Row: {
           address: string | null
+          city: string | null
           full_name: string | null
           google_maps_link: string | null
           id: string | null
+          location_latitude: number | null
+          location_longitude: number | null
           rating: number | null
           review_count: number | null
+          street_address: string | null
           whatsapp_number: string | null
         }
         Insert: {
           address?: string | null
+          city?: string | null
           full_name?: string | null
           google_maps_link?: string | null
           id?: string | null
+          location_latitude?: number | null
+          location_longitude?: number | null
           rating?: number | null
           review_count?: number | null
+          street_address?: string | null
           whatsapp_number?: string | null
         }
         Update: {
           address?: string | null
+          city?: string | null
           full_name?: string | null
           google_maps_link?: string | null
           id?: string | null
+          location_latitude?: number | null
+          location_longitude?: number | null
           rating?: number | null
           review_count?: number | null
+          street_address?: string | null
           whatsapp_number?: string | null
         }
         Relationships: []
