@@ -52,6 +52,10 @@ interface DealerData {
   whatsapp_number: string | null;
   rating: number | null;
   review_count: number | null;
+  street_address: string | null;
+  city: string | null;
+  location_latitude: number | null;
+  location_longitude: number | null;
 }
 
 export default function VehicleDetail() {
@@ -89,7 +93,7 @@ export default function VehicleDetail() {
       // Fetch dealer public profile (safe fields only, no email/PII)
       const { data: dealerData } = await supabase
         .from('public_dealer_profiles')
-        .select('full_name, address, google_maps_link, whatsapp_number, rating, review_count')
+        .select('full_name, address, google_maps_link, whatsapp_number, rating, review_count, street_address, city, location_latitude, location_longitude')
         .eq('id', data.dealer_id)
         .maybeSingle();
 
