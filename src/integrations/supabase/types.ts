@@ -186,6 +186,76 @@ export type Database = {
         }
         Relationships: []
       }
+      dealer_locations: {
+        Row: {
+          city: string
+          created_at: string
+          dealer_id: string
+          id: string
+          is_active: boolean
+          is_primary: boolean
+          location_latitude: number | null
+          location_longitude: number | null
+          location_name: string | null
+          opening_hours: string | null
+          phone: string | null
+          street_address: string
+          updated_at: string
+        }
+        Insert: {
+          city: string
+          created_at?: string
+          dealer_id: string
+          id?: string
+          is_active?: boolean
+          is_primary?: boolean
+          location_latitude?: number | null
+          location_longitude?: number | null
+          location_name?: string | null
+          opening_hours?: string | null
+          phone?: string | null
+          street_address: string
+          updated_at?: string
+        }
+        Update: {
+          city?: string
+          created_at?: string
+          dealer_id?: string
+          id?: string
+          is_active?: boolean
+          is_primary?: boolean
+          location_latitude?: number | null
+          location_longitude?: number | null
+          location_name?: string | null
+          opening_hours?: string | null
+          phone?: string | null
+          street_address?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "dealer_locations_dealer_id_fkey"
+            columns: ["dealer_id"]
+            isOneToOne: false
+            referencedRelation: "dealer_trust_stats"
+            referencedColumns: ["dealer_id"]
+          },
+          {
+            foreignKeyName: "dealer_locations_dealer_id_fkey"
+            columns: ["dealer_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "dealer_locations_dealer_id_fkey"
+            columns: ["dealer_id"]
+            isOneToOne: false
+            referencedRelation: "public_dealer_profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       email_logs: {
         Row: {
           created_at: string

@@ -27,6 +27,7 @@ import BuyerDashboard from "./pages/BuyerDashboard";
 import Marketplace from "./pages/Marketplace";
 import VehicleDetail from "./pages/VehicleDetail";
 import NotFound from "./pages/NotFound";
+import Stores from "./pages/Stores";
 import MarketplacePage from "./pages/products/MarketplacePage";
 import EscrowPage from "./pages/products/EscrowPage";
 import AIIntelligencePage from "./pages/products/AIIntelligencePage";
@@ -43,6 +44,7 @@ const App = () => (
         <Routes>
           <Route path="/" element={<Index />} />
           <Route path="/marketplace" element={<Marketplace />} />
+          <Route path="/stores" element={<Stores />} />
           <Route path="/vehicles/:id" element={<VehicleDetail />} />
           <Route path="/waitlist" element={<Waitlist />} />
           <Route path="/auth" element={<Auth />} />
