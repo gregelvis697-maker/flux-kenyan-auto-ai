@@ -3,6 +3,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
 import { DealerLocationMap } from '@/components/maps/DealerLocationMap';
+import type { DealerMapLocation } from '@/services/dealerLocations';
 
 interface DealerProfile {
   full_name: string | null;
@@ -19,9 +20,10 @@ interface DealerProfile {
 
 interface VehicleDealerInfoProps {
   dealer: DealerProfile | null;
+  dealerLocations?: DealerMapLocation[];
 }
 
-export function VehicleDealerInfo({ dealer }: VehicleDealerInfoProps) {
+export function VehicleDealerInfo({ dealer, dealerLocations }: VehicleDealerInfoProps) {
   if (!dealer) {
     return (
       <Card className="bg-card/60 border-border/50">
@@ -100,6 +102,7 @@ export function VehicleDealerInfo({ dealer }: VehicleDealerInfoProps) {
               longitude={dealer.location_longitude ?? null}
               address={dealer.street_address || dealer.address}
               city={dealer.city}
+              dealerLocations={dealerLocations}
             />
 
             {displayAddress && (
