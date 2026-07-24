@@ -262,7 +262,7 @@ export default function VehicleDetail() {
 
               {/* Mobile-only: Dealer Info */}
               <div className="lg:hidden">
-                <VehicleDealerInfo dealer={dealer} />
+                <VehicleDealerInfo dealer={dealer} dealerLocations={dealerLocations} />
               </div>
 
               <VehicleQuickSpecs
@@ -283,7 +283,7 @@ export default function VehicleDetail() {
             <div className="hidden lg:block lg:col-span-2">
               <div className="sticky top-24 space-y-6">
                 <VehicleContactCard vehicle={vehicle} dealerWhatsapp={dealer?.whatsapp_number || null} />
-                <VehicleDealerInfo dealer={dealer} />
+                <VehicleDealerInfo dealer={dealer} dealerLocations={dealerLocations} />
               </div>
             </div>
           </div>
