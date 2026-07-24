@@ -16,6 +16,7 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { ArrowLeft, Car, MessageCircle, ArrowRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { isCallForPrice, getAvailability } from '@/lib/vehicle-display';
+import { getDealerAllLocations, type DealerMapLocation } from '@/services/dealerLocations';
 
 interface VehicleData {
   id: string;
@@ -64,6 +65,7 @@ export default function VehicleDetail() {
   const { user } = useAuth();
   const [vehicle, setVehicle] = useState<VehicleData | null>(null);
   const [dealer, setDealer] = useState<DealerData | null>(null);
+  const [dealerLocations, setDealerLocations] = useState<DealerMapLocation[]>([]);
   const [loading, setLoading] = useState(true);
   const [notFound, setNotFound] = useState(false);
   const [requestModalOpen, setRequestModalOpen] = useState(false);
@@ -98,6 +100,15 @@ export default function VehicleDetail() {
         .maybeSingle();
 
       setDealer(dealerData);
+
+      // Load all map locations (primary + branches)
+      try {
+        const locs = await getDealerAllLocations(data.dealer_id, dealerData ?? undefined);
+        setDealerLocations(locs);
+      } catch (err) {
+        console.error('Load dealer locations error:', err);
+        setDealerLocations([]);
+      }
     } catch {
       setNotFound(true);
     } finally {
