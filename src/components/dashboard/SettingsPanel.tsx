@@ -9,6 +9,7 @@ import { useToast } from '@/hooks/use-toast';
 import { Loader2, Save, User, Phone, Mail, Shield, MapPin } from 'lucide-react';
 import { GeocodingService } from '@/services/geocodingService';
 import { DealerLocationMap } from '@/components/maps/DealerLocationMap';
+import { DealerLocationsCard } from '@/components/dashboard/DealerLocationsCard';
 
 interface ProfileData {
   full_name: string | null;
@@ -324,6 +325,8 @@ export function SettingsPanel() {
           </CardContent>
         </Card>
       )}
+
+      {isDealer && user && <DealerLocationsCard userId={user.id} />}
     </div>
   );
 }
