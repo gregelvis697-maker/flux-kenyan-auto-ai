@@ -13,7 +13,15 @@ export default {
       },
     },
     extend: {
+      fontFamily: {
+        display: ['Urbanist', 'system-ui', 'sans-serif'],
+        sans: ['Epilogue', 'system-ui', 'sans-serif'],
+      },
       colors: {
+        chrome: "#e5e5e5",
+        cyan: {
+          DEFAULT: "#00d4ff",
+        },
         border: "hsl(var(--border))",
         input: "hsl(var(--input))",
         ring: "hsl(var(--ring))",
