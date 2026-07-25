@@ -1,98 +1,93 @@
 import { motion } from "framer-motion";
-import { Button } from "@/components/ui/button";
-import { ArrowRight, Sparkles, Car } from "lucide-react";
-import heroImage from "@/assets/hero-automotive-ai.jpg";
+import { useNavigate } from "react-router-dom";
 
 export const Hero = () => {
-  return (
-    <section className="relative min-h-screen flex items-center justify-center overflow-hidden pt-14 sm:pt-16">
-      {/* Animated background */}
-      <div className="absolute inset-0 bg-gradient-hero">
-        <div
-          className="absolute inset-0 opacity-30"
-          style={{
-            backgroundImage: `url(${heroImage})`,
-            backgroundSize: "cover",
-            backgroundPosition: "center",
-            filter: "brightness(0.4) blur(2px)",
-          }}
-        />
-        {/* Glowing orbs */}
-        <div className="absolute top-1/4 left-1/4 w-48 sm:w-72 lg:w-96 h-48 sm:h-72 lg:h-96 bg-primary/20 rounded-full blur-[60px] sm:blur-[80px] lg:blur-[100px] animate-glow-pulse" />
-        <div
-          className="absolute bottom-1/4 right-1/4 w-48 sm:w-72 lg:w-96 h-48 sm:h-72 lg:h-96 bg-secondary/20 rounded-full blur-[60px] sm:blur-[80px] lg:blur-[100px] animate-glow-pulse"
-          style={{ animationDelay: "1.5s" }}
-        />
-      </div>
+  const navigate = useNavigate();
 
-      {/* Content */}
-      <div className="relative z-10 container mx-auto px-4 sm:px-6 py-12 sm:py-16 lg:py-20">
-        <motion.div
-          className="max-w-4xl mx-auto text-center"
+  return (
+    <section className="relative bg-background text-foreground pt-28 md:pt-36 pb-20 md:pb-28 overflow-hidden">
+      {/* Ambient chrome spotlight */}
+      <div
+        aria-hidden
+        className="pointer-events-none absolute inset-0 opacity-60"
+        style={{
+          background:
+            "radial-gradient(ellipse 60% 50% at 50% 0%, rgba(0,212,255,0.08), transparent 60%), radial-gradient(ellipse 80% 60% at 50% 100%, rgba(229,229,229,0.04), transparent 70%)",
+        }}
+      />
+
+      <div className="relative max-w-7xl mx-auto px-6 sm:px-10">
+        {/* Editorial rail */}
+        <div className="flex items-center gap-4 mb-8">
+          <div className="h-px flex-1 bg-border" />
+          <span className="text-[#00d4ff] text-[10px] sm:text-xs tracking-editorial font-bold uppercase">
+            Est. 2024 · Nairobi · Kenya
+          </span>
+        </div>
+
+        <motion.h1
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.4 }}
+          transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
+          className="font-display font-black uppercase leading-[0.85] tracking-tighter"
+          style={{ fontSize: "clamp(3rem, 10vw, 8.5rem)" }}
         >
-          {/* Badge */}
+          Drive Into
+          <br />
+          The <span className="text-stroke">Future</span>
+        </motion.h1>
 
-          {/* Main headline */}
-          <motion.h1
-            className="text-3xl sm:text-4xl md:text-5xl lg:text-7xl font-bold mb-4 sm:mb-6 leading-tight"
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.2, duration: 0.4 }}
-          >
-            <span className="text-foreground">Drive Into</span>
-            <br />
-            <span className="bg-gradient-primary bg-clip-text text-transparent">
-              The Future
-            </span>
-          </motion.h1>
-
-          {/* Subtext */}
+        <div className="mt-12 md:mt-16 flex flex-col md:flex-row md:items-end justify-between gap-8">
           <motion.p
-            className="text-base sm:text-lg md:text-xl lg:text-2xl text-muted-foreground mb-8 sm:mb-10 lg:mb-12 max-w-3xl mx-auto leading-relaxed px-2"
-            initial={{ opacity: 0, y: 20 }}
+            initial={{ opacity: 0, y: 12 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.3, duration: 0.4 }}
+            transition={{ delay: 0.15, duration: 0.5 }}
+            className="max-w-md text-base sm:text-lg text-muted-foreground font-light leading-relaxed"
           >
-            Revolutionary automotive marketplace powered by AI. Connect verified
-            dealers, importers, and buyers in Kenya's most trusted vehicle
-            platform.
+            Kenya's premier AI-powered automotive marketplace. High-performance
+            matching for high-performance drivers.
           </motion.p>
 
-          {/* CTA Buttons */}
           <motion.div
-            className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center px-4 sm:px-0"
-            initial={{ opacity: 0, y: 20 }}
+            initial={{ opacity: 0, y: 12 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.4, duration: 0.4 }}
+            transition={{ delay: 0.25, duration: 0.5 }}
+            className="flex flex-wrap gap-3"
           >
-            <Button
-              size="lg"
-              className="text-base sm:text-lg px-6 sm:px-8 py-5 sm:py-6 bg-gradient-primary hover:shadow-glow-primary transition-all duration-300 group w-full sm:w-auto"
-              asChild
+            <button
+              onClick={() => navigate("/marketplace")}
+              className="px-7 sm:px-8 py-4 bg-chrome text-background font-bold uppercase tracking-widest text-xs hover:bg-[#00d4ff] transition-colors"
             >
-              <a href="/marketplace">
-                <Car className="mr-2 w-4 h-4 sm:w-5 sm:h-5" />
-                Browse Marketplace
-                <ArrowRight className="ml-2 w-4 h-4 sm:w-5 sm:h-5 group-hover:translate-x-1 transition-transform" />
-              </a>
-            </Button>
-            <Button
-              size="lg"
-              variant="outline"
-              className="text-base sm:text-lg px-6 sm:px-8 py-5 sm:py-6 border-primary/30 hover:border-primary hover:bg-primary/10 transition-all duration-300 w-full sm:w-auto"
-              asChild
+              Browse Cars
+            </button>
+            <button
+              onClick={() => navigate("/auth")}
+              className="px-7 sm:px-8 py-4 border border-border text-foreground font-bold uppercase tracking-widest text-xs hover:border-chrome transition-colors"
             >
-              <a href="/auth">List Your Cars</a>
-            </Button>
+              Sell Vehicle
+            </button>
           </motion.div>
-        </motion.div>
-      </div>
+        </div>
 
-      {/* Bottom gradient fade */}
-      <div className="absolute bottom-0 left-0 right-0 h-20 sm:h-32 bg-gradient-to-t from-background to-transparent" />
+        {/* Meta stat rail */}
+        <div className="mt-16 md:mt-20 grid grid-cols-2 md:grid-cols-4 gap-px bg-border border border-border">
+          {[
+            { k: "Verified Dealers", v: "240+" },
+            { k: "Live Inventory", v: "1,200+" },
+            { k: "Cities Covered", v: "12" },
+            { k: "AI Trust Signals", v: "Real-time" },
+          ].map((s) => (
+            <div key={s.k} className="bg-background p-5 md:p-6">
+              <div className="text-[10px] tracking-editorial uppercase text-muted-foreground">
+                {s.k}
+              </div>
+              <div className="mt-2 font-display text-xl md:text-2xl font-black">
+                {s.v}
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
     </section>
   );
 };

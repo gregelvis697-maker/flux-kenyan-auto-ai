@@ -69,8 +69,8 @@ export const Navigation = ({ children }: { children?: React.ReactNode }) => {
           {/* Logo */}
           <Link to="/" className="flex items-center space-x-2 group" onClick={() => setMobileMenuOpen(false)}>
             <motion.div
-              className="text-xl sm:text-2xl font-bold bg-gradient-primary bg-clip-text text-transparent"
-              whileHover={{ scale: 1.05 }}
+              className="font-display text-xl sm:text-2xl font-black uppercase tracking-tight text-chrome"
+              whileHover={{ scale: 1.03 }}
               transition={{ type: "spring", stiffness: 300 }}
             >
               Flux
