@@ -4,7 +4,7 @@ import { Building2, Handshake } from "lucide-react";
 
 const dealerDetails = [
   { label: "Premium Profiles", value: "Verified Badge" },
-  { label: "Monthly Plans", value: "From KES 2,500" },
+  { label: "Monthly Plans", value: "From KES 32,000" },
   { label: "AI Insights", value: "Included" },
   { label: "Support", value: "24/7 Priority" },
 ];
