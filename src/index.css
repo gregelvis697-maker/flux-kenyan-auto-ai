@@ -2,57 +2,58 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Definition of the design system. All colors, gradients, fonts, etc should be defined here. 
-All colors MUST be HSL.
-*/
+/* Flux — Noir & Chrome design system.
+   Near-black surfaces, chrome/silver text, one cyan accent.
+   All colors HSL. */
 
 @layer base {
   :root {
-    /* Deep space blue theme - Flux automotive */
-    --background: 220 70% 8%;
-    --foreground: 0 0% 98%;
+    /* Surfaces */
+    --background: 0 0% 4%;          /* #0a0a0a */
+    --foreground: 0 0% 90%;         /* #e5e5e5 */
 
-    --card: 220 60% 12%;
-    --card-foreground: 0 0% 98%;
+    --card: 0 0% 7%;                /* #121212 */
+    --card-foreground: 0 0% 90%;
 
-    --popover: 220 65% 10%;
-    --popover-foreground: 0 0% 98%;
+    --popover: 0 0% 6%;
+    --popover-foreground: 0 0% 90%;
 
-    /* Electric cyan primary */
-    --primary: 190 100% 50%;
-    --primary-foreground: 220 70% 8%;
+    /* Chrome / silver as primary surface accent */
+    --primary: 0 0% 90%;            /* chrome #e5e5e5 */
+    --primary-foreground: 0 0% 4%;
 
-    /* Neon blue accent */
-    --secondary: 210 100% 55%;
-    --secondary-foreground: 0 0% 98%;
+    /* Cyan reserved for data / interaction */
+    --secondary: 190 100% 50%;      /* #00d4ff */
+    --secondary-foreground: 0 0% 4%;
 
-    --muted: 220 30% 20%;
-    --muted-foreground: 220 15% 65%;
+    --muted: 0 0% 10%;              /* #1a1a1a */
+    --muted-foreground: 0 0% 55%;   /* zinc-500 */
 
-    --accent: 190 100% 50%;
-    --accent-foreground: 220 70% 8%;
+    --accent: 190 100% 50%;         /* cyan accent */
+    --accent-foreground: 0 0% 4%;
 
-    --destructive: 0 84% 60%;
+    --destructive: 0 84% 55%;
     --destructive-foreground: 0 0% 98%;
 
-    --border: 220 40% 18%;
-    --input: 220 40% 18%;
+    --border: 0 0% 12%;             /* zinc-900 hairline */
+    --input: 0 0% 12%;
     --ring: 190 100% 50%;
 
-    --radius: 0.75rem;
+    --radius: 0.25rem;              /* editorial: minimal rounding */
 
-    /* Custom gradients for Flux */
-    --gradient-hero: linear-gradient(135deg, hsl(220, 70%, 8%) 0%, hsl(220, 80%, 5%) 50%, hsl(220, 70%, 8%) 100%);
-    --gradient-card: linear-gradient(180deg, hsl(220, 60%, 12%) 0%, hsl(220, 50%, 10%) 100%);
-    --gradient-primary: linear-gradient(135deg, hsl(190, 100%, 50%) 0%, hsl(210, 100%, 55%) 100%);
-    
+    /* Editorial gradients (kept for backwards compat with legacy components) */
+    --gradient-hero: linear-gradient(180deg, hsl(0 0% 4%) 0%, hsl(0 0% 6%) 100%);
+    --gradient-card: linear-gradient(180deg, hsl(0 0% 7%) 0%, hsl(0 0% 5%) 100%);
+    --gradient-primary: linear-gradient(90deg, hsl(0 0% 95%) 0%, hsl(0 0% 75%) 100%);
+    --gradient-chrome: linear-gradient(180deg, #ffffff 0%, #e5e5e5 50%, #7a7a7a 100%);
+
     /* Glow effects */
-    --glow-primary: 0 0 40px hsl(190, 100%, 50%, 0.3);
-    --glow-secondary: 0 0 30px hsl(210, 100%, 55%, 0.25);
-    
+    --glow-primary: 0 0 40px hsl(190 100% 50% / 0.18);
+    --glow-secondary: 0 0 30px hsl(190 100% 50% / 0.15);
+
     /* Shadows */
-    --shadow-elevated: 0 10px 40px -10px hsl(190, 100%, 50%, 0.2);
-    --shadow-card: 0 4px 20px hsl(220, 80%, 5%, 0.4);
+    --shadow-elevated: 0 20px 60px -20px hsl(0 0% 0% / 0.8);
+    --shadow-card: 0 4px 20px hsl(0 0% 0% / 0.5);
   }
 }
 
@@ -63,5 +64,29 @@ All colors MUST be HSL.
 
   body {
     @apply bg-background text-foreground;
+    font-family: 'Epilogue', system-ui, sans-serif;
+    font-feature-settings: 'ss01', 'cv11';
+    -webkit-font-smoothing: antialiased;
   }
+
+  h1, h2, h3, h4, h5, h6, .font-display {
+    font-family: 'Urbanist', system-ui, sans-serif;
+    letter-spacing: -0.02em;
+  }
+}
+
+@layer utilities {
+  .text-chrome {
+    background: linear-gradient(180deg, #ffffff 0%, #e5e5e5 45%, #6b6b6b 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+  .text-stroke {
+    color: transparent;
+    -webkit-text-stroke: 1.5px hsl(0 0% 90%);
+  }
+  .hairline-t { border-top: 1px solid hsl(var(--border)); }
+  .hairline-b { border-bottom: 1px solid hsl(var(--border)); }
+  .tracking-editorial { letter-spacing: 0.3em; }
 }
