@@ -37,6 +37,7 @@ import DealerToolsPage from "./pages/products/DealerToolsPage";
 
 const App = () => (
   <QueryClientProvider client={queryClient}>
+  <ThemeProvider>
   <TooltipProvider>
     <Toaster />
     <Sonner />
