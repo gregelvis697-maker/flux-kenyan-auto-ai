@@ -2,8 +2,7 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Flux — Noir & Chrome design system.
-   Near-black surfaces, chrome/silver text, one cyan accent.
+/* Flux — Noir & Chrome design system (dark) + Paper & Ember (light).
    All colors HSL. */
 
 @layer base {
@@ -22,38 +21,89 @@
     --primary: 0 0% 90%;            /* chrome #e5e5e5 */
     --primary-foreground: 0 0% 4%;
 
+    --chrome: 0 0% 90%;
+
+    /* Brand highlight — neon cyan in dark */
+    --brand: 190 100% 50%;          /* #00d4ff */
+    --brand-foreground: 0 0% 4%;
+
     /* Cyan reserved for data / interaction */
-    --secondary: 190 100% 50%;      /* #00d4ff */
+    --secondary: 190 100% 50%;
     --secondary-foreground: 0 0% 4%;
 
     --muted: 0 0% 10%;              /* #1a1a1a */
-    --muted-foreground: 0 0% 55%;   /* zinc-500 */
+    --muted-foreground: 0 0% 55%;
 
-    --accent: 190 100% 50%;         /* cyan accent */
+    --accent: 190 100% 50%;
     --accent-foreground: 0 0% 4%;
 
     --destructive: 0 84% 55%;
     --destructive-foreground: 0 0% 98%;
 
-    --border: 0 0% 12%;             /* zinc-900 hairline */
+    --border: 0 0% 12%;
     --input: 0 0% 12%;
     --ring: 190 100% 50%;
 
-    --radius: 0.25rem;              /* editorial: minimal rounding */
+    --radius: 0.25rem;
 
-    /* Editorial gradients (kept for backwards compat with legacy components) */
     --gradient-hero: linear-gradient(180deg, hsl(0 0% 4%) 0%, hsl(0 0% 6%) 100%);
     --gradient-card: linear-gradient(180deg, hsl(0 0% 7%) 0%, hsl(0 0% 5%) 100%);
     --gradient-primary: linear-gradient(90deg, hsl(0 0% 95%) 0%, hsl(0 0% 75%) 100%);
     --gradient-chrome: linear-gradient(180deg, #ffffff 0%, #e5e5e5 50%, #7a7a7a 100%);
+    --gradient-text-chrome: linear-gradient(180deg, #ffffff 0%, #e5e5e5 45%, #6b6b6b 100%);
 
-    /* Glow effects */
-    --glow-primary: 0 0 40px hsl(190 100% 50% / 0.18);
-    --glow-secondary: 0 0 30px hsl(190 100% 50% / 0.15);
+    --glow-primary: 0 0 40px hsl(var(--brand) / 0.18);
+    --glow-secondary: 0 0 30px hsl(var(--brand) / 0.15);
 
-    /* Shadows */
     --shadow-elevated: 0 20px 60px -20px hsl(0 0% 0% / 0.8);
     --shadow-card: 0 4px 20px hsl(0 0% 0% / 0.5);
+  }
+
+  /* Light theme — Paper & Ember */
+  .light {
+    --background: 40 25% 97%;       /* warm paper */
+    --foreground: 0 0% 8%;
+
+    --card: 0 0% 100%;
+    --card-foreground: 0 0% 8%;
+
+    --popover: 0 0% 100%;
+    --popover-foreground: 0 0% 8%;
+
+    --primary: 0 0% 10%;
+    --primary-foreground: 40 25% 97%;
+
+    --chrome: 0 0% 12%;
+
+    --brand: 14 82% 52%;            /* ember orange */
+    --brand-foreground: 0 0% 100%;
+
+    --secondary: 14 82% 52%;
+    --secondary-foreground: 0 0% 100%;
+
+    --muted: 40 15% 92%;
+    --muted-foreground: 30 6% 40%;
+
+    --accent: 14 82% 52%;
+    --accent-foreground: 0 0% 100%;
+
+    --destructive: 0 72% 48%;
+    --destructive-foreground: 0 0% 100%;
+
+    --border: 36 14% 86%;
+    --input: 36 14% 86%;
+    --ring: 14 82% 52%;
+
+    --gradient-hero: linear-gradient(180deg, hsl(40 25% 98%) 0%, hsl(40 20% 94%) 100%);
+    --gradient-card: linear-gradient(180deg, hsl(0 0% 100%) 0%, hsl(40 20% 96%) 100%);
+    --gradient-primary: linear-gradient(90deg, hsl(0 0% 12%) 0%, hsl(0 0% 30%) 100%);
+    --gradient-text-chrome: linear-gradient(180deg, #2b2b2b 0%, #111111 60%, #444444 100%);
+
+    --glow-primary: 0 0 40px hsl(var(--brand) / 0.22);
+    --glow-secondary: 0 0 30px hsl(var(--brand) / 0.18);
+
+    --shadow-elevated: 0 20px 50px -20px hsl(30 20% 30% / 0.25);
+    --shadow-card: 0 4px 20px hsl(30 20% 30% / 0.12);
   }
 }
 
@@ -62,31 +112,42 @@
     @apply border-border;
   }
 
+  html {
+    scroll-behavior: smooth;
+  }
+
   body {
     @apply bg-background text-foreground;
     font-family: 'Epilogue', system-ui, sans-serif;
     font-feature-settings: 'ss01', 'cv11';
     -webkit-font-smoothing: antialiased;
+    transition: background-color 0.4s ease, color 0.4s ease;
   }
 
   h1, h2, h3, h4, h5, h6, .font-display {
     font-family: 'Urbanist', system-ui, sans-serif;
     letter-spacing: -0.02em;
   }
+
+  @media (prefers-reduced-motion: reduce) {
+    html { scroll-behavior: auto; }
+  }
 }
 
 @layer utilities {
   .text-chrome {
-    background: linear-gradient(180deg, #ffffff 0%, #e5e5e5 45%, #6b6b6b 100%);
+    background: var(--gradient-text-chrome);
     -webkit-background-clip: text;
     background-clip: text;
     color: transparent;
   }
   .text-stroke {
     color: transparent;
-    -webkit-text-stroke: 1.5px hsl(0 0% 90%);
+    -webkit-text-stroke: 1.5px hsl(var(--foreground));
   }
   .hairline-t { border-top: 1px solid hsl(var(--border)); }
   .hairline-b { border-bottom: 1px solid hsl(var(--border)); }
   .tracking-editorial { letter-spacing: 0.3em; }
+  .no-scrollbar::-webkit-scrollbar { display: none; }
+  .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
 }
