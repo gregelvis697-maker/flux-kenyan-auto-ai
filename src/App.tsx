@@ -14,6 +14,7 @@ const queryClient = new QueryClient({
   },
 });
 import { AuthProvider } from "@/contexts/AuthContext";
+import { ThemeProvider } from "@/contexts/ThemeContext";
 import { ProtectedRoute } from "@/components/ProtectedRoute";
 import Index from "./pages/Index";
 import Waitlist from "./pages/Waitlist";
