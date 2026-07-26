@@ -224,9 +224,11 @@ export const Navigation = ({ children }: { children?: React.ReactNode }) => {
             aria-label="Toggle menu"
           >
             {mobileMenuOpen ? <X className="h-5 w-5 sm:h-6 sm:w-6 text-foreground" /> : <Menu className="h-5 w-5 sm:h-6 sm:w-6 text-foreground" />}
-          </motion.button>
+            </motion.button>
+          </div>
         </div>
       </div>
+
 
       {/* Mobile Menu Overlay */}
       <AnimatePresence>
