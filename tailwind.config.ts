@@ -18,7 +18,11 @@ export default {
         sans: ['Epilogue', 'system-ui', 'sans-serif'],
       },
       colors: {
-        chrome: "#e5e5e5",
+        chrome: "hsl(var(--chrome))",
+        brand: {
+          DEFAULT: "hsl(var(--brand))",
+          foreground: "hsl(var(--brand-foreground))",
+        },
         cyan: {
           DEFAULT: "#00d4ff",
         },

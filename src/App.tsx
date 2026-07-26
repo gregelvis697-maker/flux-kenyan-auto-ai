@@ -14,6 +14,7 @@ const queryClient = new QueryClient({
   },
 });
 import { AuthProvider } from "@/contexts/AuthContext";
+import { ThemeProvider } from "@/contexts/ThemeContext";
 import { ProtectedRoute } from "@/components/ProtectedRoute";
 import Index from "./pages/Index";
 import Waitlist from "./pages/Waitlist";
@@ -36,6 +37,7 @@ import DealerToolsPage from "./pages/products/DealerToolsPage";
 
 const App = () => (
   <QueryClientProvider client={queryClient}>
+  <ThemeProvider>
   <TooltipProvider>
     <Toaster />
     <Sonner />
@@ -100,6 +102,7 @@ const App = () => (
       </AuthProvider>
     </BrowserRouter>
   </TooltipProvider>
+  </ThemeProvider>
   </QueryClientProvider>
 );
 
