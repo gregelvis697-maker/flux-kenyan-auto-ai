@@ -7,6 +7,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { ProfileDropdown } from "@/components/navbar/ProfileDropdown";
 import { NotificationBell } from "@/components/navbar/NotificationBell";
 import { productMenuItems } from "@/components/products/productData";
+import { ThemeToggle } from "@/components/ThemeToggle";
 
 export const Navigation = ({ children }: { children?: React.ReactNode }) => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
