@@ -183,6 +183,7 @@ export const Navigation = ({ children }: { children?: React.ReactNode }) => {
 
           {/* Desktop Auth Actions */}
           <div className="hidden md:flex items-center space-x-2 lg:space-x-3">
+            <ThemeToggle />
             {/* WhatsApp / Quick contact CTA — hidden on dashboard/auth routes */}
             {!location.pathname.startsWith("/dashboard") && !location.pathname.startsWith("/auth") && (
               <a
@@ -214,7 +215,9 @@ export const Navigation = ({ children }: { children?: React.ReactNode }) => {
           </div>
 
           {/* Mobile Menu Button */}
-          <motion.button
+          <div className="md:hidden flex items-center gap-1">
+            <ThemeToggle />
+            <motion.button
             whileTap={{ scale: 0.95 }}
             className="md:hidden p-2.5 rounded-xl hover:bg-accent/50 transition-colors active:bg-accent/70"
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
