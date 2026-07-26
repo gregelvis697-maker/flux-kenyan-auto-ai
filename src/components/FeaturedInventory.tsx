@@ -157,7 +157,7 @@ export const FeaturedInventory = () => {
         <div
           ref={scrollerRef}
           onScroll={updateArrows}
-          className="no-scrollbar flex gap-5 md:gap-7 overflow-x-auto snap-x snap-mandatory -mx-6 px-6 sm:-mx-10 sm:px-10 pb-2"
+          className="no-scrollbar flex gap-5 md:gap-7 overflow-x-auto snap-x snap-mandatory pb-2"
         >
           {vehicles.map((v, i) => (
             <motion.article
