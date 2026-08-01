@@ -22,6 +22,9 @@ import Auth from "./pages/Auth";
 import Dashboard from "./pages/Dashboard";
 import PendingApproval from "./pages/PendingApproval";
 import AdminDashboard from "./pages/AdminDashboard";
+import AdminLogin from "./pages/AdminLogin";
+import { AdminHotkey } from "@/components/AdminHotkey";
+
 import DealerDashboard from "./pages/DealerDashboard";
 import ImporterDashboard from "./pages/ImporterDashboard";
 import BuyerDashboard from "./pages/BuyerDashboard";
