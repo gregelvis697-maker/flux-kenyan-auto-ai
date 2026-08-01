@@ -22,6 +22,9 @@ import Auth from "./pages/Auth";
 import Dashboard from "./pages/Dashboard";
 import PendingApproval from "./pages/PendingApproval";
 import AdminDashboard from "./pages/AdminDashboard";
+import AdminLogin from "./pages/AdminLogin";
+import { AdminHotkey } from "@/components/AdminHotkey";
+
 import DealerDashboard from "./pages/DealerDashboard";
 import ImporterDashboard from "./pages/ImporterDashboard";
 import BuyerDashboard from "./pages/BuyerDashboard";
@@ -43,7 +46,9 @@ const App = () => (
     <Sonner />
     <BrowserRouter>
       <AuthProvider>
+        <AdminHotkey />
         <Routes>
+
           <Route path="/" element={<Index />} />
           <Route path="/marketplace" element={<Marketplace />} />
           <Route path="/stores" element={<Stores />} />
@@ -83,7 +88,9 @@ const App = () => (
               </ProtectedRoute>
             }
           />
+          <Route path="/admin/login" element={<AdminLogin />} />
           <Route
+
             path="/admin/dashboard"
             element={
               <ProtectedRoute allowedRoles={['admin']}>

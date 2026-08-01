@@ -142,14 +142,8 @@ export const Footer = () => {
         <div className="pt-6 sm:pt-8 border-t border-border flex flex-col sm:flex-row items-center justify-between gap-4">
           <div className="flex items-center gap-3 text-xs sm:text-sm text-muted-foreground">
             <span>© {currentYear} FLUX Automotive. All rights reserved.</span>
-            <span className="hidden sm:inline">|</span>
-            <Link
-              to="/admin/dashboard"
-              className="text-primary hover:text-primary/80 transition-colors"
-            >
-              Admin Portal
-            </Link>
           </div>
+
 
           {/* Social Icons */}
           <div className="flex gap-2 sm:gap-3">
