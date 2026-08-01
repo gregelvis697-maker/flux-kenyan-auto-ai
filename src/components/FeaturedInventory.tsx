@@ -84,7 +84,7 @@ export const FeaturedInventory = () => {
           .select(
             "id, make, model, year, price, mileage, fuel_type, photos, verification_status"
           )
-          .eq("verification_status", "verified")
+          .eq("is_sold", false)
           .order("created_at", { ascending: false })
           .limit(10);
         if (mounted && data && data.length > 0) {
