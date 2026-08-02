@@ -244,7 +244,10 @@ export function SettingsPanel() {
         </CardContent>
       </Card>
 
+      {isDealer && user && <DealerSettingsContact userId={user.id} />}
+
       {isDealer && (
+
         <Card className="bg-card/60 backdrop-blur-lg border-border/50">
           <CardHeader>
             <CardTitle className="flex items-center gap-2 text-lg">
