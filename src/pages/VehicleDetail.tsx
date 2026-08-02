@@ -201,6 +201,17 @@ export default function VehicleDetail() {
 
   const vehicleAlt = `${vehicle.year} ${vehicle.make} ${vehicle.model}`;
   const isSold = getAvailability(vehicle) === 'sold';
+  const dealerContact = dealer
+    ? {
+        whatsappNumber: dealer.whatsapp_number,
+        phoneNumber: dealer.phone_number,
+        emailPublic: dealer.email_public,
+        showWhatsapp: dealer.show_whatsapp,
+        showPhone: dealer.show_phone,
+        showEmail: dealer.show_email,
+      }
+    : null;
+
 
   return (
     <div className="min-h-screen bg-background">
