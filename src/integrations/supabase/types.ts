@@ -383,6 +383,7 @@ export type Database = {
           city: string | null
           created_at: string
           email: string
+          email_public: string | null
           full_name: string | null
           google_maps_link: string | null
           id: string
@@ -393,8 +394,12 @@ export type Database = {
           monthly_listing_limit: number
           paystack_authorization_code: string | null
           paystack_customer_code: string | null
+          phone_number: string | null
           rating: number | null
           review_count: number | null
+          show_email: boolean
+          show_phone: boolean
+          show_whatsapp: boolean
           street_address: string | null
           subscription_auto_renew: boolean
           subscription_expires_at: string | null
@@ -409,6 +414,7 @@ export type Database = {
           city?: string | null
           created_at?: string
           email: string
+          email_public?: string | null
           full_name?: string | null
           google_maps_link?: string | null
           id: string
@@ -419,8 +425,12 @@ export type Database = {
           monthly_listing_limit?: number
           paystack_authorization_code?: string | null
           paystack_customer_code?: string | null
+          phone_number?: string | null
           rating?: number | null
           review_count?: number | null
+          show_email?: boolean
+          show_phone?: boolean
+          show_whatsapp?: boolean
           street_address?: string | null
           subscription_auto_renew?: boolean
           subscription_expires_at?: string | null
@@ -435,6 +445,7 @@ export type Database = {
           city?: string | null
           created_at?: string
           email?: string
+          email_public?: string | null
           full_name?: string | null
           google_maps_link?: string | null
           id?: string
@@ -445,8 +456,12 @@ export type Database = {
           monthly_listing_limit?: number
           paystack_authorization_code?: string | null
           paystack_customer_code?: string | null
+          phone_number?: string | null
           rating?: number | null
           review_count?: number | null
+          show_email?: boolean
+          show_phone?: boolean
+          show_whatsapp?: boolean
           street_address?: string | null
           subscription_auto_renew?: boolean
           subscription_expires_at?: string | null
@@ -880,41 +895,56 @@ export type Database = {
         Row: {
           address: string | null
           city: string | null
+          email_public: string | null
           full_name: string | null
           google_maps_link: string | null
           id: string | null
           location_latitude: number | null
           location_longitude: number | null
+          phone_number: string | null
           rating: number | null
           review_count: number | null
+          show_email: boolean | null
+          show_phone: boolean | null
+          show_whatsapp: boolean | null
           street_address: string | null
           whatsapp_number: string | null
         }
         Insert: {
           address?: string | null
           city?: string | null
+          email_public?: never
           full_name?: string | null
           google_maps_link?: string | null
           id?: string | null
           location_latitude?: number | null
           location_longitude?: number | null
+          phone_number?: never
           rating?: number | null
           review_count?: number | null
+          show_email?: boolean | null
+          show_phone?: boolean | null
+          show_whatsapp?: boolean | null
           street_address?: string | null
-          whatsapp_number?: string | null
+          whatsapp_number?: never
         }
         Update: {
           address?: string | null
           city?: string | null
+          email_public?: never
           full_name?: string | null
           google_maps_link?: string | null
           id?: string | null
           location_latitude?: number | null
           location_longitude?: number | null
+          phone_number?: never
           rating?: number | null
           review_count?: number | null
+          show_email?: boolean | null
+          show_phone?: boolean | null
+          show_whatsapp?: boolean | null
           street_address?: string | null
-          whatsapp_number?: string | null
+          whatsapp_number?: never
         }
         Relationships: []
       }
