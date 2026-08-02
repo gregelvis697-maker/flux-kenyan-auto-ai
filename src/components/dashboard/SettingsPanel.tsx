@@ -212,21 +212,7 @@ export function SettingsPanel() {
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="phone" className="flex items-center gap-2">
-              <Phone className="h-4 w-4 text-muted-foreground" />
-              Phone Number
-            </Label>
-            <Input
-              id="phone"
-              value={profile.phone_number || ''}
-              onChange={(e) => setProfile({ ...profile, phone_number: e.target.value })}
-              placeholder="Enter your phone number"
-              className="h-11"
-            />
-            <p className="text-xs text-muted-foreground">Phone number storage coming soon</p>
-          </div>
 
-          <div className="space-y-2">
             <Label htmlFor="email" className="flex items-center gap-2">
               <Mail className="h-4 w-4 text-muted-foreground" />
               Email Address
