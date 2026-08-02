@@ -11,6 +11,7 @@ import { MapPin, Locate, Search, Store, Loader2, ExternalLink } from 'lucide-rea
 import { DistanceUtils, type Coordinates } from '@/utils/distanceUtils';
 import { GeocodingService } from '@/services/geocodingService';
 import { StoreLocatorMap, type LocatorDealer } from '@/components/maps/StoreLocatorMap';
+import { DealerContactCard } from '@/components/contact/DealerContactCard';
 
 interface RawDealer {
   id: string;
@@ -19,6 +20,12 @@ interface RawDealer {
   city: string | null;
   location_latitude: number | null;
   location_longitude: number | null;
+  whatsapp_number: string | null;
+  phone_number: string | null;
+  email_public: string | null;
+  show_whatsapp: boolean | null;
+  show_phone: boolean | null;
+  show_email: boolean | null;
 }
 
 const QUICK_DISTANCES = [5, 10, 25, 50];
@@ -52,7 +59,7 @@ export default function Stores() {
       try {
         const { data, error } = await supabase
           .from('public_dealer_profiles')
-          .select('id, full_name, street_address, city, location_latitude, location_longitude')
+          .select('id, full_name, street_address, city, location_latitude, location_longitude, whatsapp_number, phone_number, email_public, show_whatsapp, show_phone, show_email')
           .not('location_latitude', 'is', null)
           .not('location_longitude', 'is', null);
         if (cancelled) return;
@@ -98,6 +105,12 @@ export default function Stores() {
           location_latitude: d.location_latitude!,
           location_longitude: d.location_longitude!,
           distance_km: distance,
+          whatsapp_number: d.whatsapp_number,
+          phone_number: d.phone_number,
+          email_public: d.email_public,
+          show_whatsapp: d.show_whatsapp,
+          show_phone: d.show_phone,
+          show_email: d.show_email,
         };
       })
       .filter((d) => d.distance_km <= distanceKm)
@@ -316,6 +329,18 @@ export default function Stores() {
                         View inventory
                       </Link>
                     </div>
+                    <DealerContactCard
+                      variant="compact"
+                      dealerName={d.full_name}
+                      contact={{
+                        whatsappNumber: d.whatsapp_number,
+                        phoneNumber: d.phone_number,
+                        emailPublic: d.email_public,
+                        showWhatsapp: d.show_whatsapp,
+                        showPhone: d.show_phone,
+                        showEmail: d.show_email,
+                      }}
+                    />
                   </button>
                 );
               })}
