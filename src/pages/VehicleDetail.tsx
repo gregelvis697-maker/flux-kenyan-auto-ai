@@ -16,6 +16,7 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { ArrowLeft, Car, MessageCircle, ArrowRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { isCallForPrice, getAvailability } from '@/lib/vehicle-display';
+import { DealerContactCard } from '@/components/contact/DealerContactCard';
 import { getDealerAllLocations, type DealerMapLocation } from '@/services/dealerLocations';
 
 interface VehicleData {
@@ -51,6 +52,11 @@ interface DealerData {
   address: string | null;
   google_maps_link: string | null;
   whatsapp_number: string | null;
+  phone_number: string | null;
+  email_public: string | null;
+  show_whatsapp: boolean | null;
+  show_phone: boolean | null;
+  show_email: boolean | null;
   rating: number | null;
   review_count: number | null;
   street_address: string | null;
@@ -95,7 +101,7 @@ export default function VehicleDetail() {
       // Fetch dealer public profile (safe fields only, no email/PII)
       const { data: dealerData } = await supabase
         .from('public_dealer_profiles')
-        .select('full_name, address, google_maps_link, whatsapp_number, rating, review_count, street_address, city, location_latitude, location_longitude')
+        .select('full_name, address, google_maps_link, whatsapp_number, phone_number, email_public, show_whatsapp, show_phone, show_email, rating, review_count, street_address, city, location_latitude, location_longitude')
         .eq('id', data.dealer_id)
         .maybeSingle();
 
@@ -195,6 +201,17 @@ export default function VehicleDetail() {
 
   const vehicleAlt = `${vehicle.year} ${vehicle.make} ${vehicle.model}`;
   const isSold = getAvailability(vehicle) === 'sold';
+  const dealerContact = dealer
+    ? {
+        whatsappNumber: dealer.whatsapp_number,
+        phoneNumber: dealer.phone_number,
+        emailPublic: dealer.email_public,
+        showWhatsapp: dealer.show_whatsapp,
+        showPhone: dealer.show_phone,
+        showEmail: dealer.show_email,
+      }
+    : null;
+
 
   return (
     <div className="min-h-screen bg-background">
@@ -260,9 +277,14 @@ export default function VehicleDetail() {
                 <VehicleContactCard vehicle={vehicle} dealerWhatsapp={dealer?.whatsapp_number || null} />
               </div>
 
-              {/* Mobile-only: Dealer Info */}
-              <div className="lg:hidden">
+              {/* Mobile-only: Dealer Info + contact methods */}
+              <div className="lg:hidden space-y-6">
                 <VehicleDealerInfo dealer={dealer} dealerLocations={dealerLocations} />
+                <DealerContactCard
+                  dealerName={dealer?.full_name}
+                  contact={dealerContact}
+                  vehicle={vehicle}
+                />
               </div>
 
               <VehicleQuickSpecs
@@ -284,6 +306,11 @@ export default function VehicleDetail() {
               <div className="sticky top-24 space-y-6">
                 <VehicleContactCard vehicle={vehicle} dealerWhatsapp={dealer?.whatsapp_number || null} />
                 <VehicleDealerInfo dealer={dealer} dealerLocations={dealerLocations} />
+                <DealerContactCard
+                  dealerName={dealer?.full_name}
+                  contact={dealerContact}
+                  vehicle={vehicle}
+                />
               </div>
             </div>
           </div>

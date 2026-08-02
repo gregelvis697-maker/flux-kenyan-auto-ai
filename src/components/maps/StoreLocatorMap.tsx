@@ -37,6 +37,12 @@ export interface LocatorDealer {
   location_latitude: number;
   location_longitude: number;
   distance_km: number;
+  whatsapp_number?: string | null;
+  phone_number?: string | null;
+  email_public?: string | null;
+  show_whatsapp?: boolean | null;
+  show_phone?: boolean | null;
+  show_email?: boolean | null;
 }
 
 interface StoreLocatorMapProps {

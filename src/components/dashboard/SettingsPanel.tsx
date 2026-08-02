@@ -6,10 +6,12 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { useToast } from '@/hooks/use-toast';
-import { Loader2, Save, User, Phone, Mail, Shield, MapPin } from 'lucide-react';
+import { Loader2, Save, User, Mail, Shield, MapPin } from 'lucide-react';
 import { GeocodingService } from '@/services/geocodingService';
 import { DealerLocationMap } from '@/components/maps/DealerLocationMap';
 import { DealerLocationsCard } from '@/components/dashboard/DealerLocationsCard';
+import { DealerSettingsContact } from '@/components/dealer/DealerSettingsContact';
+
 
 interface ProfileData {
   full_name: string | null;
@@ -212,21 +214,7 @@ export function SettingsPanel() {
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="phone" className="flex items-center gap-2">
-              <Phone className="h-4 w-4 text-muted-foreground" />
-              Phone Number
-            </Label>
-            <Input
-              id="phone"
-              value={profile.phone_number || ''}
-              onChange={(e) => setProfile({ ...profile, phone_number: e.target.value })}
-              placeholder="Enter your phone number"
-              className="h-11"
-            />
-            <p className="text-xs text-muted-foreground">Phone number storage coming soon</p>
-          </div>
 
-          <div className="space-y-2">
             <Label htmlFor="email" className="flex items-center gap-2">
               <Mail className="h-4 w-4 text-muted-foreground" />
               Email Address
@@ -256,7 +244,10 @@ export function SettingsPanel() {
         </CardContent>
       </Card>
 
+      {isDealer && user && <DealerSettingsContact userId={user.id} />}
+
       {isDealer && (
+
         <Card className="bg-card/60 backdrop-blur-lg border-border/50">
           <CardHeader>
             <CardTitle className="flex items-center gap-2 text-lg">
