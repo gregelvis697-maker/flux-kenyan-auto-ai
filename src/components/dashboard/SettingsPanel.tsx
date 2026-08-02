@@ -6,10 +6,12 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { useToast } from '@/hooks/use-toast';
-import { Loader2, Save, User, Phone, Mail, Shield, MapPin } from 'lucide-react';
+import { Loader2, Save, User, Mail, Shield, MapPin } from 'lucide-react';
 import { GeocodingService } from '@/services/geocodingService';
 import { DealerLocationMap } from '@/components/maps/DealerLocationMap';
 import { DealerLocationsCard } from '@/components/dashboard/DealerLocationsCard';
+import { DealerSettingsContact } from '@/components/dealer/DealerSettingsContact';
+
 
 interface ProfileData {
   full_name: string | null;
