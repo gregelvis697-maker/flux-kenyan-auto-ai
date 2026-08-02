@@ -296,10 +296,18 @@ export default function Stores() {
               {dealers.map((d) => {
                 const isSelected = selectedDealerId === d.id;
                 return (
-                  <button
+                  <div
                     key={d.id}
+                    role="button"
+                    tabIndex={0}
                     onClick={() => setSelectedDealerId(d.id)}
-                    className={`w-full text-left rounded-lg border p-3 transition-colors ${
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter' || e.key === ' ') {
+                        e.preventDefault();
+                        setSelectedDealerId(d.id);
+                      }
+                    }}
+                    className={`w-full text-left rounded-lg border p-3 transition-colors cursor-pointer ${
                       isSelected
                         ? 'border-primary bg-primary/10'
                         : 'border-border/40 bg-card/40 hover:border-primary/50'
@@ -341,7 +349,7 @@ export default function Stores() {
                         showEmail: d.show_email,
                       }}
                     />
-                  </button>
+                  </div>
                 );
               })}
             </div>
