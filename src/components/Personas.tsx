@@ -16,11 +16,6 @@ const personas = [
     title: "Importers",
     body: "End-to-end supply chain visibility from Japan and UK ports through Mombasa to the showroom floor.",
   },
-  {
-    id: "04",
-    title: "Exporters",
-    body: "High-volume logistics tools for regional distribution and verified buyers across East Africa.",
-  },
 ];
 
 export const Personas = () => {
@@ -42,7 +37,7 @@ export const Personas = () => {
           </p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-4 border-t border-border">
+        <div className="grid grid-cols-1 md:grid-cols-3 border-t border-border">
           {personas.map((p, i) => (
             <motion.div
               key={p.id}
