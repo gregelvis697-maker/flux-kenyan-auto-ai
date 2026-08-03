@@ -32,6 +32,7 @@ import Marketplace from "./pages/Marketplace";
 import VehicleDetail from "./pages/VehicleDetail";
 import NotFound from "./pages/NotFound";
 import Stores from "./pages/Stores";
+import PublicTracking from "./pages/PublicTracking";
 import MarketplacePage from "./pages/products/MarketplacePage";
 import EscrowPage from "./pages/products/EscrowPage";
 import AIIntelligencePage from "./pages/products/AIIntelligencePage";
