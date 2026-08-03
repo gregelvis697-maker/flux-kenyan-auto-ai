@@ -192,6 +192,9 @@ export default function ImporterDashboard() {
       case 'delivered':
         return <DeliveredTab />;
 
+      case 'tracking':
+        return <TrackingTab />;
+
       case 'settings':
         return <SettingsPanel />;
 
