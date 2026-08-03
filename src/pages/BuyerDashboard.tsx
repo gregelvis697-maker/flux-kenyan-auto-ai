@@ -253,6 +253,10 @@ export default function BuyerDashboard() {
               </p>
             </div>
 
+            <PurchaseTrackingList />
+
+
+
             <Card className="bg-card/60 backdrop-blur-lg border-border/50 shadow-card">
               <CardContent className="p-0">
                 {orders.length > 0 ? (
