@@ -54,7 +54,9 @@ const App = () => (
           <Route path="/marketplace" element={<Marketplace />} />
           <Route path="/stores" element={<Stores />} />
           <Route path="/vehicles/:id" element={<VehicleDetail />} />
+          <Route path="/track/:token" element={<PublicTracking />} />
           <Route path="/waitlist" element={<Waitlist />} />
+
           <Route path="/auth" element={<Auth />} />
           <Route path="/pending-approval" element={<PendingApproval />} />
           <Route
