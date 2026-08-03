@@ -18,6 +18,7 @@ import { Navigation } from '@/components/Navigation';
 import { DashboardSidebar, MenuItem } from '@/components/dashboard/DashboardSidebar';
 import { SettingsPanel } from '@/components/dashboard/SettingsPanel';
 import { SavedVehiclesTab } from '@/components/marketplace/SavedVehiclesTab';
+import { PurchaseTrackingList } from '@/components/buyer/PurchaseTrackingList';
 import { cn } from '@/lib/utils';
 
 const buyerMenuItems: MenuItem[] = [
