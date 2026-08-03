@@ -18,6 +18,7 @@ import { Navigation } from '@/components/Navigation';
 import { DashboardSidebar, MenuItem } from '@/components/dashboard/DashboardSidebar';
 import { SettingsPanel } from '@/components/dashboard/SettingsPanel';
 import { SavedVehiclesTab } from '@/components/marketplace/SavedVehiclesTab';
+import { PurchaseTrackingList } from '@/components/buyer/PurchaseTrackingList';
 import { cn } from '@/lib/utils';
 
 const buyerMenuItems: MenuItem[] = [
@@ -252,6 +253,10 @@ export default function BuyerDashboard() {
                 Track your vehicle inquiries and contact requests
               </p>
             </div>
+
+            <PurchaseTrackingList />
+
+
 
             <Card className="bg-card/60 backdrop-blur-lg border-border/50 shadow-card">
               <CardContent className="p-0">

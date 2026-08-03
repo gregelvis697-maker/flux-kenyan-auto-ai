@@ -32,6 +32,7 @@ import Marketplace from "./pages/Marketplace";
 import VehicleDetail from "./pages/VehicleDetail";
 import NotFound from "./pages/NotFound";
 import Stores from "./pages/Stores";
+import PublicTracking from "./pages/PublicTracking";
 import MarketplacePage from "./pages/products/MarketplacePage";
 import EscrowPage from "./pages/products/EscrowPage";
 import AIIntelligencePage from "./pages/products/AIIntelligencePage";
@@ -53,7 +54,9 @@ const App = () => (
           <Route path="/marketplace" element={<Marketplace />} />
           <Route path="/stores" element={<Stores />} />
           <Route path="/vehicles/:id" element={<VehicleDetail />} />
+          <Route path="/track/:token" element={<PublicTracking />} />
           <Route path="/waitlist" element={<Waitlist />} />
+
           <Route path="/auth" element={<Auth />} />
           <Route path="/pending-approval" element={<PendingApproval />} />
           <Route

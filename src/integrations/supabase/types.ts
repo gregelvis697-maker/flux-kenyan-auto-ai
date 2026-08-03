@@ -715,6 +715,134 @@ export type Database = {
           },
         ]
       }
+      vehicle_tracking: {
+        Row: {
+          actual_delivery_date: string | null
+          buyer_id: string | null
+          created_at: string
+          current_stage: string
+          delay_reason: string | null
+          estimated_delivery_date: string | null
+          id: string
+          importer_id: string
+          is_public: boolean
+          order_date: string | null
+          public_tracking_token: string | null
+          tracking_enabled: boolean
+          tracking_status: string
+          updated_at: string
+          vehicle_id: string
+        }
+        Insert: {
+          actual_delivery_date?: string | null
+          buyer_id?: string | null
+          created_at?: string
+          current_stage?: string
+          delay_reason?: string | null
+          estimated_delivery_date?: string | null
+          id?: string
+          importer_id: string
+          is_public?: boolean
+          order_date?: string | null
+          public_tracking_token?: string | null
+          tracking_enabled?: boolean
+          tracking_status?: string
+          updated_at?: string
+          vehicle_id: string
+        }
+        Update: {
+          actual_delivery_date?: string | null
+          buyer_id?: string | null
+          created_at?: string
+          current_stage?: string
+          delay_reason?: string | null
+          estimated_delivery_date?: string | null
+          id?: string
+          importer_id?: string
+          is_public?: boolean
+          order_date?: string | null
+          public_tracking_token?: string | null
+          tracking_enabled?: boolean
+          tracking_status?: string
+          updated_at?: string
+          vehicle_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "vehicle_tracking_vehicle_id_fkey"
+            columns: ["vehicle_id"]
+            isOneToOne: false
+            referencedRelation: "vehicle_risk_flags"
+            referencedColumns: ["vehicle_id"]
+          },
+          {
+            foreignKeyName: "vehicle_tracking_vehicle_id_fkey"
+            columns: ["vehicle_id"]
+            isOneToOne: false
+            referencedRelation: "vehicles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      vehicle_tracking_updates: {
+        Row: {
+          created_at: string
+          created_by: string | null
+          estimated_next_arrival: string | null
+          id: string
+          location_geocoded_at: string | null
+          location_latitude: number | null
+          location_longitude: number | null
+          location_text: string | null
+          notes: string | null
+          stage: string
+          stage_label: string | null
+          status: string
+          tracking_id: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          created_by?: string | null
+          estimated_next_arrival?: string | null
+          id?: string
+          location_geocoded_at?: string | null
+          location_latitude?: number | null
+          location_longitude?: number | null
+          location_text?: string | null
+          notes?: string | null
+          stage: string
+          stage_label?: string | null
+          status?: string
+          tracking_id: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          created_by?: string | null
+          estimated_next_arrival?: string | null
+          id?: string
+          location_geocoded_at?: string | null
+          location_latitude?: number | null
+          location_longitude?: number | null
+          location_text?: string | null
+          notes?: string | null
+          stage?: string
+          stage_label?: string | null
+          status?: string
+          tracking_id?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "vehicle_tracking_updates_tracking_id_fkey"
+            columns: ["tracking_id"]
+            isOneToOne: false
+            referencedRelation: "vehicle_tracking"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       vehicles: {
         Row: {
           availability_status: string | null
@@ -975,6 +1103,7 @@ export type Database = {
         Args: { admin_email: string; admin_user_id: string }
         Returns: undefined
       }
+      get_public_tracking: { Args: { _token: string }; Returns: Json }
       get_role_status: {
         Args: { _user_id: string }
         Returns: Database["public"]["Enums"]["approval_status"]

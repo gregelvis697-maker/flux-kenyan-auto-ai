@@ -3,11 +3,12 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/lib/supabase';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Package, Truck, CheckCircle, FileText, Ship, MapPin, LayoutDashboard, Settings } from 'lucide-react';
+import { Package, Truck, CheckCircle, FileText, Ship, MapPin, LayoutDashboard, Settings, Navigation2 } from 'lucide-react';
 import { Navigation } from '@/components/Navigation';
 import { AvailableRequestsTab } from '@/components/importer/AvailableRequestsTab';
 import { MyShipmentsTab } from '@/components/importer/MyShipmentsTab';
 import { DeliveredTab } from '@/components/importer/DeliveredTab';
+import { TrackingTab } from '@/components/importer/TrackingTab';
 import { DashboardSidebar, MenuItem } from '@/components/dashboard/DashboardSidebar';
 import { SettingsPanel } from '@/components/dashboard/SettingsPanel';
 import { cn } from '@/lib/utils';
@@ -17,6 +18,7 @@ const importerMenuItems: MenuItem[] = [
   { id: 'available', label: 'Assigned Requests', icon: FileText },
   { id: 'shipments', label: 'Active Imports', icon: Ship },
   { id: 'delivered', label: 'Completed Imports', icon: MapPin },
+  { id: 'tracking', label: 'Vehicle Tracking', icon: Navigation2 },
   { id: 'settings', label: 'Settings', icon: Settings },
 ];
 
@@ -189,6 +191,9 @@ export default function ImporterDashboard() {
 
       case 'delivered':
         return <DeliveredTab />;
+
+      case 'tracking':
+        return <TrackingTab />;
 
       case 'settings':
         return <SettingsPanel />;
