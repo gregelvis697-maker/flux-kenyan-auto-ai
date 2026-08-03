@@ -17,6 +17,7 @@ const importerMenuItems: MenuItem[] = [
   { id: 'available', label: 'Assigned Requests', icon: FileText },
   { id: 'shipments', label: 'Active Imports', icon: Ship },
   { id: 'delivered', label: 'Completed Imports', icon: MapPin },
+  { id: 'tracking', label: 'Vehicle Tracking', icon: Navigation2 },
   { id: 'settings', label: 'Settings', icon: Settings },
 ];
 
