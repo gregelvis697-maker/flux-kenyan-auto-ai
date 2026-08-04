@@ -160,7 +160,7 @@ export default function VehicleDetail() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-background">
+      <div className="min-h-screen bg-background/80">
         <Navigation />
         <main className="pt-20 pb-12 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <Skeleton className="h-8 w-48 mb-6" />
@@ -185,7 +185,7 @@ export default function VehicleDetail() {
 
   if (notFound || !vehicle) {
     return (
-      <div className="min-h-screen bg-background">
+      <div className="min-h-screen bg-background/80">
         <Navigation />
         <main className="pt-20 pb-12 flex flex-col items-center justify-center min-h-[60vh]">
           <Car className="h-20 w-20 text-muted-foreground/30 mb-4" />
@@ -214,7 +214,7 @@ export default function VehicleDetail() {
 
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-background/80">
       <Navigation />
 
       <main className="pt-20 pb-24 md:pb-12">

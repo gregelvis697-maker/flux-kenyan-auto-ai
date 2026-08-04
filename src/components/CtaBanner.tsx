@@ -6,7 +6,7 @@ export const CtaBanner = () => {
   const navigate = useNavigate();
 
   return (
-    <section className="relative overflow-hidden border-t border-border">
+    <section className="relative overflow-hidden border-t border-border min-h-[520px] sm:min-h-0 flex items-center">
       <img
         src={ctaBg}
         alt=""
@@ -14,16 +14,25 @@ export const CtaBanner = () => {
         loading="lazy"
         width={1920}
         height={1088}
-        className="absolute inset-0 h-full w-full object-cover opacity-60 dark:opacity-70"
+        className="absolute inset-0 h-full w-full object-cover object-center opacity-60 dark:opacity-70"
       />
       <div
         aria-hidden
-        className="absolute inset-0"
+        className="absolute inset-0 sm:hidden"
+        style={{
+          background:
+            "linear-gradient(180deg, hsl(var(--background) / 0.94) 0%, hsl(var(--background) / 0.82) 55%, hsl(var(--background) / 0.55) 100%)",
+        }}
+      />
+      <div
+        aria-hidden
+        className="absolute inset-0 hidden sm:block"
         style={{
           background:
             "linear-gradient(90deg, hsl(var(--background) / 0.95) 0%, hsl(var(--background) / 0.75) 45%, hsl(var(--background) / 0.35) 100%)",
         }}
       />
+
 
       <div className="relative max-w-7xl mx-auto px-6 sm:px-10 py-24 md:py-36">
         <motion.div

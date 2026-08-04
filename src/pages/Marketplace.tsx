@@ -312,7 +312,7 @@ export default function Marketplace() {
   }, [filters]);
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-background/80">
       <Navigation />
 
       <main className="pt-20 pb-12">
