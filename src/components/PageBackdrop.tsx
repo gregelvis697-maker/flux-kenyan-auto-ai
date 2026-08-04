@@ -3,26 +3,43 @@ import bgLight from "@/assets/bg-auto-light.jpg";
 
 /**
  * Fixed, theme-aware automotive backdrop rendered behind every page.
- * Sits below content (negative z-index) and never intercepts pointer events.
+ * Uses <picture> with device breakpoints + object-fit cover so the image
+ * scales cleanly from phones to ultrawide without cropping the subject.
  */
 export const PageBackdrop = () => (
   <div aria-hidden className="pointer-events-none fixed inset-0 -z-10 overflow-hidden">
-    <img
-      src={bgDark}
-      alt=""
-      loading="lazy"
-      width={1920}
-      height={1280}
-      className="hidden dark:block absolute inset-0 h-full w-full object-cover opacity-70"
-    />
-    <img
-      src={bgLight}
-      alt=""
-      loading="lazy"
-      width={1920}
-      height={1280}
-      className="block dark:hidden absolute inset-0 h-full w-full object-cover opacity-25"
-    />
+    {/* Dark theme */}
+    <picture className="hidden dark:block">
+      <source media="(max-width: 640px)" srcSet={`${bgDark}?w=768 768w`} />
+      <source media="(max-width: 1024px)" srcSet={`${bgDark}?w=1280 1280w`} />
+      <img
+        src={bgDark}
+        alt=""
+        loading="lazy"
+        decoding="async"
+        width={1920}
+        height={1280}
+        sizes="100vw"
+        className="absolute inset-0 h-full w-full object-cover object-[60%_center] sm:object-center opacity-70"
+      />
+    </picture>
+
+    {/* Light theme */}
+    <picture className="block dark:hidden">
+      <source media="(max-width: 640px)" srcSet={`${bgLight}?w=768 768w`} />
+      <source media="(max-width: 1024px)" srcSet={`${bgLight}?w=1280 1280w`} />
+      <img
+        src={bgLight}
+        alt=""
+        loading="lazy"
+        decoding="async"
+        width={1920}
+        height={1280}
+        sizes="100vw"
+        className="absolute inset-0 h-full w-full object-cover object-[60%_center] sm:object-center opacity-25"
+      />
+    </picture>
+
     <div
       className="absolute inset-0"
       style={{
