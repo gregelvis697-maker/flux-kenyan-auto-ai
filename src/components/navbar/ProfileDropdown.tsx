@@ -1,6 +1,6 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
-import { LogOut, Settings, LayoutDashboard } from "lucide-react";
+import { LogOut, LayoutDashboard } from "lucide-react";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -11,6 +11,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useAuth } from "@/contexts/AuthContext";
+import { roleHomePath } from "@/components/ProtectedRoute";
 import { motion } from "framer-motion";
 
 export const ProfileDropdown = () => {
@@ -22,10 +23,7 @@ export const ProfileDropdown = () => {
     navigate("/auth");
   };
 
-  const getRoleDashboard = () => {
-    if (!userRole) return "/dashboard/buyer";
-    return `/dashboard/${userRole}`;
-  };
+  const getRoleDashboard = () => roleHomePath(userRole);
 
   const getRoleLabel = () => {
     if (!userRole) return "User";
