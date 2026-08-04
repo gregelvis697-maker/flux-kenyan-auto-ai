@@ -88,13 +88,14 @@ const App = () => (
             }
           />
           <Route
-            path="/dashboard/:role"
+            path="/dashboard"
             element={
               <ProtectedRoute>
-                <Dashboard />
+                <DashboardRedirect />
               </ProtectedRoute>
             }
           />
+          <Route path="/dashboard/:role" element={<Navigate to="/dashboard" replace />} />
           <Route path="/admin/login" element={<AdminLogin />} />
           <Route
 
