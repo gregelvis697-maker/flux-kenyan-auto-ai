@@ -6,16 +6,19 @@ export const CtaBanner = () => {
   const navigate = useNavigate();
 
   return (
-    <section className="relative overflow-hidden border-t border-border min-h-[520px] sm:min-h-0 flex items-center">
+    <section className="relative overflow-hidden border-t border-border min-h-[520px] sm:min-h-[440px] md:min-h-[520px] flex items-center">
       <img
         src={ctaBg}
         alt=""
         aria-hidden
         loading="lazy"
+        decoding="async"
         width={1920}
         height={1088}
-        className="absolute inset-0 h-full w-full object-cover object-center opacity-60 dark:opacity-70"
+        sizes="100vw"
+        className="absolute inset-0 h-full w-full object-cover object-[65%_center] sm:object-[60%_center] md:object-center opacity-60 dark:opacity-70"
       />
+
       <div
         aria-hidden
         className="absolute inset-0 sm:hidden"
