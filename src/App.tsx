@@ -19,7 +19,7 @@ import { ProtectedRoute } from "@/components/ProtectedRoute";
 import Index from "./pages/Index";
 import Waitlist from "./pages/Waitlist";
 import Auth from "./pages/Auth";
-import Dashboard from "./pages/Dashboard";
+import { DashboardRedirect } from "@/components/DashboardRedirect";
 import PendingApproval from "./pages/PendingApproval";
 import AdminDashboard from "./pages/AdminDashboard";
 import AdminLogin from "./pages/AdminLogin";
