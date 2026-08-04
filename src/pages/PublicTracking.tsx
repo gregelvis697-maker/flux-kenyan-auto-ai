@@ -99,7 +99,7 @@ export default function PublicTracking() {
   const { vehicle, tracking, importer } = data;
 
   return (
-    <main className="min-h-screen bg-background px-4 py-8 sm:py-12">
+    <main className="min-h-screen bg-background/80 px-4 py-8 sm:py-12">
       <div className="mx-auto max-w-3xl space-y-4 sm:space-y-6">
         <header className="text-center">
           <p className="text-xs uppercase tracking-[0.2em] text-muted-foreground">Flux Vehicle Tracking</p>

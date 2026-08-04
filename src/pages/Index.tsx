@@ -11,7 +11,7 @@ import { Navigation } from "@/components/Navigation";
 
 const Index = () => {
   return (
-    <div className="min-h-screen bg-background text-foreground">
+    <div className="min-h-screen bg-background/80 text-foreground">
       <Navigation />
       <Hero />
       <FeaturedInventory />

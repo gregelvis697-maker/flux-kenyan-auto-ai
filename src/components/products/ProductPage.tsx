@@ -37,7 +37,7 @@ interface ProductPageProps {
 
 const ProductPage: React.FC<ProductPageProps> = ({ data }) => {
   return (
-    <div className="min-h-screen bg-background text-foreground">
+    <div className="min-h-screen bg-background/80 text-foreground">
       <Navigation />
       <div className="pt-16">
         {/* Hero */}
