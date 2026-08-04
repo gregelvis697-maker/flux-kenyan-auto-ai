@@ -1,6 +1,6 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
-import { LogOut, Settings, LayoutDashboard } from "lucide-react";
+import { LogOut, LayoutDashboard } from "lucide-react";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -11,6 +11,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useAuth } from "@/contexts/AuthContext";
+import { roleHomePath } from "@/components/ProtectedRoute";
 import { motion } from "framer-motion";
 
 export const ProfileDropdown = () => {
@@ -22,10 +23,7 @@ export const ProfileDropdown = () => {
     navigate("/auth");
   };
 
-  const getRoleDashboard = () => {
-    if (!userRole) return "/dashboard/buyer";
-    return `/dashboard/${userRole}`;
-  };
+  const getRoleDashboard = () => roleHomePath(userRole);
 
   const getRoleLabel = () => {
     if (!userRole) return "User";
@@ -72,13 +70,6 @@ export const ProfileDropdown = () => {
         >
           <LayoutDashboard className="mr-2 h-4 w-4" />
           <span>Dashboard</span>
-        </DropdownMenuItem>
-        <DropdownMenuItem
-          onClick={() => navigate("/settings")}
-          className="cursor-pointer hover:bg-accent/50"
-        >
-          <Settings className="mr-2 h-4 w-4" />
-          <span>Settings</span>
         </DropdownMenuItem>
         <DropdownMenuSeparator />
         <DropdownMenuItem

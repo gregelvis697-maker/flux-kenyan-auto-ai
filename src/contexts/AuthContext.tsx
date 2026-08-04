@@ -50,16 +50,16 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       async (event, session) => {
         setSession(session);
         setUser(session?.user ?? null);
-        
+
         if (session?.user) {
           setTimeout(() => {
-            fetchUserRole(session.user.id);
+            fetchUserRole(session.user.id).then(() => setLoading(false));
           }, 0);
         } else {
           setUserRole(null);
+          setApprovalStatus(null);
+          setLoading(false);
         }
-        
-        setLoading(false);
       }
     );
 

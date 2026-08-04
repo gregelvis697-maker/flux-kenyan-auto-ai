@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
+import { roleHomePath } from '@/components/ProtectedRoute';
 import { supabase } from '@/lib/supabase';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Package, Truck, CheckCircle, FileText, Ship, MapPin, LayoutDashboard, Settings, Navigation2 } from 'lucide-react';
@@ -39,8 +40,8 @@ export default function ImporterDashboard() {
         navigate('/auth');
         return;
       }
-      if (userRole !== 'importer') {
-        navigate(`/dashboard/${userRole}`);
+      if (userRole && userRole !== 'importer') {
+        navigate(roleHomePath(userRole), { replace: true });
         return;
       }
       if (approvalStatus !== 'approved') {

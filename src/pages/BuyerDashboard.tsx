@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
+import { roleHomePath } from '@/components/ProtectedRoute';
 import { supabase } from '@/lib/supabase';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -70,8 +71,8 @@ export default function BuyerDashboard() {
         navigate('/auth');
         return;
       }
-      if (userRole !== 'buyer') {
-        navigate(`/dashboard/${userRole}`);
+      if (userRole && userRole !== 'buyer') {
+        navigate(roleHomePath(userRole), { replace: true });
         return;
       }
     }

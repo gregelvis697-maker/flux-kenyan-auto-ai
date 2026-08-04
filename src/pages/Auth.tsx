@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
+import { roleHomePath } from '@/components/ProtectedRoute';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -37,7 +38,7 @@ const Auth = () => {
     if (user && approvalStatus === 'pending') {
       navigate('/pending-approval', { replace: true });
     } else if (user && userRole && approvalStatus === 'approved') {
-      navigate(`/dashboard/${userRole}`, { replace: true });
+      navigate(roleHomePath(userRole), { replace: true });
     }
   }, [user, userRole, approvalStatus, navigate]);
 

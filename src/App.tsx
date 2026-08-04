@@ -3,7 +3,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -19,7 +19,7 @@ import { ProtectedRoute } from "@/components/ProtectedRoute";
 import Index from "./pages/Index";
 import Waitlist from "./pages/Waitlist";
 import Auth from "./pages/Auth";
-import Dashboard from "./pages/Dashboard";
+import { DashboardRedirect } from "@/components/DashboardRedirect";
 import PendingApproval from "./pages/PendingApproval";
 import AdminDashboard from "./pages/AdminDashboard";
 import AdminLogin from "./pages/AdminLogin";
@@ -88,13 +88,14 @@ const App = () => (
             }
           />
           <Route
-            path="/dashboard/:role"
+            path="/dashboard"
             element={
               <ProtectedRoute>
-                <Dashboard />
+                <DashboardRedirect />
               </ProtectedRoute>
             }
           />
+          <Route path="/dashboard/:role" element={<Navigate to="/dashboard" replace />} />
           <Route path="/admin/login" element={<AdminLogin />} />
           <Route
 

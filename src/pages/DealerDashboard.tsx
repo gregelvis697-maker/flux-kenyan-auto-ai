@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
+import { roleHomePath } from '@/components/ProtectedRoute';
 import { supabase } from '@/lib/supabase';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Package, TrendingUp, Car, FileText, Truck, LayoutGrid, LayoutDashboard, Settings, CreditCard } from 'lucide-react';
@@ -70,8 +71,8 @@ export default function DealerDashboard() {
         navigate('/auth');
         return;
       }
-      if (userRole !== 'dealer') {
-        navigate(`/dashboard/${userRole}`);
+      if (userRole && userRole !== 'dealer') {
+        navigate(roleHomePath(userRole), { replace: true });
         return;
       }
       if (approvalStatus !== 'approved') {
