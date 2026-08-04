@@ -24,6 +24,8 @@ import PendingApproval from "./pages/PendingApproval";
 import AdminDashboard from "./pages/AdminDashboard";
 import AdminLogin from "./pages/AdminLogin";
 import { AdminHotkey } from "@/components/AdminHotkey";
+import { PageBackdrop } from "@/components/PageBackdrop";
+
 
 import DealerDashboard from "./pages/DealerDashboard";
 import ImporterDashboard from "./pages/ImporterDashboard";
@@ -47,7 +49,9 @@ const App = () => (
     <Sonner />
     <BrowserRouter>
       <AuthProvider>
+        <PageBackdrop />
         <AdminHotkey />
+
         <Routes>
 
           <Route path="/" element={<Index />} />
