@@ -73,13 +73,6 @@ export const ProfileDropdown = () => {
           <LayoutDashboard className="mr-2 h-4 w-4" />
           <span>Dashboard</span>
         </DropdownMenuItem>
-        <DropdownMenuItem
-          onClick={() => navigate("/settings")}
-          className="cursor-pointer hover:bg-accent/50"
-        >
-          <Settings className="mr-2 h-4 w-4" />
-          <span>Settings</span>
-        </DropdownMenuItem>
         <DropdownMenuSeparator />
         <DropdownMenuItem
           onClick={handleSignOut}
