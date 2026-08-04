@@ -4,6 +4,13 @@ import { useAuth } from '@/contexts/AuthContext';
 
 type UserRole = 'buyer' | 'dealer' | 'importer' | 'admin';
 
+export const roleHomePath = (role?: UserRole | null) => {
+  if (role === 'admin') return '/admin/dashboard';
+  if (role === 'dealer') return '/dashboard/dealer';
+  if (role === 'importer') return '/dashboard/importer';
+  return '/dashboard/buyer';
+};
+
 interface ProtectedRouteProps {
   children: React.ReactNode;
   allowedRoles?: UserRole[];
