@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
-import { Menu, X, Home, Users, LogIn, UserPlus, Car, ChevronDown, MessageCircle } from "lucide-react";
+import { Menu, X, Home, Users, LogIn, UserPlus, Car, ChevronDown } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/contexts/AuthContext";
 import { motion, AnimatePresence } from "framer-motion";
@@ -184,19 +184,6 @@ export const Navigation = ({ children }: { children?: React.ReactNode }) => {
           {/* Desktop Auth Actions */}
           <div className="hidden md:flex items-center space-x-2 lg:space-x-3">
             <ThemeToggle />
-            {/* WhatsApp / Quick contact CTA — hidden on dashboard/auth routes */}
-            {!location.pathname.startsWith("/dashboard") && !location.pathname.startsWith("/auth") && (
-              <a
-                href="https://wa.me/254700000000?text=Hi%20Flux%2C%20I%27m%20interested%20in%20a%20vehicle"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="hidden lg:inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold rounded-full border border-emerald-500/40 text-emerald-500 hover:bg-emerald-500/10 transition-all"
-                aria-label="Contact on WhatsApp"
-              >
-                <MessageCircle className="h-3.5 w-3.5" />
-                WhatsApp
-              </a>
-            )}
             {user ? (
               <>
                 {children || <NotificationBell />}
