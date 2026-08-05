@@ -1,4 +1,4 @@
-import bgDark from "@/assets/bg-auto-dark.jpg";
+import bgDark from "@/assets/bg-auto-dark-v2.jpg";
 import bgLight from "@/assets/bg-auto-light.jpg";
 import { useLocation } from "react-router-dom";
 
@@ -10,7 +10,7 @@ import { useLocation } from "react-router-dom";
 export const PageBackdrop = () => {
   const { pathname } = useLocation();
   const base =
-    "absolute inset-0 h-full w-full object-cover object-[62%_center] sm:object-[58%_center] md:object-center";
+    "absolute inset-0 h-full w-full object-cover object-[72%_center] sm:object-[66%_center] md:object-center";
 
   if (pathname === "/marketplace") return null;
 
