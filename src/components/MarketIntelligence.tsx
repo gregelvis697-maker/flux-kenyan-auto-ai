@@ -14,7 +14,7 @@ export const MarketIntelligence = () => {
   const navigate = useNavigate();
 
   return (
-    <section className="relative bg-background text-foreground py-20 md:py-28 border-t border-border overflow-hidden">
+    <section className="relative bg-background/75 text-foreground py-20 md:py-28 border-t border-border overflow-hidden">
       <div className="relative max-w-7xl mx-auto px-6 sm:px-10">
         <div className="grid lg:grid-cols-2 gap-12 lg:gap-20 items-center">
           {/* Copy */}

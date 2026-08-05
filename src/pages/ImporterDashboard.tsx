@@ -88,7 +88,7 @@ export default function ImporterDashboard() {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-background">
+      <div className="min-h-screen flex items-center justify-center bg-background/65">
         <div className="animate-spin rounded-full h-10 w-10 border-2 border-primary border-t-transparent shadow-[0_0_20px_hsl(var(--primary)/0.5)]"></div>
       </div>
     );
@@ -205,7 +205,7 @@ export default function ImporterDashboard() {
   };
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-background/65">
       <Navigation />
       
       <DashboardSidebar

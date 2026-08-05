@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Clock, LogOut, Mail, CheckCircle, ArrowRight } from 'lucide-react';
+import { Clock, LogOut, CheckCircle, ArrowRight } from 'lucide-react';
 import { Navigation } from '@/components/Navigation';
 
 const PendingApproval = () => {
@@ -18,7 +18,7 @@ const PendingApproval = () => {
   return (
     <>
       <Navigation />
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-background via-background to-primary/5 p-4 sm:p-6 pt-20 sm:pt-24">
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-background/55 via-background/70 to-primary/5 p-4 sm:p-6 pt-20 sm:pt-24">
         <Card className="w-full max-w-md border-border/50 bg-card/80 backdrop-blur-sm shadow-card">
           <CardHeader className="text-center space-y-3 sm:space-y-4 pb-4">
             <div className="mx-auto w-14 h-14 sm:w-16 sm:h-16 rounded-full bg-primary/10 flex items-center justify-center border border-primary/20 shadow-[0_0_20px_hsl(var(--primary)/0.2)]">
@@ -35,8 +35,7 @@ const PendingApproval = () => {
                 Thank you for registering as a <span className="font-semibold text-foreground">{userRole}</span>.
               </p>
               <p>
-                Our team will review your request and notify you via email once your account has been approved. 
-                This typically takes 1-2 business days.
+                Our team will review your request. This typically takes 1-2 business days.
               </p>
             </div>
             
@@ -51,9 +50,9 @@ const PendingApproval = () => {
                 </li>
                 <li className="flex items-start gap-3 text-sm text-muted-foreground">
                   <div className="p-1.5 rounded-full bg-primary/10 mt-0.5 flex-shrink-0">
-                    <Mail className="w-3 h-3 text-primary" />
+                    <CheckCircle className="w-3 h-3 text-primary" />
                   </div>
-                  <span>You'll receive an email notification</span>
+                  <span>Your account status will be updated</span>
                 </li>
                 <li className="flex items-start gap-3 text-sm text-muted-foreground">
                   <div className="p-1.5 rounded-full bg-primary/10 mt-0.5 flex-shrink-0">

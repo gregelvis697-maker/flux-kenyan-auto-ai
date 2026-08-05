@@ -55,7 +55,7 @@ export const Hero = () => {
   return (
     <section
       ref={sectionRef}
-      className="relative bg-background text-foreground pt-28 md:pt-36 pb-20 md:pb-28 overflow-hidden"
+      className="relative bg-background/70 text-foreground pt-28 md:pt-36 pb-20 md:pb-28 overflow-hidden"
     >
       {/* Parallax network visualisation */}
       <motion.div

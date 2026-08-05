@@ -73,7 +73,7 @@ export default function PublicTracking() {
 
   if (loading) {
     return (
-      <main className="flex min-h-screen items-center justify-center bg-background">
+      <main className="flex min-h-screen items-center justify-center bg-background/65">
         <Loader2 className="h-6 w-6 animate-spin text-primary" />
       </main>
     );
@@ -81,7 +81,7 @@ export default function PublicTracking() {
 
   if (!data) {
     return (
-      <main className="flex min-h-screen items-center justify-center bg-background px-4">
+      <main className="flex min-h-screen items-center justify-center bg-background/65 px-4">
         <div className="max-w-md text-center">
           <Search className="mx-auto mb-4 h-10 w-10 text-muted-foreground opacity-50" />
           <h1 className="text-2xl font-semibold text-foreground">Tracking link not found</h1>

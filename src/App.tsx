@@ -51,8 +51,8 @@ const App = () => (
       <AuthProvider>
         <PageBackdrop />
         <AdminHotkey />
-
-        <Routes>
+        <div className="relative z-10 min-h-screen">
+          <Routes>
 
           <Route path="/" element={<Index />} />
           <Route path="/marketplace" element={<Marketplace />} />
@@ -113,7 +113,8 @@ const App = () => (
           <Route path="/products/dealer-tools" element={<DealerToolsPage />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
-        </Routes>
+          </Routes>
+        </div>
       </AuthProvider>
     </BrowserRouter>
   </TooltipProvider>

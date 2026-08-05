@@ -26,7 +26,7 @@ const PILLARS = [
 
 export const TrustProof = () => {
   return (
-    <section className="relative bg-background text-foreground py-20 md:py-28 border-t border-border overflow-hidden">
+    <section className="relative bg-background/75 text-foreground py-20 md:py-28 border-t border-border overflow-hidden">
       <div
         aria-hidden
         className="pointer-events-none absolute inset-0"
