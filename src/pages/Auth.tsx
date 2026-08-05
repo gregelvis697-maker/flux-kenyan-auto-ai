@@ -24,6 +24,20 @@ const authSchema = z.object({
 
 type UserRole = 'buyer' | 'dealer' | 'importer';
 
+const getAuthErrorMessage = (error: Error) => {
+  const message = error.message.toLowerCase();
+  if (message.includes('already registered') || message.includes('already exists')) {
+    return 'An account with this email already exists. Please sign in instead.';
+  }
+  if (message.includes('rate limit') || message.includes('after') && message.includes('seconds')) {
+    return 'Too many attempts were made. Please wait a moment and try again.';
+  }
+  if (message.includes('invalid login credentials')) {
+    return 'The email or password is incorrect.';
+  }
+  return error.message;
+};
+
 const Auth = () => {
   const [isLogin, setIsLogin] = useState(true);
   const [email, setEmail] = useState('');
@@ -52,7 +66,7 @@ const Auth = () => {
         if (error) {
           toast({
             title: 'Error',
-            description: error.message,
+            description: getAuthErrorMessage(error),
             variant: 'destructive',
           });
         }
@@ -62,13 +76,13 @@ const Auth = () => {
         if (error) {
           toast({
             title: 'Error',
-            description: error.message,
+            description: getAuthErrorMessage(error),
             variant: 'destructive',
           });
         } else {
           const successMessage = role === 'buyer' 
             ? 'Account created successfully! Redirecting to your dashboard...'
-            : 'Account created! Your request is pending admin approval. You will be notified via email.';
+            : 'Account created! Your request is now pending admin approval.';
           
           toast({
             title: 'Success',
@@ -90,7 +104,7 @@ const Auth = () => {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-background via-background to-primary/5 p-4 sm:p-6">
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-background/55 via-background/70 to-primary/5 p-4 sm:p-6">
       <Link 
         to="/" 
         className="absolute top-4 left-4 sm:top-6 sm:left-6 inline-flex items-center gap-1.5 sm:gap-2 text-muted-foreground hover:text-foreground transition-colors p-2 -m-2 rounded-lg active:bg-accent/50"

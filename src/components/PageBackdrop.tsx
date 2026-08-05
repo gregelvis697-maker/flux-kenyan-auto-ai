@@ -1,5 +1,6 @@
-import bgDark from "@/assets/bg-auto-dark.jpg";
+import bgDark from "@/assets/bg-auto-dark-v2.jpg";
 import bgLight from "@/assets/bg-auto-light.jpg";
+import { useLocation } from "react-router-dom";
 
 /**
  * Fixed, theme-aware automotive backdrop rendered behind every page.
@@ -7,11 +8,14 @@ import bgLight from "@/assets/bg-auto-light.jpg";
  * framed on phones, tablets and wide desktops without stretching.
  */
 export const PageBackdrop = () => {
+  const { pathname } = useLocation();
   const base =
-    "absolute inset-0 h-full w-full object-cover object-[62%_center] sm:object-[58%_center] md:object-center";
+    "absolute inset-0 h-full w-full object-cover object-[72%_center] sm:object-[66%_center] md:object-center";
+
+  if (pathname === "/marketplace") return null;
 
   return (
-    <div aria-hidden className="pointer-events-none fixed inset-0 -z-10 overflow-hidden">
+    <div aria-hidden className="pointer-events-none fixed inset-0 z-0 overflow-hidden">
       <img
         src={bgDark}
         alt=""
@@ -20,7 +24,7 @@ export const PageBackdrop = () => {
         width={1920}
         height={1280}
         sizes="100vw"
-        className={`hidden dark:block ${base} opacity-70`}
+        className={`hidden dark:block ${base} opacity-90`}
       />
       <img
         src={bgLight}
@@ -30,13 +34,13 @@ export const PageBackdrop = () => {
         width={1920}
         height={1280}
         sizes="100vw"
-        className={`block dark:hidden ${base} opacity-25`}
+        className={`block dark:hidden ${base} opacity-60`}
       />
       <div
         className="absolute inset-0"
         style={{
           background:
-            "radial-gradient(ellipse 90% 60% at 50% 0%, hsl(var(--background) / 0.85) 0%, hsl(var(--background) / 0.95) 60%, hsl(var(--background)) 100%)",
+            "linear-gradient(180deg, hsl(var(--background) / 0.38) 0%, hsl(var(--background) / 0.68) 72%, hsl(var(--background) / 0.82) 100%)",
         }}
       />
     </div>

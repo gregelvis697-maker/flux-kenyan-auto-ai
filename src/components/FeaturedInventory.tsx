@@ -120,7 +120,7 @@ export const FeaturedInventory = () => {
     n && n > 0 ? `KES ${n.toLocaleString()}` : "Call for Price";
 
   return (
-    <section className="bg-background text-foreground py-20 md:py-28">
+    <section className="bg-background/75 text-foreground py-20 md:py-28">
       <div className="max-w-7xl mx-auto px-6 sm:px-10">
         <div className="flex items-end justify-between border-b border-border pb-6 mb-10 gap-4">
           <div>

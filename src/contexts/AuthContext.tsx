@@ -84,13 +84,10 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         return { error: new Error('Admin accounts can only be created manually') };
       }
 
-      const redirectUrl = `${window.location.origin}/`;
-      
       const { data, error } = await supabase.auth.signUp({
         email,
         password,
         options: {
-          emailRedirectTo: redirectUrl,
           data: {
             role: role,
             full_name: ''
@@ -116,6 +113,8 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
           });
 
         if (roleError) throw roleError;
+
+        await fetchUserRole(data.user.id);
       }
 
       return { error: null };
