@@ -3,12 +3,22 @@ import { useNavigate } from "react-router-dom";
 import { TrendingUp, Activity, Timer, BarChart3 } from "lucide-react";
 
 const SIGNALS = [
-  { label: "Price vs Market", value: "-8.4%", note: "Below fair value", icon: TrendingUp },
-  { label: "Demand Index", value: "High", note: "Nairobi · 30d", icon: Activity },
-  { label: "Days to Sell", value: "23", note: "Segment median", icon: Timer },
+  {
+    label: "Price vs Market",
+    note: "Compares a listing against comparable Kenyan sales",
+    icon: TrendingUp,
+  },
+  {
+    label: "Demand Index",
+    note: "Tracks buyer interest by make, model and region",
+    icon: Activity,
+  },
+  {
+    label: "Days to Sell",
+    note: "Estimates how fast a segment is moving",
+    icon: Timer,
+  },
 ];
-
-const BARS = [38, 62, 45, 78, 55, 88, 70, 94, 66, 81];
 
 export const MarketIntelligence = () => {
   const navigate = useNavigate();
@@ -53,9 +63,6 @@ export const MarketIntelligence = () => {
                         {s.note}
                       </div>
                     </div>
-                  </div>
-                  <div className="font-display text-xl sm:text-2xl font-black text-brand shrink-0">
-                    {s.value}
                   </div>
                 </motion.div>
               ))}

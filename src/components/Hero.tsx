@@ -1,37 +1,14 @@
 import { useEffect, useRef, useState } from "react";
-import { motion, useScroll, useTransform, useInView, animate } from "framer-motion";
+import { motion, useScroll, useTransform } from "framer-motion";
 import { useNavigate } from "react-router-dom";
 import { HeroNetwork } from "@/components/HeroNetwork";
+import { supabase } from "@/lib/supabase";
 
-const STATS = [
-  { k: "Verified Dealers", v: 240, suffix: "+" },
-  { k: "Live Inventory", v: 1200, suffix: "+" },
-  { k: "Cities Covered", v: 12, suffix: "" },
-  { k: "AI Trust Signals", v: 0, suffix: "", literal: "Real-time" },
+const STATS: { k: string; literal: string }[] = [
+  { k: "Dealer Verification", literal: "KRA + Yard" },
+  { k: "Coverage", literal: "Kenya-wide" },
+  { k: "Trust Signals", literal: "Real-time" },
 ];
-
-const Counter = ({ to, suffix }: { to: number; suffix: string }) => {
-  const ref = useRef<HTMLSpanElement>(null);
-  const inView = useInView(ref, { once: true, margin: "-40px" });
-  const [val, setVal] = useState(0);
-
-  useEffect(() => {
-    if (!inView) return;
-    const controls = animate(0, to, {
-      duration: 1.2,
-      ease: [0.22, 1, 0.36, 1],
-      onUpdate: (v) => setVal(Math.round(v)),
-    });
-    return () => controls.stop();
-  }, [inView, to]);
-
-  return (
-    <span ref={ref}>
-      {val.toLocaleString()}
-      {suffix}
-    </span>
-  );
-};
 
 export const Hero = () => {
   const navigate = useNavigate();
@@ -45,6 +22,25 @@ export const Hero = () => {
   const glowY = useTransform(scrollYProgress, [0, 1], ["0%", "40%"]);
   const contentY = useTransform(scrollYProgress, [0, 1], ["0%", "-8%"]);
   const contentOpacity = useTransform(scrollYProgress, [0, 0.8], [1, 0.25]);
+
+  const [liveListings, setLiveListings] = useState<number | null>(null);
+  useEffect(() => {
+    let mounted = true;
+    (async () => {
+      try {
+        const { count } = await supabase
+          .from("vehicles")
+          .select("id", { count: "exact", head: true })
+          .eq("is_sold", false);
+        if (mounted && typeof count === "number") setLiveListings(count);
+      } catch {
+        /* silent: hide the tile */
+      }
+    })();
+    return () => {
+      mounted = false;
+    };
+  }, []);
 
   const [parallax, setParallax] = useState(0);
   useEffect(() => {
@@ -144,7 +140,10 @@ export const Hero = () => {
 
         {/* Animated meta stat rail */}
         <div className="mt-16 md:mt-20 grid grid-cols-2 md:grid-cols-4 gap-px bg-border border border-border">
-          {STATS.map((s, i) => (
+          {(liveListings && liveListings > 0
+            ? [{ k: "Live Listings", literal: liveListings.toLocaleString() }, ...STATS]
+            : STATS
+          ).map((s, i) => (
             <motion.div
               key={s.k}
               initial={{ opacity: 0, y: 16 }}
@@ -158,11 +157,7 @@ export const Hero = () => {
                 {s.k}
               </div>
               <div className="mt-2 font-display text-xl md:text-2xl font-black">
-                {s.literal ? (
-                  <span className="text-brand">{s.literal}</span>
-                ) : (
-                  <Counter to={s.v} suffix={s.suffix} />
-                )}
+                <span className="text-brand">{s.literal}</span>
               </div>
             </motion.div>
           ))}
