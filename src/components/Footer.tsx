@@ -51,14 +51,14 @@ export const Footer = () => {
   return (
     <footer className="relative py-10 sm:py-12 lg:py-16 border-t border-border bg-card/30">
       <div className="container mx-auto px-4 sm:px-6">
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-8 sm:gap-10 mb-8 sm:mb-10">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-8 sm:gap-10 mb-8 sm:mb-10">
           {/* Brand + Contact */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.4 }}
             viewport={{ once: true }}
-            className="col-span-2 md:col-span-3 lg:col-span-1"
+            className="col-span-1 sm:col-span-1"
           >
             <h3 className="text-xl sm:text-2xl font-bold mb-3 bg-gradient-primary bg-clip-text text-transparent">
               Flux
