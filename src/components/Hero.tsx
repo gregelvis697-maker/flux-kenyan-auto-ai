@@ -2,8 +2,9 @@ import { useEffect, useRef, useState } from "react";
 import { motion, useScroll, useTransform } from "framer-motion";
 import { useNavigate } from "react-router-dom";
 import { HeroNetwork } from "@/components/HeroNetwork";
-import { supabase } from "@/lib/supabase";
+import { usePlatformStats } from "@/hooks/usePlatformStats";
 
+// Qualitative, non-numeric capability labels (always true, never invented data)
 const STATS: { k: string; literal: string }[] = [
   { k: "Dealer Verification", literal: "KRA + Yard" },
   { k: "Coverage", literal: "Kenya-wide" },
@@ -23,24 +24,20 @@ export const Hero = () => {
   const contentY = useTransform(scrollYProgress, [0, 1], ["0%", "-8%"]);
   const contentOpacity = useTransform(scrollYProgress, [0, 0.8], [1, 0.25]);
 
-  const [liveListings, setLiveListings] = useState<number | null>(null);
-  useEffect(() => {
-    let mounted = true;
-    (async () => {
-      try {
-        const { count } = await supabase
-          .from("vehicles")
-          .select("id", { count: "exact", head: true })
-          .eq("is_sold", false);
-        if (mounted && typeof count === "number") setLiveListings(count);
-      } catch {
-        /* silent: hide the tile */
-      }
-    })();
-    return () => {
-      mounted = false;
-    };
-  }, []);
+  const { data: stats, isLoading: statsLoading } = usePlatformStats();
+
+  // Only metrics with a real, non-zero backend value are rendered.
+  const liveMetrics = stats
+    ? [
+        { k: "Live Listings", literal: stats.liveListings.toLocaleString() , n: stats.liveListings },
+        { k: "Verified Listings", literal: stats.verifiedListings.toLocaleString(), n: stats.verifiedListings },
+        { k: "Verified Dealers", literal: stats.verifiedDealers.toLocaleString(), n: stats.verifiedDealers },
+        { k: "Vehicles Tracked", literal: stats.trackedVehicles.toLocaleString(), n: stats.trackedVehicles },
+      ].filter((m) => m.n > 0)
+    : [];
+
+  const tiles = [...liveMetrics, ...STATS].slice(0, 4);
+
 
   const [parallax, setParallax] = useState(0);
   useEffect(() => {
