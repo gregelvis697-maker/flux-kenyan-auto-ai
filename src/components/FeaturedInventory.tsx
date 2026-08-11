@@ -7,69 +7,11 @@ import { QuickViewModal, type QuickViewVehicle } from "@/components/QuickViewMod
 
 type FeaturedVehicle = QuickViewVehicle;
 
-const FALLBACK: FeaturedVehicle[] = [
-  {
-    id: "sample-1",
-    make: "Mercedes-Benz",
-    model: "G63 AMG",
-    year: 2023,
-    price: 32500000,
-    mileage: 12000,
-    fuel_type: "petrol",
-    photos: null,
-    verification_status: "verified",
-  },
-  {
-    id: "sample-2",
-    make: "Toyota",
-    model: "Land Cruiser 300",
-    year: 2022,
-    price: 18900000,
-    mileage: 4500,
-    fuel_type: "diesel",
-    photos: null,
-    verification_status: "verified",
-  },
-  {
-    id: "sample-3",
-    make: "Range Rover",
-    model: "Sport SVR",
-    year: 2021,
-    price: 16500000,
-    mileage: 22000,
-    fuel_type: "petrol",
-    photos: null,
-    verification_status: "verified",
-  },
-  {
-    id: "sample-4",
-    make: "Porsche",
-    model: "Macan GTS",
-    year: 2022,
-    price: 14200000,
-    mileage: 18000,
-    fuel_type: "petrol",
-    photos: null,
-    verification_status: "verified",
-  },
-  {
-    id: "sample-5",
-    make: "BMW",
-    model: "X5 M Competition",
-    year: 2023,
-    price: 21000000,
-    mileage: 9000,
-    fuel_type: "petrol",
-    photos: null,
-    verification_status: "verified",
-  },
-];
-
-const matchPct = (i: number) => [98, 95, 92, 90, 89, 87, 86, 85][i % 8];
 
 export const FeaturedInventory = () => {
   const navigate = useNavigate();
-  const [vehicles, setVehicles] = useState<FeaturedVehicle[]>(FALLBACK);
+  const [vehicles, setVehicles] = useState<FeaturedVehicle[]>([]);
+  const [loading, setLoading] = useState(true);
   const [quickView, setQuickView] = useState<FeaturedVehicle | null>(null);
   const scrollerRef = useRef<HTMLDivElement>(null);
   const [canLeft, setCanLeft] = useState(false);
@@ -87,11 +29,13 @@ export const FeaturedInventory = () => {
           .eq("is_sold", false)
           .order("created_at", { ascending: false })
           .limit(10);
-        if (mounted && data && data.length > 0) {
+        if (mounted && data) {
           setVehicles(data as FeaturedVehicle[]);
         }
       } catch {
-        /* silent fallback */
+        /* silent: render empty state */
+      } finally {
+        if (mounted) setLoading(false);
       }
     })();
     return () => {
@@ -182,16 +126,13 @@ export const FeaturedInventory = () => {
                     <Car className="w-16 h-16" />
                   </div>
                 )}
-                <div className="absolute top-4 left-4 flex gap-2">
-                  <span className="bg-brand text-brand-foreground text-[10px] font-black px-2 py-1 uppercase tracking-tighter">
-                    {matchPct(i)}% Match
-                  </span>
-                  {v.verification_status === "verified" && (
-                    <span className="bg-background/80 backdrop-blur-md border border-border text-foreground text-[10px] px-2 py-1 uppercase tracking-tighter">
-                      AI Trust: High
+                {v.verification_status === "verified" && (
+                  <div className="absolute top-4 left-4 flex gap-2">
+                    <span className="bg-brand text-brand-foreground text-[10px] font-black px-2 py-1 uppercase tracking-tighter">
+                      Verified
                     </span>
-                  )}
-                </div>
+                  </div>
+                )}
                 <div className="absolute inset-0 flex items-end justify-center pb-5 opacity-0 group-hover:opacity-100 transition-opacity duration-300 bg-gradient-to-t from-background/70 to-transparent">
                   <span className="text-[10px] font-black uppercase tracking-editorial text-brand">
                     Quick View
@@ -211,7 +152,9 @@ export const FeaturedInventory = () => {
                       {v.fuel_type ? ` · ${v.fuel_type}` : ""}
                     </p>
                   </div>
-                  <CheckCircle2 className="w-5 h-5 text-brand shrink-0" />
+                  {v.verification_status === "verified" && (
+                    <CheckCircle2 className="w-5 h-5 text-brand shrink-0" />
+                  )}
                 </div>
                 <div className="font-display text-2xl sm:text-3xl font-black tracking-tighter">
                   {fmt(v.price)}
@@ -219,6 +162,15 @@ export const FeaturedInventory = () => {
               </div>
             </motion.article>
           ))}
+          {!loading && vehicles.length === 0 && (
+            <div className="w-full border border-border p-10 text-center">
+              <Car className="w-10 h-10 mx-auto text-muted-foreground/40" />
+              <p className="mt-4 text-sm text-muted-foreground font-light">
+                No live listings yet. Verified dealer inventory will appear here
+                as it goes live.
+              </p>
+            </div>
+          )}
         </div>
 
         <div className="mt-12 flex justify-center">

@@ -6,14 +6,14 @@ const dealerDetails = [
   { label: "Premium Profiles", value: "Verified Badge" },
   { label: "Monthly Plans", value: "From KES 32,000" },
   { label: "AI Insights", value: "Included" },
-  { label: "Support", value: "24/7 Priority" },
+  { label: "Support", value: "Dedicated" },
 ];
 
 const commissionDetails = [
-  { label: "Commission Rate", value: "2.5% – 5%" },
+  { label: "Structure", value: "Per completed sale" },
   { label: "Processing", value: "Automated" },
   { label: "Tracking", value: "Real-time" },
-  { label: "Settlement", value: "48 Hours" },
+  { label: "Settlement", value: "Automated payouts" },
 ];
 
 export const BusinessModel = () => {
