@@ -9,26 +9,6 @@ const platformLinks = [
   { label: "For Buyers", href: "/auth" },
 ];
 
-const companyLinks = [
-  { label: "About Us", href: "#" },
-  { label: "Careers", href: "#" },
-  { label: "Press", href: "#" },
-  { label: "Contact", href: "#" },
-];
-
-const resourceLinks = [
-  { label: "Blog", href: "#" },
-  { label: "Help Center", href: "#" },
-  { label: "API Docs", href: "#" },
-  { label: "System Status", href: "#" },
-];
-
-const legalLinks = [
-  { label: "Privacy Policy", href: "#" },
-  { label: "Terms of Service", href: "#" },
-  { label: "Cookie Policy", href: "#" },
-  { label: "GDPR", href: "#" },
-];
 
 export const Footer = () => {
   const currentYear = new Date().getFullYear();
@@ -111,30 +91,6 @@ export const Footer = () => {
             viewport={{ once: true }}
           >
             <LinkList title="Platform" links={platformLinks} />
-          </motion.div>
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.4, delay: 0.1 }}
-            viewport={{ once: true }}
-          >
-            <LinkList title="Company" links={companyLinks} />
-          </motion.div>
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.4, delay: 0.15 }}
-            viewport={{ once: true }}
-          >
-            <LinkList title="Resources" links={resourceLinks} />
-          </motion.div>
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.4, delay: 0.2 }}
-            viewport={{ once: true }}
-          >
-            <LinkList title="Legal" links={legalLinks} />
           </motion.div>
         </div>
 
