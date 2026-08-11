@@ -51,21 +51,7 @@ export const TrustProof = () => {
               with signals you can audit before you ever leave the house.
             </p>
 
-            <div className="mt-8 flex gap-px bg-border border border-border">
-              {[
-                { k: "Verification pass rate", v: "68%" },
-                { k: "Avg. listing audit", v: "14 pts" },
-              ].map((s) => (
-                <div key={s.k} className="bg-background p-4 flex-1">
-                  <div className="font-display text-2xl font-black text-brand">
-                    {s.v}
-                  </div>
-                  <div className="mt-1 text-[10px] uppercase tracking-editorial text-muted-foreground">
-                    {s.k}
-                  </div>
-                </div>
-              ))}
-            </div>
+
           </div>
 
           <div className="lg:col-span-8 grid sm:grid-cols-2 gap-px bg-border border border-border">

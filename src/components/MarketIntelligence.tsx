@@ -3,12 +3,22 @@ import { useNavigate } from "react-router-dom";
 import { TrendingUp, Activity, Timer, BarChart3 } from "lucide-react";
 
 const SIGNALS = [
-  { label: "Price vs Market", value: "-8.4%", note: "Below fair value", icon: TrendingUp },
-  { label: "Demand Index", value: "High", note: "Nairobi · 30d", icon: Activity },
-  { label: "Days to Sell", value: "23", note: "Segment median", icon: Timer },
+  {
+    label: "Price vs Market",
+    note: "Compares a listing against comparable Kenyan sales",
+    icon: TrendingUp,
+  },
+  {
+    label: "Demand Index",
+    note: "Tracks buyer interest by make, model and region",
+    icon: Activity,
+  },
+  {
+    label: "Days to Sell",
+    note: "Estimates how fast a segment is moving",
+    icon: Timer,
+  },
 ];
-
-const BARS = [38, 62, 45, 78, 55, 88, 70, 94, 66, 81];
 
 export const MarketIntelligence = () => {
   const navigate = useNavigate();
@@ -54,9 +64,6 @@ export const MarketIntelligence = () => {
                       </div>
                     </div>
                   </div>
-                  <div className="font-display text-xl sm:text-2xl font-black text-brand shrink-0">
-                    {s.value}
-                  </div>
                 </motion.div>
               ))}
             </div>
@@ -88,46 +95,44 @@ export const MarketIntelligence = () => {
             <div className="relative flex items-center justify-between mb-8">
               <div>
                 <div className="text-[10px] tracking-editorial uppercase text-muted-foreground">
-                  Segment Price Index
+                  How it works
                 </div>
                 <div className="font-display text-2xl font-black mt-1">
-                  SUV · Nairobi
+                  Listing-level context
                 </div>
               </div>
               <BarChart3 className="h-5 w-5 text-brand" />
             </div>
 
-            <div className="relative flex items-end gap-1.5 sm:gap-2 h-40 sm:h-52">
-              {BARS.map((h, i) => (
-                <motion.div
-                  key={i}
-                  initial={{ height: 0, opacity: 0 }}
-                  whileInView={{ height: `${h}%`, opacity: 1 }}
-                  viewport={{ once: true }}
-                  transition={{ duration: 0.6, delay: i * 0.06, ease: [0.22, 1, 0.36, 1] }}
-                  className={`flex-1 ${
-                    i === BARS.length - 3 ? "bg-brand" : "bg-muted"
-                  }`}
-                />
-              ))}
-            </div>
-
-            <div className="relative mt-6 grid grid-cols-3 gap-px bg-border border border-border">
+            <ol className="relative space-y-px bg-border border border-border">
               {[
-                { k: "Listings", v: "1,204" },
-                { k: "Median", v: "KES 4.2M" },
-                { k: "Spread", v: "±11%" },
-              ].map((s) => (
-                <div key={s.k} className="bg-card p-3 sm:p-4">
-                  <div className="text-[9px] uppercase tracking-editorial text-muted-foreground">
-                    {s.k}
+                {
+                  t: "Collect",
+                  d: "Verified dealer listings and import records enter the platform.",
+                },
+                {
+                  t: "Compare",
+                  d: "Each vehicle is matched against comparable Kenyan listings by make, model, year and mileage.",
+                },
+                {
+                  t: "Surface",
+                  d: "Pricing context and demand signals are shown on the listing — no numbers invented, only what the data supports.",
+                },
+              ].map((step, i) => (
+                <li key={step.t} className="bg-card p-4 sm:p-5">
+                  <div className="text-[10px] uppercase tracking-editorial text-muted-foreground">
+                    Step 0{i + 1}
                   </div>
-                  <div className="mt-1 font-display font-black text-sm sm:text-base">
-                    {s.v}
+                  <div className="mt-1 font-display font-black uppercase tracking-tight">
+                    {step.t}
                   </div>
-                </div>
+                  <p className="mt-2 text-sm text-muted-foreground font-light leading-relaxed">
+                    {step.d}
+                  </p>
+                </li>
               ))}
-            </div>
+            </ol>
+
           </motion.div>
         </div>
       </div>
