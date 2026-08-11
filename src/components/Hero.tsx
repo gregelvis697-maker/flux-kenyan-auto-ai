@@ -2,8 +2,9 @@ import { useEffect, useRef, useState } from "react";
 import { motion, useScroll, useTransform } from "framer-motion";
 import { useNavigate } from "react-router-dom";
 import { HeroNetwork } from "@/components/HeroNetwork";
-import { supabase } from "@/lib/supabase";
+import { usePlatformStats } from "@/hooks/usePlatformStats";
 
+// Qualitative, non-numeric capability labels (always true, never invented data)
 const STATS: { k: string; literal: string }[] = [
   { k: "Dealer Verification", literal: "KRA + Yard" },
   { k: "Coverage", literal: "Kenya-wide" },
@@ -23,24 +24,20 @@ export const Hero = () => {
   const contentY = useTransform(scrollYProgress, [0, 1], ["0%", "-8%"]);
   const contentOpacity = useTransform(scrollYProgress, [0, 0.8], [1, 0.25]);
 
-  const [liveListings, setLiveListings] = useState<number | null>(null);
-  useEffect(() => {
-    let mounted = true;
-    (async () => {
-      try {
-        const { count } = await supabase
-          .from("vehicles")
-          .select("id", { count: "exact", head: true })
-          .eq("is_sold", false);
-        if (mounted && typeof count === "number") setLiveListings(count);
-      } catch {
-        /* silent: hide the tile */
-      }
-    })();
-    return () => {
-      mounted = false;
-    };
-  }, []);
+  const { data: stats, isLoading: statsLoading } = usePlatformStats();
+
+  // Only metrics with a real, non-zero backend value are rendered.
+  const liveMetrics = stats
+    ? [
+        { k: "Live Listings", literal: stats.liveListings.toLocaleString() , n: stats.liveListings },
+        { k: "Verified Listings", literal: stats.verifiedListings.toLocaleString(), n: stats.verifiedListings },
+        { k: "Verified Dealers", literal: stats.verifiedDealers.toLocaleString(), n: stats.verifiedDealers },
+        { k: "Vehicles Tracked", literal: stats.trackedVehicles.toLocaleString(), n: stats.trackedVehicles },
+      ].filter((m) => m.n > 0)
+    : [];
+
+  const tiles = [...liveMetrics, ...STATS].slice(0, 4);
+
 
   const [parallax, setParallax] = useState(0);
   useEffect(() => {
@@ -138,30 +135,35 @@ export const Hero = () => {
           </motion.div>
         </div>
 
-        {/* Animated meta stat rail */}
+        {/* Live metric rail — backend-sourced, with loading + empty states */}
         <div className="mt-16 md:mt-20 grid grid-cols-2 md:grid-cols-4 gap-px bg-border border border-border">
-          {(liveListings && liveListings > 0
-            ? [{ k: "Live Listings", literal: liveListings.toLocaleString() }, ...STATS]
-            : STATS
-          ).map((s, i) => (
-            <motion.div
-              key={s.k}
-              initial={{ opacity: 0, y: 16 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true, margin: "-40px" }}
-              transition={{ duration: 0.45, delay: i * 0.08 }}
-              className="group relative bg-background p-5 md:p-6 overflow-hidden"
-            >
-              <span className="absolute left-0 top-0 h-full w-px bg-brand scale-y-0 group-hover:scale-y-100 origin-top transition-transform duration-400" />
-              <div className="text-[10px] tracking-editorial uppercase text-muted-foreground">
-                {s.k}
-              </div>
-              <div className="mt-2 font-display text-xl md:text-2xl font-black">
-                <span className="text-brand">{s.literal}</span>
-              </div>
-            </motion.div>
-          ))}
+          {statsLoading
+            ? Array.from({ length: 4 }).map((_, i) => (
+                <div key={i} className="bg-background p-5 md:p-6">
+                  <div className="h-2 w-20 bg-muted animate-pulse" />
+                  <div className="mt-3 h-6 w-24 bg-muted animate-pulse" />
+                </div>
+              ))
+            : tiles.map((s, i) => (
+                <motion.div
+                  key={s.k}
+                  initial={{ opacity: 0, y: 16 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true, margin: "-40px" }}
+                  transition={{ duration: 0.45, delay: i * 0.08 }}
+                  className="group relative bg-background p-5 md:p-6 overflow-hidden"
+                >
+                  <span className="absolute left-0 top-0 h-full w-px bg-brand scale-y-0 group-hover:scale-y-100 origin-top transition-transform duration-400" />
+                  <div className="text-[10px] tracking-editorial uppercase text-muted-foreground">
+                    {s.k}
+                  </div>
+                  <div className="mt-2 font-display text-xl md:text-2xl font-black">
+                    <span className="text-brand">{s.literal}</span>
+                  </div>
+                </motion.div>
+              ))}
         </div>
+
       </motion.div>
     </section>
   );

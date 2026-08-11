@@ -19,7 +19,7 @@ export const FeaturedInventory = () => {
 
   useEffect(() => {
     let mounted = true;
-    (async () => {
+    const load = async () => {
       try {
         const { data } = await supabase
           .from("vehicles")
@@ -37,11 +37,25 @@ export const FeaturedInventory = () => {
       } finally {
         if (mounted) setLoading(false);
       }
-    })();
+    };
+
+    load();
+
+    const channel = supabase
+      .channel("featured-inventory")
+      .on(
+        "postgres_changes",
+        { event: "*", schema: "public", table: "vehicles" },
+        () => load(),
+      )
+      .subscribe();
+
     return () => {
       mounted = false;
+      supabase.removeChannel(channel);
     };
   }, []);
+
 
   const updateArrows = () => {
     const el = scrollerRef.current;
