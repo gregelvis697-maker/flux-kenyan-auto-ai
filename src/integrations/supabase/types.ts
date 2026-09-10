@@ -87,6 +87,90 @@ export type Database = {
           },
         ]
       }
+      buyer_preferences: {
+        Row: {
+          buyer_id: string
+          commute_distance_km: number | null
+          created_at: string
+          fuel_efficiency_importance: string | null
+          fuel_type_preference: string | null
+          id: string
+          include_in_transit_vehicles: boolean
+          interior_vibe: string | null
+          is_active: boolean
+          maintenance_budget_range: string | null
+          mileage_preference: string | null
+          notification_preference: string
+          preferred_features: Json
+          price_max: number | null
+          price_min: number | null
+          primary_use_case: string | null
+          profile_name: string
+          purchase_timeline: string | null
+          transmission_preference: string | null
+          trust_priorities: Json
+          updated_at: string
+          vehicle_type: string | null
+          vibe: string | null
+          year_max: number | null
+          year_min: number | null
+        }
+        Insert: {
+          buyer_id: string
+          commute_distance_km?: number | null
+          created_at?: string
+          fuel_efficiency_importance?: string | null
+          fuel_type_preference?: string | null
+          id?: string
+          include_in_transit_vehicles?: boolean
+          interior_vibe?: string | null
+          is_active?: boolean
+          maintenance_budget_range?: string | null
+          mileage_preference?: string | null
+          notification_preference?: string
+          preferred_features?: Json
+          price_max?: number | null
+          price_min?: number | null
+          primary_use_case?: string | null
+          profile_name?: string
+          purchase_timeline?: string | null
+          transmission_preference?: string | null
+          trust_priorities?: Json
+          updated_at?: string
+          vehicle_type?: string | null
+          vibe?: string | null
+          year_max?: number | null
+          year_min?: number | null
+        }
+        Update: {
+          buyer_id?: string
+          commute_distance_km?: number | null
+          created_at?: string
+          fuel_efficiency_importance?: string | null
+          fuel_type_preference?: string | null
+          id?: string
+          include_in_transit_vehicles?: boolean
+          interior_vibe?: string | null
+          is_active?: boolean
+          maintenance_budget_range?: string | null
+          mileage_preference?: string | null
+          notification_preference?: string
+          preferred_features?: Json
+          price_max?: number | null
+          price_min?: number | null
+          primary_use_case?: string | null
+          profile_name?: string
+          purchase_timeline?: string | null
+          transmission_preference?: string | null
+          trust_priorities?: Json
+          updated_at?: string
+          vehicle_type?: string | null
+          vibe?: string | null
+          year_max?: number | null
+          year_min?: number | null
+        }
+        Relationships: []
+      }
       contact_requests: {
         Row: {
           buyer_email: string
@@ -1103,6 +1187,7 @@ export type Database = {
         Args: { admin_email: string; admin_user_id: string }
         Returns: undefined
       }
+      get_demand_summary: { Args: never; Returns: Json }
       get_public_tracking: { Args: { _token: string }; Returns: Json }
       get_role_status: {
         Args: { _user_id: string }

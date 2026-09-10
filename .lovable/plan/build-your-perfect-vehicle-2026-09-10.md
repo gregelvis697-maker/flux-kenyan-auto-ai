@@ -5,6 +5,7 @@ Turn passive browsing into demand-first discovery: a guided questionnaire that c
 ## What gets built
 
 ### 1. The questionnaire (`/build`)
+
 - 17 questions across 5 sections: vehicle basics, lifestyle/use case, transmission and fuel, features and priorities, buying intent.
 - One question per screen, big touch targets, progress bar ("Question 5 of 17"), Back, Next, and Skip (skipped answers count as "flexible").
 - Works without an account. Answers are held locally as you go; at the end a guest is invited to create an account, and the answers are saved automatically once they sign up.
@@ -12,11 +13,13 @@ Turn passive browsing into demand-first discovery: a guided questionnaire that c
 - Completion screen: visual summary of the profile, then "View my matches", "Edit answers", or "Save and browse".
 
 ### 2. Entry points
+
 - Homepage hero gains a second, equally prominent choice: "Browse Marketplace" or "Build Your Perfect Vehicle" (with "Takes 5 minutes").
 - Marketplace gets a "Match my preferences" toggle that applies the saved profile as filters; can be switched back to show everything.
 - Vehicle pages show a match score badge and a short reason ("Matches your sporty vibe") when a profile exists.
 
 ### 3. Buyer dashboard: "My Perfect Vehicle"
+
 - New sidebar section showing the saved profile as a summary card ("2015-2024 SUVs, KES 1.5M-2.5M, practical and sporty").
 - Current matches listed as vehicle cards with a match score and quick actions.
 - Empty state: "No perfect matches yet - we'll show them here the moment one appears."
@@ -25,12 +28,15 @@ Turn passive browsing into demand-first discovery: a guided questionnaire that c
 - Notification frequency (instant / daily / weekly / none) is stored now; the actual sending of alerts is out of scope for this build.
 
 ### 4. Admin demand view
+
 - New panel in the admin dashboard aggregating saved profiles: most-wanted vehicle types, price bands, timelines, and supply gaps (high demand, few listings) to use when recruiting importers. Individual buyers are never shown - counts only.
 
 ### 5. Favicon
+
 Replace the default icon with the uploaded FLUX mark.
 
 ### 6. Workspace skills
+
 `npx skills add Leonxlnx/taste-skill` and `npx impeccable install` run as part of the build.
 
 ## Matching
@@ -47,4 +53,5 @@ Score out of 100: vehicle type 20, year range 15, price range 15, vibe 15, use c
 - Reuses existing tokens, cards and sidebar patterns - no visual redesign.
 
 ## Out of scope
+
 Real-time alert delivery, price alerts, AI recommendations.
