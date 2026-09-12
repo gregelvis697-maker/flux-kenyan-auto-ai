@@ -357,6 +357,37 @@ export default function Marketplace() {
             />
           </div>
 
+          {/* Preference matching */}
+          <div className="mb-3 flex flex-wrap items-center gap-2">
+            {activePreference ? (
+              <button
+                onClick={() => setMatchMode((m) => !m)}
+                className={cn(
+                  'inline-flex items-center gap-2 px-4 py-2 rounded-full text-xs sm:text-sm font-semibold border transition-all',
+                  matchMode
+                    ? 'bg-primary text-primary-foreground border-primary'
+                    : 'bg-card/60 border-border/60 text-muted-foreground hover:text-foreground'
+                )}
+              >
+                <Sparkles className="h-4 w-4" />
+                {matchMode ? 'Showing your matches' : 'Match my preferences'}
+              </button>
+            ) : (
+              <Link
+                to="/build"
+                className="inline-flex items-center gap-2 px-4 py-2 rounded-full text-xs sm:text-sm font-semibold border border-border/60 bg-card/60 text-muted-foreground hover:text-foreground transition-all"
+              >
+                <Sparkles className="h-4 w-4" />
+                Build your perfect vehicle
+              </Link>
+            )}
+            {matchMode && (
+              <span className="text-xs text-muted-foreground">
+                Based on "{activePreference?.profile_name}"
+              </span>
+            )}
+          </div>
+
           {/* Availability Tabs */}
           <div className="mb-3 -mx-4 sm:mx-0 px-4 sm:px-0 overflow-x-auto scrollbar-hide">
             <div className="inline-flex items-center gap-1 p-1 rounded-full bg-card/60 border border-border/50">
