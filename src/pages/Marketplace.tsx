@@ -295,8 +295,17 @@ export default function Marketplace() {
       }
     });
 
+    // Preference matching — narrows and re-orders by how well each vehicle fits the saved profile
+    if (matchMode && activePreference) {
+      result = result
+        .map((v) => ({ v, score: scoreVehicle(activePreference, v).score }))
+        .filter((x) => x.score >= 50)
+        .sort((a, b) => b.score - a.score)
+        .map((x) => x.v);
+    }
+
     return result;
-  }, [vehicles, searchQuery, filters, sortBy, availability]);
+  }, [vehicles, searchQuery, filters, sortBy, availability, matchMode, activePreference]);
 
   const totalPages = Math.max(1, Math.ceil(filteredVehicles.length / ITEMS_PER_PAGE));
   const safePage = Math.min(currentPage, totalPages);
