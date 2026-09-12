@@ -19,6 +19,9 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { Button } from '@/components/ui/button';
 import { getAvailability } from '@/lib/vehicle-display';
 import { RequestAvailabilityModal } from '@/components/marketplace/RequestAvailabilityModal';
+import { useBuyerPreferences } from '@/hooks/useBuyerPreferences';
+import { scoreVehicle } from '@/lib/preferenceMatching';
+import { Sparkles } from 'lucide-react';
 
 export interface MarketplaceVehicle {
   id: string;
@@ -58,6 +61,12 @@ export default function Marketplace() {
   const [error, setError] = useState(false);
   const [dealerNames, setDealerNames] = useState<Record<string, string>>({});
   const [requestModalOpen, setRequestModalOpen] = useState(false);
+  const [matchMode, setMatchMode] = useState(false);
+  const { preferences } = useBuyerPreferences();
+  const activePreference = useMemo(
+    () => preferences.find((p) => p.is_active) || preferences[0] || null,
+    [preferences],
+  );
 
   // Parse state from URL
   const searchQuery = searchParams.get('q') || '';
