@@ -127,6 +127,15 @@ export const Hero = () => {
               Browse Cars
             </button>
             <button
+              onClick={() => navigate("/build")}
+              className="px-7 sm:px-8 py-4 border border-brand text-brand font-bold uppercase tracking-widest text-xs hover:bg-brand hover:text-brand-foreground transition-colors"
+            >
+              Build Your Perfect Vehicle
+              <span className="block mt-1 text-[10px] font-medium tracking-normal normal-case opacity-70">
+                Takes 5 minutes
+              </span>
+            </button>
+            <button
               onClick={() => navigate("/auth")}
               className="px-7 sm:px-8 py-4 border border-border text-foreground font-bold uppercase tracking-widest text-xs hover:border-brand transition-colors"
             >

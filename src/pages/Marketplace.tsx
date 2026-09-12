@@ -19,6 +19,9 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { Button } from '@/components/ui/button';
 import { getAvailability } from '@/lib/vehicle-display';
 import { RequestAvailabilityModal } from '@/components/marketplace/RequestAvailabilityModal';
+import { useBuyerPreferences } from '@/hooks/useBuyerPreferences';
+import { scoreVehicle } from '@/lib/preferenceMatching';
+import { Sparkles } from 'lucide-react';
 
 export interface MarketplaceVehicle {
   id: string;
@@ -58,6 +61,12 @@ export default function Marketplace() {
   const [error, setError] = useState(false);
   const [dealerNames, setDealerNames] = useState<Record<string, string>>({});
   const [requestModalOpen, setRequestModalOpen] = useState(false);
+  const [matchMode, setMatchMode] = useState(false);
+  const { preferences } = useBuyerPreferences();
+  const activePreference = useMemo(
+    () => preferences.find((p) => p.is_active) || preferences[0] || null,
+    [preferences],
+  );
 
   // Parse state from URL
   const searchQuery = searchParams.get('q') || '';
@@ -286,8 +295,17 @@ export default function Marketplace() {
       }
     });
 
+    // Preference matching — narrows and re-orders by how well each vehicle fits the saved profile
+    if (matchMode && activePreference) {
+      result = result
+        .map((v) => ({ v, score: scoreVehicle(activePreference, v).score }))
+        .filter((x) => x.score >= 50)
+        .sort((a, b) => b.score - a.score)
+        .map((x) => x.v);
+    }
+
     return result;
-  }, [vehicles, searchQuery, filters, sortBy, availability]);
+  }, [vehicles, searchQuery, filters, sortBy, availability, matchMode, activePreference]);
 
   const totalPages = Math.max(1, Math.ceil(filteredVehicles.length / ITEMS_PER_PAGE));
   const safePage = Math.min(currentPage, totalPages);
@@ -337,6 +355,37 @@ export default function Marketplace() {
               className="pl-10 bg-card border-border/50 h-11"
               aria-label="Search vehicles"
             />
+          </div>
+
+          {/* Preference matching */}
+          <div className="mb-3 flex flex-wrap items-center gap-2">
+            {activePreference ? (
+              <button
+                onClick={() => setMatchMode((m) => !m)}
+                className={cn(
+                  'inline-flex items-center gap-2 px-4 py-2 rounded-full text-xs sm:text-sm font-semibold border transition-all',
+                  matchMode
+                    ? 'bg-primary text-primary-foreground border-primary'
+                    : 'bg-card/60 border-border/60 text-muted-foreground hover:text-foreground'
+                )}
+              >
+                <Sparkles className="h-4 w-4" />
+                {matchMode ? 'Showing your matches' : 'Match my preferences'}
+              </button>
+            ) : (
+              <Link
+                to="/build"
+                className="inline-flex items-center gap-2 px-4 py-2 rounded-full text-xs sm:text-sm font-semibold border border-border/60 bg-card/60 text-muted-foreground hover:text-foreground transition-all"
+              >
+                <Sparkles className="h-4 w-4" />
+                Build your perfect vehicle
+              </Link>
+            )}
+            {matchMode && (
+              <span className="text-xs text-muted-foreground">
+                Based on "{activePreference?.profile_name}"
+              </span>
+            )}
           </div>
 
           {/* Availability Tabs */}

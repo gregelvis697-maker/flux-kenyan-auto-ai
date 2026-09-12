@@ -10,6 +10,7 @@ import { ActivityFeed } from '@/components/admin/ActivityFeed';
 import { AdminSidebar } from '@/components/admin/AdminSidebar';
 import { UserTable } from '@/components/admin/UserTable';
 import { InsightsPanel } from '@/components/admin/InsightsPanel';
+import { DemandPanel } from '@/components/admin/DemandPanel';
 import { EmailLogsPanel } from '@/components/admin/EmailLogsPanel';
 import { EmailTemplatesPanel } from '@/components/admin/EmailTemplatesPanel';
 import { AuditTrailViewer } from '@/components/admin/AuditTrailViewer';
@@ -822,6 +823,9 @@ export default function AdminDashboard() {
       case 'insights':
         return <InsightsPanel metrics={metrics} />;
 
+      case 'demand':
+        return <DemandPanel />;
+
       case 'activity':
         return <ActivityFeed activities={activities} loading={false} />;
 
@@ -851,6 +855,7 @@ export default function AdminDashboard() {
       'rejected': 'Rejected Applications',
       'vehicle-verification': 'Vehicle Verification',
       'insights': 'Analytics & Insights',
+      'demand': 'Buyer Demand Insights',
       'activity': 'Activity Log',
       'email-logs': 'Email Logs',
       'email-templates': 'Email Templates',

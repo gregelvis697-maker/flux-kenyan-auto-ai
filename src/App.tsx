@@ -31,6 +31,7 @@ import DealerDashboard from "./pages/DealerDashboard";
 import ImporterDashboard from "./pages/ImporterDashboard";
 import BuyerDashboard from "./pages/BuyerDashboard";
 import Marketplace from "./pages/Marketplace";
+import BuildYourPerfect from "./pages/BuildYourPerfect";
 import VehicleDetail from "./pages/VehicleDetail";
 import NotFound from "./pages/NotFound";
 import Stores from "./pages/Stores";
@@ -56,6 +57,7 @@ const App = () => (
 
           <Route path="/" element={<Index />} />
           <Route path="/marketplace" element={<Marketplace />} />
+          <Route path="/build" element={<BuildYourPerfect />} />
           <Route path="/stores" element={<Stores />} />
           <Route path="/vehicles/:id" element={<VehicleDetail />} />
           <Route path="/track/:token" element={<PublicTracking />} />

@@ -70,6 +70,12 @@ const menuItems = [
     section: 'analytics',
   },
   {
+    id: 'demand',
+    label: 'Buyer Demand',
+    icon: BarChart3,
+    section: 'analytics',
+  },
+  {
     id: 'activity',
     label: 'Activity Log',
     icon: Activity,
