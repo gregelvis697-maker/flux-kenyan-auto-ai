@@ -20,10 +20,12 @@ import { DashboardSidebar, MenuItem } from '@/components/dashboard/DashboardSide
 import { SettingsPanel } from '@/components/dashboard/SettingsPanel';
 import { SavedVehiclesTab } from '@/components/marketplace/SavedVehiclesTab';
 import { PurchaseTrackingList } from '@/components/buyer/PurchaseTrackingList';
+import { MyPerfectVehicleTab } from '@/components/buyer/MyPerfectVehicleTab';
 import { cn } from '@/lib/utils';
 
 const buyerMenuItems: MenuItem[] = [
   { id: 'overview', label: 'Overview', icon: LayoutDashboard },
+  { id: 'my-perfect-vehicle', label: 'My Perfect Vehicle', icon: Sparkles },
   { id: 'saved-vehicles', label: 'Saved Vehicles', icon: Heart },
   { id: 'orders', label: 'My Orders', icon: ShoppingCart },
   { id: 'recommendations', label: 'Recommended Vehicles', icon: Car },
@@ -310,6 +312,9 @@ export default function BuyerDashboard() {
             </Card>
           </div>
         );
+
+      case 'my-perfect-vehicle':
+        return <MyPerfectVehicleTab />;
 
       case 'saved-vehicles':
         return <SavedVehiclesTab />;

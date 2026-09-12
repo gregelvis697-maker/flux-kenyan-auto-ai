@@ -855,6 +855,7 @@ export default function AdminDashboard() {
       'rejected': 'Rejected Applications',
       'vehicle-verification': 'Vehicle Verification',
       'insights': 'Analytics & Insights',
+      'demand': 'Buyer Demand Insights',
       'activity': 'Activity Log',
       'email-logs': 'Email Logs',
       'email-templates': 'Email Templates',
