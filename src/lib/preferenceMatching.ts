@@ -1,5 +1,5 @@
 // Rule-based match scoring between a saved buyer preference and a vehicle listing.
-import type { PreferenceAnswers } from '@/lib/buildQuestions';
+import { asList, type PreferenceAnswers } from '@/lib/buildQuestions';
 
 export interface MatchableVehicle {
   make: string;
@@ -63,14 +63,15 @@ export function scoreVehicle(pref: PreferenceAnswers, v: MatchableVehicle): Matc
   const body = norm(v.body_type);
   const make = norm(v.make);
 
-  // Vehicle type
-  if (!pref.vehicle_type) {
+  // Vehicle type — any selected type counts as a match
+  const wantTypes = asList(pref.vehicle_type);
+  if (wantTypes.length === 0) {
     score += WEIGHTS.type * 0.5;
   } else {
-    const wanted = TYPE_MAP[pref.vehicle_type] || [pref.vehicle_type];
-    if (body && wanted.includes(body)) {
+    const hit = wantTypes.find((t) => body && (TYPE_MAP[t] || [t]).includes(body));
+    if (hit) {
       score += WEIGHTS.type;
-      reasons.push(`Matches your ${pref.vehicle_type} preference`);
+      reasons.push(`Matches your ${hit} preference`);
     } else if (!body) {
       score += WEIGHTS.type * 0.5;
     }
@@ -103,54 +104,54 @@ export function scoreVehicle(pref: PreferenceAnswers, v: MatchableVehicle): Matc
     reasons.push('Slightly above your budget');
   }
 
-  // Vibe
-  if (!pref.vibe) {
+  // Vibe — any selected vibe counts
+  const wantVibes = asList(pref.vibe);
+  if (wantVibes.length === 0) {
     score += WEIGHTS.vibe * 0.5;
   } else {
-    const hints = VIBE_HINTS[pref.vibe] || [];
-    if (hints.some((h) => make.includes(h))) {
+    const hitVibe = wantVibes.find((vb) => (VIBE_HINTS[vb] || []).some((h) => make.includes(h)));
+    if (hitVibe) {
       score += WEIGHTS.vibe;
-      reasons.push(`Fits your ${pref.vibe} vibe`);
+      reasons.push(`Fits your ${hitVibe} vibe`);
     } else {
       score += WEIGHTS.vibe * 0.5;
     }
   }
 
-  // Use case
-  if (!pref.primary_use_case) {
+  // Use case — any selected use case counts
+  const wantUses = asList(pref.primary_use_case);
+  const useTypes = wantUses.flatMap((u) => USE_CASE_TYPES[u] || []);
+  if (wantUses.length === 0 || useTypes.length === 0) {
     score += WEIGHTS.useCase * 0.5;
-  } else {
-    const types = USE_CASE_TYPES[pref.primary_use_case] || [];
-    if (types.length === 0) score += WEIGHTS.useCase * 0.5;
-    else if (body && types.includes(body)) {
-      score += WEIGHTS.useCase;
-      reasons.push('Suits how you plan to use it');
-    } else if (!body) score += WEIGHTS.useCase * 0.5;
+  } else if (body && useTypes.includes(body)) {
+    score += WEIGHTS.useCase;
+    reasons.push('Suits how you plan to use it');
+  } else if (!body) {
+    score += WEIGHTS.useCase * 0.5;
   }
 
   // Fuel
   const fuel = norm(v.fuel_type);
-  const wantFuel = pref.fuel_type_preference;
-  if (!wantFuel || wantFuel === 'both') {
+  const wantFuels = asList(pref.fuel_type_preference);
+  const fuelHit = wantFuels.find((f) =>
+    f === 'hybrid' ? fuel.includes('hybrid') || fuel.includes('electric') : fuel === f,
+  );
+  if (wantFuels.length === 0 || wantFuels.includes('both')) {
     score += WEIGHTS.fuel * 0.5;
-  } else if (wantFuel === 'hybrid') {
-    if (fuel.includes('hybrid') || fuel.includes('electric')) {
-      score += WEIGHTS.fuel;
-      reasons.push('Hybrid or electric, as you asked');
-    }
-  } else if (fuel === wantFuel) {
+  } else if (fuelHit) {
     score += WEIGHTS.fuel;
-    reasons.push(`${wantFuel} engine`);
+    reasons.push(fuelHit === 'hybrid' ? 'Hybrid or electric, as you asked' : `${fuelHit} engine`);
   }
 
   // Transmission
   const trans = norm(v.transmission);
-  const wantTrans = pref.transmission_preference;
-  if (!wantTrans || wantTrans === 'both' || !trans) {
+  const wantTransList = asList(pref.transmission_preference);
+  const transHit = wantTransList.find((t) => trans.includes(t));
+  if (wantTransList.length === 0 || wantTransList.includes('both') || !trans) {
     score += WEIGHTS.transmission * 0.5;
-  } else if (trans.includes(wantTrans)) {
+  } else if (transHit) {
     score += WEIGHTS.transmission;
-    reasons.push(`${wantTrans} transmission`);
+    reasons.push(`${transHit} transmission`);
   }
 
   const rounded = Math.round(score);

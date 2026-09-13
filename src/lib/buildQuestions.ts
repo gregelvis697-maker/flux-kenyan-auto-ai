@@ -28,22 +28,22 @@ export interface Question {
 
 export interface PreferenceAnswers {
   profile_name?: string;
-  vehicle_type?: string | null;
+  vehicle_type?: string[] | null;
   year_min?: number | null;
   year_max?: number | null;
   price_min?: number | null;
   price_max?: number | null;
-  mileage_preference?: string | null;
-  primary_use_case?: string | null;
+  mileage_preference?: string[] | null;
+  primary_use_case?: string[] | null;
   commute_distance_km?: number | null;
-  vibe?: string | null;
-  maintenance_budget_range?: string | null;
+  vibe?: string[] | null;
+  maintenance_budget_range?: string[] | null;
   include_in_transit_vehicles?: boolean;
-  transmission_preference?: string | null;
-  fuel_type_preference?: string | null;
+  transmission_preference?: string[] | null;
+  fuel_type_preference?: string[] | null;
   preferred_features?: string[];
-  interior_vibe?: string | null;
-  fuel_efficiency_importance?: string | null;
+  interior_vibe?: string[] | null;
+  fuel_efficiency_importance?: string[] | null;
   purchase_timeline?: string | null;
   notification_preference?: string | null;
   trust_priorities?: string[];
@@ -56,8 +56,9 @@ export const QUESTIONS: Question[] = [
   {
     id: 'vehicle_type',
     section: 'Vehicle basics',
-    kind: 'single',
+    kind: 'multi',
     field: 'vehicle_type',
+    max: 6,
     title: 'What type of vehicle appeals to you?',
     options: [
       { value: 'sedan', label: 'Sedan', hint: 'Daily commute comfort', emoji: '🚗' },
@@ -87,15 +88,16 @@ export const QUESTIONS: Question[] = [
     fieldMax: 'price_max',
     title: 'What is your total budget?',
     help: 'This is your total budget — monthly financing is available.',
-    min: 300_000,
-    rangeMax: 10_000_000,
-    step: 50_000,
+    min: 250_000,
+    rangeMax: 200_000_000,
+    step: 250_000,
   },
   {
     id: 'mileage_preference',
     section: 'Vehicle basics',
-    kind: 'single',
+    kind: 'multi',
     field: 'mileage_preference',
+    max: 4,
     title: 'Mileage preference?',
     options: [
       { value: 'under_50k', label: 'Under 50,000 km', hint: 'Nearly new' },
@@ -109,8 +111,9 @@ export const QUESTIONS: Question[] = [
   {
     id: 'primary_use_case',
     section: 'Lifestyle',
-    kind: 'single',
+    kind: 'multi',
     field: 'primary_use_case',
+    max: 5,
     title: "What's your primary use case?",
     options: [
       { value: 'commute', label: 'Daily commute to work or school', emoji: '🏙️' },
@@ -137,8 +140,9 @@ export const QUESTIONS: Question[] = [
   {
     id: 'vibe',
     section: 'Lifestyle',
-    kind: 'single',
+    kind: 'multi',
     field: 'vibe',
+    max: 5,
     title: 'Which vibe resonates most?',
     options: [
       { value: 'luxury', label: 'Luxury & status', hint: 'Premium brands, leather, tech', emoji: '🏢' },
@@ -151,8 +155,9 @@ export const QUESTIONS: Question[] = [
   {
     id: 'maintenance_budget_range',
     section: 'Lifestyle',
-    kind: 'single',
+    kind: 'multi',
     field: 'maintenance_budget_range',
+    max: 3,
     title: 'Monthly maintenance budget you are comfortable with?',
     options: [
       { value: 'low', label: 'Low', hint: 'Under KES 5,000 / month' },
@@ -177,8 +182,9 @@ export const QUESTIONS: Question[] = [
   {
     id: 'transmission_preference',
     section: 'Drivetrain',
-    kind: 'single',
+    kind: 'multi',
     field: 'transmission_preference',
+    max: 3,
     title: 'Transmission preference?',
     options: [
       { value: 'automatic', label: 'Automatic', hint: 'Easier in traffic' },
@@ -189,8 +195,9 @@ export const QUESTIONS: Question[] = [
   {
     id: 'fuel_type_preference',
     section: 'Drivetrain',
-    kind: 'single',
+    kind: 'multi',
     field: 'fuel_type_preference',
+    max: 4,
     title: 'Fuel type?',
     options: [
       { value: 'petrol', label: 'Petrol', hint: 'Most common, affordable' },
@@ -206,8 +213,8 @@ export const QUESTIONS: Question[] = [
     section: 'Features',
     kind: 'multi',
     field: 'preferred_features',
-    max: 3,
-    title: 'Which features matter most? Pick up to three.',
+    max: 7,
+    title: 'Which features matter most? Pick all that apply.',
     options: [
       { value: 'sunroof', label: 'Sunroof / panoramic roof' },
       { value: 'leather', label: 'Leather interior' },
@@ -221,8 +228,9 @@ export const QUESTIONS: Question[] = [
   {
     id: 'interior_vibe',
     section: 'Features',
-    kind: 'single',
+    kind: 'multi',
     field: 'interior_vibe',
+    max: 5,
     title: 'Interior vibe preference?',
     options: [
       { value: 'spacious', label: 'Spacious', hint: 'Legroom, open cockpit' },
@@ -235,8 +243,9 @@ export const QUESTIONS: Question[] = [
   {
     id: 'fuel_efficiency_importance',
     section: 'Features',
-    kind: 'single',
+    kind: 'multi',
     field: 'fuel_efficiency_importance',
+    max: 3,
     title: 'How important is fuel efficiency?',
     options: [
       { value: 'critical', label: 'Critical', hint: 'Eco-conscious, budget-aware' },
@@ -293,11 +302,24 @@ export const TOTAL_QUESTIONS = QUESTIONS.length;
 
 export const GUEST_STORAGE_KEY = 'flux.build.v1';
 
-export const labelFor = (questionId: string, value?: string | null): string | null => {
+export const labelFor = (
+  questionId: string,
+  value?: string | string[] | null,
+): string | null => {
   if (value === null || value === undefined || value === '') return null;
   const q = QUESTIONS.find((x) => x.id === questionId);
-  const opt = q?.options?.find((o) => o.value === String(value));
-  return opt?.label ?? String(value);
+  const one = (v: string) => q?.options?.find((o) => o.value === v)?.label ?? v;
+  if (Array.isArray(value)) {
+    const list = value.filter(Boolean).map(one);
+    return list.length ? list.join(', ') : null;
+  }
+  return one(String(value));
+};
+
+/** Normalises a stored answer (legacy single value or array) into a list. */
+export const asList = (value?: string | string[] | null): string[] => {
+  if (value === null || value === undefined || value === '') return [];
+  return Array.isArray(value) ? value.filter(Boolean) : [String(value)];
 };
 
 export const formatKes = (n?: number | null) => {

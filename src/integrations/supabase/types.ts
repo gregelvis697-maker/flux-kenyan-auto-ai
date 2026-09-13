@@ -92,26 +92,26 @@ export type Database = {
           buyer_id: string
           commute_distance_km: number | null
           created_at: string
-          fuel_efficiency_importance: string | null
-          fuel_type_preference: string | null
+          fuel_efficiency_importance: string[] | null
+          fuel_type_preference: string[] | null
           id: string
           include_in_transit_vehicles: boolean
-          interior_vibe: string | null
+          interior_vibe: string[] | null
           is_active: boolean
-          maintenance_budget_range: string | null
-          mileage_preference: string | null
+          maintenance_budget_range: string[] | null
+          mileage_preference: string[] | null
           notification_preference: string
           preferred_features: Json
           price_max: number | null
           price_min: number | null
-          primary_use_case: string | null
+          primary_use_case: string[] | null
           profile_name: string
           purchase_timeline: string | null
-          transmission_preference: string | null
+          transmission_preference: string[] | null
           trust_priorities: Json
           updated_at: string
-          vehicle_type: string | null
-          vibe: string | null
+          vehicle_type: string[] | null
+          vibe: string[] | null
           year_max: number | null
           year_min: number | null
         }
@@ -119,26 +119,26 @@ export type Database = {
           buyer_id: string
           commute_distance_km?: number | null
           created_at?: string
-          fuel_efficiency_importance?: string | null
-          fuel_type_preference?: string | null
+          fuel_efficiency_importance?: string[] | null
+          fuel_type_preference?: string[] | null
           id?: string
           include_in_transit_vehicles?: boolean
-          interior_vibe?: string | null
+          interior_vibe?: string[] | null
           is_active?: boolean
-          maintenance_budget_range?: string | null
-          mileage_preference?: string | null
+          maintenance_budget_range?: string[] | null
+          mileage_preference?: string[] | null
           notification_preference?: string
           preferred_features?: Json
           price_max?: number | null
           price_min?: number | null
-          primary_use_case?: string | null
+          primary_use_case?: string[] | null
           profile_name?: string
           purchase_timeline?: string | null
-          transmission_preference?: string | null
+          transmission_preference?: string[] | null
           trust_priorities?: Json
           updated_at?: string
-          vehicle_type?: string | null
-          vibe?: string | null
+          vehicle_type?: string[] | null
+          vibe?: string[] | null
           year_max?: number | null
           year_min?: number | null
         }
@@ -146,26 +146,26 @@ export type Database = {
           buyer_id?: string
           commute_distance_km?: number | null
           created_at?: string
-          fuel_efficiency_importance?: string | null
-          fuel_type_preference?: string | null
+          fuel_efficiency_importance?: string[] | null
+          fuel_type_preference?: string[] | null
           id?: string
           include_in_transit_vehicles?: boolean
-          interior_vibe?: string | null
+          interior_vibe?: string[] | null
           is_active?: boolean
-          maintenance_budget_range?: string | null
-          mileage_preference?: string | null
+          maintenance_budget_range?: string[] | null
+          mileage_preference?: string[] | null
           notification_preference?: string
           preferred_features?: Json
           price_max?: number | null
           price_min?: number | null
-          primary_use_case?: string | null
+          primary_use_case?: string[] | null
           profile_name?: string
           purchase_timeline?: string | null
-          transmission_preference?: string | null
+          transmission_preference?: string[] | null
           trust_priorities?: Json
           updated_at?: string
-          vehicle_type?: string | null
-          vibe?: string | null
+          vehicle_type?: string[] | null
+          vibe?: string[] | null
           year_max?: number | null
           year_min?: number | null
         }
@@ -454,6 +454,303 @@ export type Database = {
           },
           {
             foreignKeyName: "favorites_vehicle_id_fkey"
+            columns: ["vehicle_id"]
+            isOneToOne: false
+            referencedRelation: "vehicles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      job_state: {
+        Row: {
+          job_name: string
+          last_run_at: string | null
+          lease_until: string | null
+          pause_reason: string | null
+          paused: boolean
+          updated_at: string
+        }
+        Insert: {
+          job_name: string
+          last_run_at?: string | null
+          lease_until?: string | null
+          pause_reason?: string | null
+          paused?: boolean
+          updated_at?: string
+        }
+        Update: {
+          job_name?: string
+          last_run_at?: string | null
+          lease_until?: string | null
+          pause_reason?: string | null
+          paused?: boolean
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      notification_delivery_log: {
+        Row: {
+          bounce_reason: string | null
+          buyer_id: string
+          channel: string
+          created_at: string
+          delivery_status: string
+          id: string
+          notification_id: string | null
+        }
+        Insert: {
+          bounce_reason?: string | null
+          buyer_id: string
+          channel: string
+          created_at?: string
+          delivery_status: string
+          id?: string
+          notification_id?: string | null
+        }
+        Update: {
+          bounce_reason?: string | null
+          buyer_id?: string
+          channel?: string
+          created_at?: string
+          delivery_status?: string
+          id?: string
+          notification_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "notification_delivery_log_notification_id_fkey"
+            columns: ["notification_id"]
+            isOneToOne: false
+            referencedRelation: "notifications"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      notification_preferences: {
+        Row: {
+          buyer_id: string
+          created_at: string
+          daily_digest_hour: number
+          email_enabled: boolean
+          frequency_tier: string
+          id: string
+          in_app_enabled: boolean
+          last_clicked_at: string | null
+          last_notified_at: string | null
+          notification_enabled: boolean
+          notify_new_vehicle: boolean
+          notify_price_drop: boolean
+          notify_tracked_updates: boolean
+          quiet_hours_end: number
+          quiet_hours_start: number
+          snoozed_until: string | null
+          updated_at: string
+          weekly_digest_day: number
+          whatsapp_enabled: boolean
+        }
+        Insert: {
+          buyer_id: string
+          created_at?: string
+          daily_digest_hour?: number
+          email_enabled?: boolean
+          frequency_tier?: string
+          id?: string
+          in_app_enabled?: boolean
+          last_clicked_at?: string | null
+          last_notified_at?: string | null
+          notification_enabled?: boolean
+          notify_new_vehicle?: boolean
+          notify_price_drop?: boolean
+          notify_tracked_updates?: boolean
+          quiet_hours_end?: number
+          quiet_hours_start?: number
+          snoozed_until?: string | null
+          updated_at?: string
+          weekly_digest_day?: number
+          whatsapp_enabled?: boolean
+        }
+        Update: {
+          buyer_id?: string
+          created_at?: string
+          daily_digest_hour?: number
+          email_enabled?: boolean
+          frequency_tier?: string
+          id?: string
+          in_app_enabled?: boolean
+          last_clicked_at?: string | null
+          last_notified_at?: string | null
+          notification_enabled?: boolean
+          notify_new_vehicle?: boolean
+          notify_price_drop?: boolean
+          notify_tracked_updates?: boolean
+          quiet_hours_end?: number
+          quiet_hours_start?: number
+          snoozed_until?: string | null
+          updated_at?: string
+          weekly_digest_day?: number
+          whatsapp_enabled?: boolean
+        }
+        Relationships: []
+      }
+      notification_queue: {
+        Row: {
+          attempts: number
+          created_at: string
+          event_type: string
+          id: string
+          payload: Json
+          processed_at: string | null
+          vehicle_id: string | null
+        }
+        Insert: {
+          attempts?: number
+          created_at?: string
+          event_type: string
+          id?: string
+          payload?: Json
+          processed_at?: string | null
+          vehicle_id?: string | null
+        }
+        Update: {
+          attempts?: number
+          created_at?: string
+          event_type?: string
+          id?: string
+          payload?: Json
+          processed_at?: string | null
+          vehicle_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "notification_queue_vehicle_id_fkey"
+            columns: ["vehicle_id"]
+            isOneToOne: false
+            referencedRelation: "vehicle_risk_flags"
+            referencedColumns: ["vehicle_id"]
+          },
+          {
+            foreignKeyName: "notification_queue_vehicle_id_fkey"
+            columns: ["vehicle_id"]
+            isOneToOne: false
+            referencedRelation: "vehicles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      notifications: {
+        Row: {
+          action_url: string | null
+          body: string
+          buyer_id: string
+          channel: string
+          clicked_at: string | null
+          created_at: string
+          dedupe_key: string | null
+          id: string
+          match_score: number | null
+          notification_type: string
+          preference_id: string | null
+          read_at: string | null
+          sent_at: string | null
+          status: string
+          title: string
+          vehicle_id: string | null
+        }
+        Insert: {
+          action_url?: string | null
+          body: string
+          buyer_id: string
+          channel?: string
+          clicked_at?: string | null
+          created_at?: string
+          dedupe_key?: string | null
+          id?: string
+          match_score?: number | null
+          notification_type: string
+          preference_id?: string | null
+          read_at?: string | null
+          sent_at?: string | null
+          status?: string
+          title: string
+          vehicle_id?: string | null
+        }
+        Update: {
+          action_url?: string | null
+          body?: string
+          buyer_id?: string
+          channel?: string
+          clicked_at?: string | null
+          created_at?: string
+          dedupe_key?: string | null
+          id?: string
+          match_score?: number | null
+          notification_type?: string
+          preference_id?: string | null
+          read_at?: string | null
+          sent_at?: string | null
+          status?: string
+          title?: string
+          vehicle_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "notifications_preference_id_fkey"
+            columns: ["preference_id"]
+            isOneToOne: false
+            referencedRelation: "buyer_preferences"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "notifications_vehicle_id_fkey"
+            columns: ["vehicle_id"]
+            isOneToOne: false
+            referencedRelation: "vehicle_risk_flags"
+            referencedColumns: ["vehicle_id"]
+          },
+          {
+            foreignKeyName: "notifications_vehicle_id_fkey"
+            columns: ["vehicle_id"]
+            isOneToOne: false
+            referencedRelation: "vehicles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      price_history: {
+        Row: {
+          created_at: string
+          id: string
+          price: number
+          price_change_percent: number | null
+          price_previous: number | null
+          vehicle_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          price: number
+          price_change_percent?: number | null
+          price_previous?: number | null
+          vehicle_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          price?: number
+          price_change_percent?: number | null
+          price_previous?: number | null
+          vehicle_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "price_history_vehicle_id_fkey"
+            columns: ["vehicle_id"]
+            isOneToOne: false
+            referencedRelation: "vehicle_risk_flags"
+            referencedColumns: ["vehicle_id"]
+          },
+          {
+            foreignKeyName: "price_history_vehicle_id_fkey"
             columns: ["vehicle_id"]
             isOneToOne: false
             referencedRelation: "vehicles"
@@ -927,6 +1224,42 @@ export type Database = {
           },
         ]
       }
+      vehicle_views: {
+        Row: {
+          buyer_id: string
+          id: string
+          vehicle_id: string
+          viewed_at: string
+        }
+        Insert: {
+          buyer_id: string
+          id?: string
+          vehicle_id: string
+          viewed_at?: string
+        }
+        Update: {
+          buyer_id?: string
+          id?: string
+          vehicle_id?: string
+          viewed_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "vehicle_views_vehicle_id_fkey"
+            columns: ["vehicle_id"]
+            isOneToOne: false
+            referencedRelation: "vehicle_risk_flags"
+            referencedColumns: ["vehicle_id"]
+          },
+          {
+            foreignKeyName: "vehicle_views_vehicle_id_fkey"
+            columns: ["vehicle_id"]
+            isOneToOne: false
+            referencedRelation: "vehicles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       vehicles: {
         Row: {
           availability_status: string | null
@@ -1188,6 +1521,7 @@ export type Database = {
         Returns: undefined
       }
       get_demand_summary: { Args: never; Returns: Json }
+      get_notification_stats: { Args: never; Returns: Json }
       get_public_tracking: { Args: { _token: string }; Returns: Json }
       get_role_status: {
         Args: { _user_id: string }
