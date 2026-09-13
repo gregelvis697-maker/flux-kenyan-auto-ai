@@ -213,7 +213,7 @@ export const QUESTIONS: Question[] = [
     section: 'Features',
     kind: 'multi',
     field: 'preferred_features',
-    max: 3,
+    max: 7,
     title: 'Which features matter most? Pick all that apply.',
     options: [
       { value: 'sunroof', label: 'Sunroof / panoramic roof' },
