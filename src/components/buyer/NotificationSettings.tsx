@@ -31,7 +31,7 @@ interface Prefs {
 }
 
 const DEFAULTS: Prefs = {
-  frequency_tier: 'daily',
+  frequency_tier: 'seriously_considering',
   notification_enabled: true,
   in_app_enabled: true,
   email_enabled: true,
@@ -137,9 +137,9 @@ export function NotificationSettings() {
             <Select value={prefs.frequency_tier} onValueChange={(v) => set('frequency_tier', v)}>
               <SelectTrigger className="w-40"><SelectValue /></SelectTrigger>
               <SelectContent>
-                <SelectItem value="instant">As they happen</SelectItem>
-                <SelectItem value="daily">Daily summary</SelectItem>
-                <SelectItem value="weekly">Weekly summary</SelectItem>
+                <SelectItem value="actively_looking">As they happen</SelectItem>
+                <SelectItem value="seriously_considering">Daily summary</SelectItem>
+                <SelectItem value="planning_ahead">Weekly summary</SelectItem>
               </SelectContent>
             </Select>
           </div>

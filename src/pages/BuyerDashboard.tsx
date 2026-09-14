@@ -13,6 +13,7 @@ import {
   Package,
   Heart,
   Sparkles,
+  Bell,
   ExternalLink
 } from 'lucide-react';
 import { Navigation } from '@/components/Navigation';
