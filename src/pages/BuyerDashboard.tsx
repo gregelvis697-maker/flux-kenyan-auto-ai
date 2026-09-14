@@ -22,6 +22,7 @@ import { SettingsPanel } from '@/components/dashboard/SettingsPanel';
 import { SavedVehiclesTab } from '@/components/marketplace/SavedVehiclesTab';
 import { PurchaseTrackingList } from '@/components/buyer/PurchaseTrackingList';
 import { MyPerfectVehicleTab } from '@/components/buyer/MyPerfectVehicleTab';
+import { NotificationSettings } from '@/components/buyer/NotificationSettings';
 import { cn } from '@/lib/utils';
 
 const buyerMenuItems: MenuItem[] = [
@@ -30,6 +31,7 @@ const buyerMenuItems: MenuItem[] = [
   { id: 'saved-vehicles', label: 'Saved Vehicles', icon: Heart },
   { id: 'orders', label: 'My Orders', icon: ShoppingCart },
   { id: 'recommendations', label: 'Recommended Vehicles', icon: Car },
+  { id: 'notifications', label: 'Notifications', icon: Bell },
   { id: 'settings', label: 'Settings', icon: Settings },
 ];
 
@@ -381,6 +383,9 @@ export default function BuyerDashboard() {
             )}
           </div>
         );
+
+      case 'notifications':
+        return <NotificationSettings />;
 
       case 'settings':
         return <SettingsPanel />;

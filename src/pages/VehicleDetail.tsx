@@ -122,6 +122,23 @@ export default function VehicleDetail() {
     }
   };
 
+  // Record that this buyer looked at the vehicle (powers price-drop alerts)
+  useEffect(() => {
+    if (!user || !id) return;
+    (async () => {
+      try {
+        await (supabase as any)
+          .from('vehicle_views')
+          .upsert(
+            { buyer_id: user.id, vehicle_id: id, viewed_at: new Date().toISOString() },
+            { onConflict: 'buyer_id,vehicle_id' },
+          );
+      } catch (e) {
+        console.error('Unable to record vehicle view', e);
+      }
+    })();
+  }, [user, id]);
+
   // Set page title
   useEffect(() => {
     if (vehicle) {
