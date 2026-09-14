@@ -59,15 +59,18 @@ export function DemandPanel() {
 
   if (!summary || summary.total_profiles === 0) {
     return (
-      <Card className="border-border/50 bg-card/60">
-        <CardContent className="py-12 text-center">
-          <Users className="h-12 w-12 mx-auto text-muted-foreground/50 mb-3" />
-          <p className="text-muted-foreground font-medium">No buyer demand data yet</p>
-          <p className="text-sm text-muted-foreground/70 mt-1">
-            Insights appear once buyers complete the Build Your Perfect Vehicle questionnaire.
-          </p>
-        </CardContent>
-      </Card>
+      <div className="space-y-6">
+        <Card className="border-border/50 bg-card/60">
+          <CardContent className="py-12 text-center">
+            <Users className="h-12 w-12 mx-auto text-muted-foreground/50 mb-3" />
+            <p className="text-muted-foreground font-medium">No buyer demand data yet</p>
+            <p className="text-sm text-muted-foreground/70 mt-1">
+              Insights appear once buyers complete the Build Your Perfect Vehicle questionnaire.
+            </p>
+          </CardContent>
+        </Card>
+        <NotificationStatsPanel />
+      </div>
     );
   }
 
