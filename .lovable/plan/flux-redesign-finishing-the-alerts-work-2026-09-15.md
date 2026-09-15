@@ -24,7 +24,7 @@ The page is cut down to what Flux does:
 1. Hero
 2. Live stats rail
 3. "Everything you need in one platform" — four short capability tiles beside a product visual
-4. Featured inventory (live listings)
+4. Featured inventory (live listings) this should be more prominent so it should be 2nd and be very high up 
 5. One compact trust/verification strip
 6. Single closing call to action + footer
 

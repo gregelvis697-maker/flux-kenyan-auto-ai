@@ -1,179 +1,126 @@
-import { useEffect, useRef, useState } from "react";
-import { motion, useScroll, useTransform } from "framer-motion";
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { HeroNetwork } from "@/components/HeroNetwork";
-import { usePlatformStats } from "@/hooks/usePlatformStats";
+import { motion } from "framer-motion";
+import { Search, ShieldCheck, Route, LineChart } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import heroVehicle from "@/assets/hero-vehicle.jpg";
 
-// Qualitative, non-numeric capability labels (always true, never invented data)
-const STATS: { k: string; literal: string }[] = [
-  { k: "Dealer Verification", literal: "KRA + Yard" },
-  { k: "Coverage", literal: "Kenya-wide" },
-  { k: "Trust Signals", literal: "Real-time" },
+const POPULAR_MAKES = ["Toyota", "Mazda", "Subaru", "Nissan", "Mercedes-Benz"];
+
+const FEATURES = [
+  { icon: ShieldCheck, title: "Verified sellers", body: "Checked before listing" },
+  { icon: LineChart, title: "Fair price signal", body: "Compared to the market" },
+  { icon: Route, title: "Import tracking", body: "Order to delivery" },
 ];
 
 export const Hero = () => {
   const navigate = useNavigate();
-  const sectionRef = useRef<HTMLElement>(null);
-  const { scrollYProgress } = useScroll({
-    target: sectionRef,
-    offset: ["start start", "end start"],
-  });
+  const [query, setQuery] = useState("");
 
-  const bgY = useTransform(scrollYProgress, [0, 1], ["0%", "22%"]);
-  const glowY = useTransform(scrollYProgress, [0, 1], ["0%", "40%"]);
-  const contentY = useTransform(scrollYProgress, [0, 1], ["0%", "-8%"]);
-  const contentOpacity = useTransform(scrollYProgress, [0, 0.8], [1, 0.25]);
-
-  const { data: stats, isLoading: statsLoading } = usePlatformStats();
-
-  // Only metrics with a real, non-zero backend value are rendered.
-  const liveMetrics = stats
-    ? [
-        { k: "Live Listings", literal: stats.liveListings.toLocaleString() , n: stats.liveListings },
-        { k: "Verified Listings", literal: stats.verifiedListings.toLocaleString(), n: stats.verifiedListings },
-        { k: "Verified Dealers", literal: stats.verifiedDealers.toLocaleString(), n: stats.verifiedDealers },
-        { k: "Vehicles Tracked", literal: stats.trackedVehicles.toLocaleString(), n: stats.trackedVehicles },
-      ].filter((m) => m.n > 0)
-    : [];
-
-  const tiles = [...liveMetrics, ...STATS].slice(0, 4);
-
-
-  const [parallax, setParallax] = useState(0);
-  useEffect(() => {
-    const unsub = scrollYProgress.on("change", (v) => setParallax(v * 60));
-    return () => unsub();
-  }, [scrollYProgress]);
+  const search = (term?: string) => {
+    const q = (term ?? query).trim();
+    navigate(q ? `/marketplace?q=${encodeURIComponent(q)}` : "/marketplace");
+  };
 
   return (
-    <section
-      ref={sectionRef}
-      className="relative bg-background/70 text-foreground pt-28 md:pt-36 pb-20 md:pb-28 overflow-hidden"
-    >
-      {/* Parallax network visualisation */}
-      <motion.div
-        aria-hidden
-        style={{ y: bgY, willChange: "transform" }}
-        className="pointer-events-none absolute inset-0 opacity-70"
-      >
-        <HeroNetwork parallax={parallax} />
-      </motion.div>
-
-      {/* Ambient spotlight */}
-      <motion.div
-        aria-hidden
-        style={{ y: glowY, willChange: "transform" }}
-        className="pointer-events-none absolute inset-0 opacity-70"
-      >
-        <div
-          className="absolute inset-0"
-          style={{
-            background:
-              "radial-gradient(ellipse 60% 50% at 50% 0%, hsl(var(--brand) / 0.10), transparent 60%), radial-gradient(ellipse 80% 60% at 50% 100%, hsl(var(--chrome) / 0.05), transparent 70%)",
-          }}
-        />
-      </motion.div>
-
-      <motion.div
-        style={{ y: contentY, opacity: contentOpacity }}
-        className="relative max-w-7xl mx-auto px-6 sm:px-10"
-      >
-        {/* Editorial rail */}
-        <div className="flex items-center gap-4 mb-8">
-          <div className="h-px flex-1 bg-border" />
-          <motion.span
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ duration: 0.8 }}
-            className="text-brand text-[10px] sm:text-xs tracking-editorial font-bold uppercase"
-          >
-            Est. 2024 · Nairobi · Kenya
-          </motion.span>
-        </div>
-
-        <motion.h1
-          initial={{ opacity: 0, y: 20 }}
+    <section className="relative overflow-hidden pt-28 pb-16 md:pt-36 md:pb-24">
+      <div className="max-w-7xl mx-auto px-6 sm:px-10 grid lg:grid-cols-2 gap-12 lg:gap-16 items-center">
+        {/* Left column */}
+        <motion.div
+          initial={{ opacity: 0, y: 18 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
-          className="font-display font-black uppercase leading-[0.85] tracking-tighter"
-          style={{ fontSize: "clamp(3rem, 10vw, 8.5rem)" }}
+          transition={{ duration: 0.5 }}
         >
-          Drive Into
-          <br />
-          The <span className="text-stroke">Future</span>
-        </motion.h1>
+          <span className="inline-flex items-center gap-2 rounded-full border border-border bg-card/60 px-3 py-1 text-[10px] uppercase tracking-editorial text-muted-foreground">
+            <span className="h-1.5 w-1.5 rounded-full bg-primary" />
+            Kenya's verified car marketplace
+          </span>
 
-        <div className="mt-12 md:mt-16 flex flex-col md:flex-row md:items-end justify-between gap-8">
-          <motion.p
-            initial={{ opacity: 0, y: 12 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.15, duration: 0.5 }}
-            className="max-w-md text-base sm:text-lg text-muted-foreground font-light leading-relaxed"
+          <h1 className="mt-6 font-display text-4xl sm:text-5xl lg:text-6xl font-bold tracking-tight leading-[1.02] text-foreground">
+            Find, buy and import
+            <br />
+            cars with <span className="text-primary">confidence</span>
+          </h1>
+
+          <p className="mt-5 text-base sm:text-lg text-muted-foreground leading-relaxed max-w-lg">
+            Verified dealers, documented history and honest pricing — from first
+            search to the day the keys are yours.
+          </p>
+
+          {/* Search */}
+          <form
+            onSubmit={(e) => {
+              e.preventDefault();
+              search();
+            }}
+            className="mt-8 flex items-center gap-2 rounded-xl border border-border bg-card/70 p-2 max-w-lg backdrop-blur-sm"
           >
-            Kenya's premier AI-powered automotive marketplace. High-performance
-            matching for high-performance drivers.
-          </motion.p>
+            <Search className="ml-2 h-4 w-4 text-muted-foreground shrink-0" />
+            <input
+              value={query}
+              onChange={(e) => setQuery(e.target.value)}
+              placeholder="Search by make, model or year"
+              aria-label="Search cars"
+              className="flex-1 bg-transparent text-base text-foreground placeholder:text-muted-foreground focus:outline-none min-h-12"
+            />
+            <Button type="submit" className="min-h-11 px-5 shrink-0">
+              Search cars
+            </Button>
+          </form>
 
-          <motion.div
-            initial={{ opacity: 0, y: 12 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.25, duration: 0.5 }}
-            className="flex flex-wrap gap-3"
+          <div className="mt-5 flex flex-wrap items-center gap-2">
+            <span className="text-xs text-muted-foreground mr-1">Popular:</span>
+            {POPULAR_MAKES.map((make) => (
+              <button
+                key={make}
+                type="button"
+                onClick={() => navigate(`/marketplace?make=${encodeURIComponent(make)}`)}
+                className="rounded-full border border-border px-3 py-1.5 text-xs text-muted-foreground hover:text-primary hover:border-primary/50 transition-colors"
+              >
+                {make}
+              </button>
+            ))}
+          </div>
+
+          <button
+            type="button"
+            onClick={() => navigate("/describe")}
+            className="mt-6 text-sm font-medium text-primary hover:underline underline-offset-4"
           >
-            <button
-              onClick={() => navigate("/marketplace")}
-              className="px-7 sm:px-8 py-4 bg-chrome text-background font-bold uppercase tracking-widest text-xs hover:bg-brand hover:text-brand-foreground transition-colors"
-            >
-              Browse Cars
-            </button>
-            <button
-              onClick={() => navigate("/build")}
-              className="px-7 sm:px-8 py-4 border border-brand text-brand font-bold uppercase tracking-widest text-xs hover:bg-brand hover:text-brand-foreground transition-colors"
-            >
-              Build Your Perfect Vehicle
-              <span className="block mt-1 text-[10px] font-medium tracking-normal normal-case opacity-70">
-                Takes 5 minutes
-              </span>
-            </button>
-            <button
-              onClick={() => navigate("/auth")}
-              className="px-7 sm:px-8 py-4 border border-border text-foreground font-bold uppercase tracking-widest text-xs hover:border-brand transition-colors"
-            >
-              Sell Vehicle
-            </button>
-          </motion.div>
-        </div>
+            Not sure yet? Describe your perfect vehicle →
+          </button>
+        </motion.div>
 
-        {/* Live metric rail — backend-sourced, with loading + empty states */}
-        <div className="mt-16 md:mt-20 grid grid-cols-2 md:grid-cols-4 gap-px bg-border border border-border">
-          {statsLoading
-            ? Array.from({ length: 4 }).map((_, i) => (
-                <div key={i} className="bg-background p-5 md:p-6">
-                  <div className="h-2 w-20 bg-muted animate-pulse" />
-                  <div className="mt-3 h-6 w-24 bg-muted animate-pulse" />
+        {/* Right column */}
+        <motion.div
+          initial={{ opacity: 0, scale: 0.98 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ duration: 0.6, delay: 0.1 }}
+          className="relative"
+        >
+          <div className="relative rounded-2xl overflow-hidden border border-border">
+            <img
+              src={heroVehicle}
+              alt="Modern SUV listed on Flux"
+              width={1280}
+              height={1024}
+              className="w-full h-full object-cover aspect-[5/4]"
+            />
+          </div>
+
+          <div className="mt-4 lg:mt-0 lg:absolute lg:-bottom-8 lg:-left-8 w-full lg:w-64 rounded-xl border border-border bg-card/95 backdrop-blur-md divide-y divide-border shadow-elevated">
+            {FEATURES.map((f) => (
+              <div key={f.title} className="flex items-center gap-3 p-4">
+                <f.icon className="h-4 w-4 text-primary shrink-0" />
+                <div>
+                  <p className="text-sm font-semibold text-foreground">{f.title}</p>
+                  <p className="text-xs text-muted-foreground">{f.body}</p>
                 </div>
-              ))
-            : tiles.map((s, i) => (
-                <motion.div
-                  key={s.k}
-                  initial={{ opacity: 0, y: 16 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true, margin: "-40px" }}
-                  transition={{ duration: 0.45, delay: i * 0.08 }}
-                  className="group relative bg-background p-5 md:p-6 overflow-hidden"
-                >
-                  <span className="absolute left-0 top-0 h-full w-px bg-brand scale-y-0 group-hover:scale-y-100 origin-top transition-transform duration-400" />
-                  <div className="text-[10px] tracking-editorial uppercase text-muted-foreground">
-                    {s.k}
-                  </div>
-                  <div className="mt-2 font-display text-xl md:text-2xl font-black">
-                    <span className="text-brand">{s.literal}</span>
-                  </div>
-                </motion.div>
-              ))}
-        </div>
-
-      </motion.div>
+              </div>
+            ))}
+          </div>
+        </motion.div>
+      </div>
     </section>
   );
 };
