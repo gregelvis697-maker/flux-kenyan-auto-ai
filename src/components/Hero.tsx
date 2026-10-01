@@ -1,8 +1,31 @@
 import { useEffect, useRef, useState } from "react";
 import { motion, useScroll, useTransform } from "framer-motion";
 import { useNavigate } from "react-router-dom";
+import { Search } from "lucide-react";
 import { HeroNetwork } from "@/components/HeroNetwork";
 import { usePlatformStats } from "@/hooks/usePlatformStats";
+import { supabase } from "@/lib/supabase";
+
+const BODY_OPTIONS = [
+  { value: "", label: "Any body type" },
+  { value: "suv", label: "SUV" },
+  { value: "sedan", label: "Sedan" },
+  { value: "van", label: "Van" },
+  { value: "coupe", label: "Coupe" },
+];
+
+const BUDGET_OPTIONS = [
+  { value: "", label: "Any budget" },
+  { value: "1000000", label: "Under KES 1M" },
+  { value: "2000000", label: "Under KES 2M" },
+  { value: "3000000", label: "Under KES 3M" },
+  { value: "5000000", label: "Under KES 5M" },
+  { value: "10000000", label: "Under KES 10M" },
+  { value: "20000000", label: "Under KES 20M" },
+];
+
+const selectClass =
+  "h-12 w-full bg-background/60 border border-border px-3 text-sm text-foreground outline-none focus:border-brand transition-colors appearance-none cursor-pointer";
 
 // Qualitative, non-numeric capability labels (always true, never invented data)
 const STATS: { k: string; literal: string }[] = [
@@ -44,6 +67,38 @@ export const Hero = () => {
     const unsub = scrollYProgress.on("change", (v) => setParallax(v * 60));
     return () => unsub();
   }, [scrollYProgress]);
+
+  // Hero search state
+  const [query, setQuery] = useState("");
+  const [make, setMake] = useState("");
+  const [bodyType, setBodyType] = useState("");
+  const [maxBudget, setMaxBudget] = useState("");
+  const [makes, setMakes] = useState<string[]>([]);
+
+  useEffect(() => {
+    let cancelled = false;
+    supabase
+      .from("vehicles")
+      .select("make")
+      .limit(500)
+      .then(({ data }) => {
+        if (cancelled || !data) return;
+        const unique = [...new Set(data.map((v) => v.make).filter(Boolean))].sort();
+        setMakes(unique);
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  const handleSearch = () => {
+    const params = new URLSearchParams();
+    if (query.trim()) params.set("q", query.trim());
+    if (make) params.set("make", make);
+    if (bodyType) params.set("body", bodyType);
+    if (maxBudget) params.set("maxPrice", maxBudget);
+    navigate(`/marketplace${params.toString() ? `?${params.toString()}` : ""}`);
+  };
 
   return (
     <section
@@ -103,7 +158,66 @@ export const Hero = () => {
           The <span className="text-stroke">Future</span>
         </motion.h1>
 
-        <div className="mt-12 md:mt-16 flex flex-col md:flex-row md:items-end justify-between gap-8">
+        {/* Search bar with quick filters */}
+        <motion.div
+          initial={{ opacity: 0, y: 12 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.1, duration: 0.5 }}
+          className="mt-12 md:mt-16 border border-border bg-background/50 backdrop-blur-md p-3 md:p-4"
+        >
+          <div className="grid grid-cols-1 md:grid-cols-[1fr_180px_160px_170px_auto] gap-2">
+            <div className="relative">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground pointer-events-none" />
+              <input
+                type="text"
+                value={query}
+                onChange={(e) => setQuery(e.target.value)}
+                onKeyDown={(e) => e.key === "Enter" && handleSearch()}
+                placeholder="Search make, model…"
+                className="h-12 w-full bg-background/60 border border-border pl-10 pr-3 text-sm text-foreground placeholder:text-muted-foreground outline-none focus:border-brand transition-colors"
+              />
+            </div>
+            <select
+              value={make}
+              onChange={(e) => setMake(e.target.value)}
+              className={selectClass}
+              aria-label="Make"
+            >
+              <option value="">Any make</option>
+              {makes.map((m) => (
+                <option key={m} value={m}>{m}</option>
+              ))}
+            </select>
+            <select
+              value={bodyType}
+              onChange={(e) => setBodyType(e.target.value)}
+              className={selectClass}
+              aria-label="Body type"
+            >
+              {BODY_OPTIONS.map((o) => (
+                <option key={o.value} value={o.value}>{o.label}</option>
+              ))}
+            </select>
+            <select
+              value={maxBudget}
+              onChange={(e) => setMaxBudget(e.target.value)}
+              className={selectClass}
+              aria-label="Max budget"
+            >
+              {BUDGET_OPTIONS.map((o) => (
+                <option key={o.value} value={o.value}>{o.label}</option>
+              ))}
+            </select>
+            <button
+              onClick={handleSearch}
+              className="h-12 px-8 bg-brand text-brand-foreground font-bold uppercase tracking-widest text-xs hover:bg-chrome hover:text-background transition-colors"
+            >
+              Search
+            </button>
+          </div>
+        </motion.div>
+
+        <div className="mt-8 flex flex-col md:flex-row md:items-end justify-between gap-8">
           <motion.p
             initial={{ opacity: 0, y: 12 }}
             animate={{ opacity: 1, y: 0 }}

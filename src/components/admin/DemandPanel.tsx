@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { supabase } from '@/lib/supabase';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Users, TrendingUp, AlertTriangle } from 'lucide-react';
+import { NotificationStatsPanel } from '@/components/admin/NotificationStatsPanel';
 
 interface TypeRow {
   vehicle_type: string;
