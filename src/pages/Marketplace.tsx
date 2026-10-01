@@ -289,6 +289,7 @@ export default function Marketplace() {
         case 'price_asc': return a.price - b.price;
         case 'price_desc': return b.price - a.price;
         case 'mileage_asc': return (a.mileage || 999999) - (b.mileage || 999999);
+        case 'mileage_desc': return (b.mileage || 0) - (a.mileage || 0);
         case 'year_desc': return b.year - a.year;
         case 'newest':
         default: return new Date(b.created_at).getTime() - new Date(a.created_at).getTime();
