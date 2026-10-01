@@ -158,7 +158,66 @@ export const Hero = () => {
           The <span className="text-stroke">Future</span>
         </motion.h1>
 
-        <div className="mt-12 md:mt-16 flex flex-col md:flex-row md:items-end justify-between gap-8">
+        {/* Search bar with quick filters */}
+        <motion.div
+          initial={{ opacity: 0, y: 12 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.1, duration: 0.5 }}
+          className="mt-12 md:mt-16 border border-border bg-background/50 backdrop-blur-md p-3 md:p-4"
+        >
+          <div className="grid grid-cols-1 md:grid-cols-[1fr_180px_160px_170px_auto] gap-2">
+            <div className="relative">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground pointer-events-none" />
+              <input
+                type="text"
+                value={query}
+                onChange={(e) => setQuery(e.target.value)}
+                onKeyDown={(e) => e.key === "Enter" && handleSearch()}
+                placeholder="Search make, model…"
+                className="h-12 w-full bg-background/60 border border-border pl-10 pr-3 text-sm text-foreground placeholder:text-muted-foreground outline-none focus:border-brand transition-colors"
+              />
+            </div>
+            <select
+              value={make}
+              onChange={(e) => setMake(e.target.value)}
+              className={selectClass}
+              aria-label="Make"
+            >
+              <option value="">Any make</option>
+              {makes.map((m) => (
+                <option key={m} value={m}>{m}</option>
+              ))}
+            </select>
+            <select
+              value={bodyType}
+              onChange={(e) => setBodyType(e.target.value)}
+              className={selectClass}
+              aria-label="Body type"
+            >
+              {BODY_OPTIONS.map((o) => (
+                <option key={o.value} value={o.value}>{o.label}</option>
+              ))}
+            </select>
+            <select
+              value={maxBudget}
+              onChange={(e) => setMaxBudget(e.target.value)}
+              className={selectClass}
+              aria-label="Max budget"
+            >
+              {BUDGET_OPTIONS.map((o) => (
+                <option key={o.value} value={o.value}>{o.label}</option>
+              ))}
+            </select>
+            <button
+              onClick={handleSearch}
+              className="h-12 px-8 bg-brand text-brand-foreground font-bold uppercase tracking-widest text-xs hover:bg-chrome hover:text-background transition-colors"
+            >
+              Search
+            </button>
+          </div>
+        </motion.div>
+
+        <div className="mt-8 flex flex-col md:flex-row md:items-end justify-between gap-8">
           <motion.p
             initial={{ opacity: 0, y: 12 }}
             animate={{ opacity: 1, y: 0 }}
