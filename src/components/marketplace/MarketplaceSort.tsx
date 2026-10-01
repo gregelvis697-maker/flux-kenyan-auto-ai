@@ -6,13 +6,14 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 
-export type SortOption = 'newest' | 'price_asc' | 'price_desc' | 'mileage_asc' | 'year_desc';
+export type SortOption = 'newest' | 'price_asc' | 'price_desc' | 'mileage_asc' | 'mileage_desc' | 'year_desc';
 
 const SORT_OPTIONS: { value: SortOption; label: string }[] = [
   { value: 'newest', label: 'Newest First' },
   { value: 'price_asc', label: 'Price: Low to High' },
   { value: 'price_desc', label: 'Price: High to Low' },
   { value: 'mileage_asc', label: 'Lowest Mileage' },
+  { value: 'mileage_desc', label: 'Highest Mileage' },
   { value: 'year_desc', label: 'Newest Year' },
 ];
 
@@ -21,6 +22,7 @@ const SORT_LABELS: Record<SortOption, string> = {
   price_asc: 'Price: Low to High',
   price_desc: 'Price: High to Low',
   mileage_asc: 'Lowest Mileage',
+  mileage_desc: 'Highest Mileage',
   year_desc: 'Newest Year',
 };
 
