@@ -1,8 +1,31 @@
 import { useEffect, useRef, useState } from "react";
 import { motion, useScroll, useTransform } from "framer-motion";
 import { useNavigate } from "react-router-dom";
+import { Search } from "lucide-react";
 import { HeroNetwork } from "@/components/HeroNetwork";
 import { usePlatformStats } from "@/hooks/usePlatformStats";
+import { supabase } from "@/lib/supabase";
+
+const BODY_OPTIONS = [
+  { value: "", label: "Any body type" },
+  { value: "suv", label: "SUV" },
+  { value: "sedan", label: "Sedan" },
+  { value: "van", label: "Van" },
+  { value: "coupe", label: "Coupe" },
+];
+
+const BUDGET_OPTIONS = [
+  { value: "", label: "Any budget" },
+  { value: "1000000", label: "Under KES 1M" },
+  { value: "2000000", label: "Under KES 2M" },
+  { value: "3000000", label: "Under KES 3M" },
+  { value: "5000000", label: "Under KES 5M" },
+  { value: "10000000", label: "Under KES 10M" },
+  { value: "20000000", label: "Under KES 20M" },
+];
+
+const selectClass =
+  "h-12 w-full bg-background/60 border border-border px-3 text-sm text-foreground outline-none focus:border-brand transition-colors appearance-none cursor-pointer";
 
 // Qualitative, non-numeric capability labels (always true, never invented data)
 const STATS: { k: string; literal: string }[] = [
