@@ -68,6 +68,38 @@ export const Hero = () => {
     return () => unsub();
   }, [scrollYProgress]);
 
+  // Hero search state
+  const [query, setQuery] = useState("");
+  const [make, setMake] = useState("");
+  const [bodyType, setBodyType] = useState("");
+  const [maxBudget, setMaxBudget] = useState("");
+  const [makes, setMakes] = useState<string[]>([]);
+
+  useEffect(() => {
+    let cancelled = false;
+    supabase
+      .from("vehicles")
+      .select("make")
+      .limit(500)
+      .then(({ data }) => {
+        if (cancelled || !data) return;
+        const unique = [...new Set(data.map((v) => v.make).filter(Boolean))].sort();
+        setMakes(unique);
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  const handleSearch = () => {
+    const params = new URLSearchParams();
+    if (query.trim()) params.set("q", query.trim());
+    if (make) params.set("make", make);
+    if (bodyType) params.set("body", bodyType);
+    if (maxBudget) params.set("maxPrice", maxBudget);
+    navigate(`/marketplace${params.toString() ? `?${params.toString()}` : ""}`);
+  };
+
   return (
     <section
       ref={sectionRef}
