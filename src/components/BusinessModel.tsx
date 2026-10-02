@@ -30,11 +30,11 @@ export const BusinessModel = () => {
           className="text-center mb-10 sm:mb-12 lg:mb-16"
         >
           <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold mb-4 sm:mb-6 px-2">
-            <span className="text-foreground">Sustainable </span>
-            <span className="bg-gradient-primary bg-clip-text text-transparent">Revenue Model</span>
+            <span className="text-foreground">Simple, </span>
+            <span className="text-primary">honest pricing</span>
           </h2>
           <p className="text-base sm:text-lg lg:text-xl text-muted-foreground max-w-2xl mx-auto px-4">
-            Dual revenue streams powering growth and innovation.
+            Dealers pay a monthly listing plan. Buyers pay nothing.
           </p>
         </motion.div>
 

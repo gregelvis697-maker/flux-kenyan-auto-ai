@@ -20,10 +20,10 @@ import { Button } from "@/components/ui/button";
 const solutions = [
   {
     icon: ShieldCheck,
-    title: "Blockchain Trust",
+    title: "Verified Dealers",
     description:
-      "Immutable verification of dealers, vehicles, and transaction histories.",
-    bullets: ["Verified Records", "Tamper-Proof", "Full Transparency"],
+      "Every dealer's documents and credentials are checked before they can list.",
+    bullets: ["Verified Records", "Checked Credentials", "Open Histories"],
   },
   {
     icon: Brain,
@@ -36,35 +36,35 @@ const solutions = [
     icon: Network,
     title: "Direct Connect",
     description:
-      "Remove middlemen and connect buyers directly with verified dealers.",
+      "Buyers talk straight to verified dealers — no brokers in between.",
     bullets: ["No Brokers", "Direct Contact", "Fair Prices"],
   },
   {
     icon: BarChart3,
-    title: "Market Analytics",
+    title: "Live Market Prices",
     description:
-      "Comprehensive data insights empower better decisions for all stakeholders.",
-    bullets: ["Live Pricing", "Demand Forecasting", "Market Reports"],
+      "Current asking prices and demand data for the models you're shopping.",
+    bullets: ["Live Pricing", "Demand Signals", "Market Reports"],
   },
   {
     icon: Zap,
     title: "Instant Verification",
     description:
-      "Real-time authentication of documents, vehicles, and dealer credentials.",
+      "Documents, photos, and dealer details checked as listings come in.",
     bullets: ["Document Scanning", "Photo Verification", "Instant Approval"],
   },
   {
     icon: Lock,
-    title: "Secure Payments",
+    title: "Safe Payments",
     description:
-      "Escrow services and encrypted transactions protect every party involved.",
-    bullets: ["Escrow System", "Multiple Gateways", "Refund Protection"],
+      "Deal and pay through the platform, with buyer and seller protection.",
+    bullets: ["Platform Payments", "Known Providers", "Refund Support"],
   },
 ];
 
 const stakeholders = [
   {
-    label: "WHOLESALE POWER",
+    label: "FOR IMPORTERS",
     title: "Importers",
     icon: Ship,
     description:
@@ -79,7 +79,7 @@ const stakeholders = [
     showCta: true,
   },
   {
-    label: "MARKET LEADERS",
+    label: "FOR DEALERS",
     title: "Dealers",
     icon: Store,
     description:
@@ -94,7 +94,7 @@ const stakeholders = [
     showCta: true,
   },
   {
-    label: "SMART SHOPPERS",
+    label: "FOR BUYERS",
     title: "Buyers",
     icon: ShoppingCart,
     description:
@@ -109,7 +109,7 @@ const stakeholders = [
     showCta: true,
   },
   {
-    label: "PLATFORM CONTROL",
+    label: "FOR ADMINS",
     title: "Admin",
     icon: Settings,
     description:
@@ -138,12 +138,6 @@ export const SolutionSection = () => {
 
   return (
     <section id="solution" className="relative overflow-hidden">
-      {/* Background effects */}
-      <div className="absolute inset-0">
-        <div className="absolute top-1/2 left-1/3 w-48 sm:w-72 lg:w-96 h-48 sm:h-72 lg:h-96 bg-primary/10 rounded-full blur-[80px] sm:blur-[100px] lg:blur-[120px]" />
-        <div className="absolute bottom-1/3 right-1/4 w-48 sm:w-72 lg:w-96 h-48 sm:h-72 lg:h-96 bg-secondary/10 rounded-full blur-[80px] sm:blur-[100px] lg:blur-[120px]" />
-      </div>
-
       {/* Part A: The FLUX Solution */}
       <div className="py-16 sm:py-20 lg:py-24 relative z-10" ref={ref}>
         <div className="container mx-auto px-4 sm:px-6">
@@ -155,13 +149,12 @@ export const SolutionSection = () => {
           >
             <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold mb-4 sm:mb-6 px-2">
               <span className="text-foreground">The </span>
-              <span className="bg-gradient-primary bg-clip-text text-transparent">
+              <span className="text-primary">
                 FLUX Solution
               </span>
             </h2>
             <p className="text-base sm:text-lg lg:text-xl text-muted-foreground max-w-2xl mx-auto px-4">
-              Six revolutionary pillars transforming Kenya's automotive
-              infrastructure.
+              What the platform does for you, from first search to final payment.
             </p>
           </motion.div>
 
@@ -174,7 +167,7 @@ export const SolutionSection = () => {
                 transition={{ duration: 0.4, delay: index * 0.1 }}
                 className="group"
               >
-                <div className="relative h-full p-5 sm:p-6 lg:p-8 bg-gradient-card rounded-xl border border-border hover:border-primary/50 transition-all duration-300 shadow-card hover:shadow-elevated">
+                <div className="relative h-full p-5 sm:p-6 lg:p-8 bg-gradient-card rounded-xl border border-border border-l-2 border-l-primary/70 hover:border-primary/50 transition-colors duration-300 shadow-card">
                   {/* Icon */}
                   <div className="mb-4 sm:mb-5 inline-flex p-3 sm:p-4 rounded-xl bg-primary/15 border border-primary/20 group-hover:shadow-glow-primary transition-all duration-300">
                     <item.icon className="w-6 h-6 sm:w-7 sm:h-7 text-primary" />
@@ -220,13 +213,12 @@ export const SolutionSection = () => {
           >
             <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold mb-4 sm:mb-6 px-2">
               <span className="text-foreground">Built for </span>
-              <span className="bg-gradient-primary bg-clip-text text-transparent">
+              <span className="text-primary">
                 Every Stakeholder
               </span>
             </h2>
             <p className="text-base sm:text-lg lg:text-xl text-muted-foreground max-w-2xl mx-auto px-4">
-              Tailored solutions for importers, dealers, buyers, and
-              administrators.
+              Importers, dealers, and buyers each get tools built for their side of the deal.
             </p>
           </motion.div>
 
