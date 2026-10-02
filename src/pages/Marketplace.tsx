@@ -22,6 +22,7 @@ import { RequestAvailabilityModal } from '@/components/marketplace/RequestAvaila
 import { useBuyerPreferences } from '@/hooks/useBuyerPreferences';
 import { scoreVehicle } from '@/lib/preferenceMatching';
 import { Sparkles } from 'lucide-react';
+import { AiDescribeSearch } from '@/components/AiDescribeSearch';
 
 export interface MarketplaceVehicle {
   id: string;
@@ -357,6 +358,12 @@ export default function Marketplace() {
               aria-label="Search vehicles"
             />
           </div>
+
+          <details className="mb-4 border border-border/50 bg-card px-4 py-3">
+            <summary className="cursor-pointer text-sm font-semibold text-foreground">Describe your ideal car (AI search)</summary>
+            <div className="mt-3"><AiDescribeSearch /></div>
+          </details>
+
 
           {/* Preference matching */}
           <div className="mb-3 flex flex-wrap items-center gap-2">

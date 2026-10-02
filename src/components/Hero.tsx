@@ -1,31 +1,29 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { motion, useScroll, useTransform } from "framer-motion";
 import { useNavigate } from "react-router-dom";
-import { Search } from "lucide-react";
+import { ChevronsRight, Search, Wand2 } from "lucide-react";
 import { HeroNetwork } from "@/components/HeroNetwork";
+import { AiDescribeSearch } from "@/components/AiDescribeSearch";
 import { usePlatformStats } from "@/hooks/usePlatformStats";
 import { supabase } from "@/lib/supabase";
 
-const BODY_OPTIONS = [
-  { value: "", label: "Any body type" },
-  { value: "suv", label: "SUV" },
-  { value: "sedan", label: "Sedan" },
-  { value: "van", label: "Van" },
-  { value: "coupe", label: "Coupe" },
+const FUEL_OPTIONS = [
+  { value: "", label: "Fuel Type" },
+  { value: "petrol", label: "Petrol" },
+  { value: "diesel", label: "Diesel" },
+  { value: "hybrid", label: "Hybrid" },
+  { value: "electric", label: "Electric" },
 ];
 
-const BUDGET_OPTIONS = [
-  { value: "", label: "Any budget" },
-  { value: "1000000", label: "Under KES 1M" },
-  { value: "2000000", label: "Under KES 2M" },
-  { value: "3000000", label: "Under KES 3M" },
-  { value: "5000000", label: "Under KES 5M" },
-  { value: "10000000", label: "Under KES 10M" },
-  { value: "20000000", label: "Under KES 20M" },
-];
+const CURRENT_YEAR = new Date().getFullYear();
+const YEARS = Array.from({ length: 20 }, (_, i) => String(CURRENT_YEAR - i));
+
+const PRICE_STEPS = [500000, 1000000, 2000000, 3000000, 5000000, 10000000, 20000000, 50000000, 100000000, 200000000].map(
+  (v) => ({ value: String(v), label: `KES ${v >= 1000000 ? `${v / 1000000}M` : `${v / 1000}K`}` })
+);
 
 const selectClass =
-  "h-12 w-full bg-background/60 border border-border px-3 text-sm text-foreground outline-none focus:border-brand transition-colors appearance-none cursor-pointer";
+  "h-12 w-full bg-transparent border-0 border-b border-border px-0 text-sm text-foreground outline-none focus:border-brand transition-colors cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed [&>option]:bg-card";
 
 // Qualitative, non-numeric capability labels (always true, never invented data)
 const STATS: { k: string; literal: string }[] = [
@@ -71,32 +69,43 @@ export const Hero = () => {
   // Hero search state
   const [query, setQuery] = useState("");
   const [make, setMake] = useState("");
-  const [bodyType, setBodyType] = useState("");
-  const [maxBudget, setMaxBudget] = useState("");
-  const [makes, setMakes] = useState<string[]>([]);
+  const [model, setModel] = useState("");
+  const [fuel, setFuel] = useState("");
+  const [year, setYear] = useState("");
+  const [minPrice, setMinPrice] = useState("");
+  const [maxPrice, setMaxPrice] = useState("");
+  const [rows, setRows] = useState<{ make: string; model: string }[]>([]);
 
   useEffect(() => {
     let cancelled = false;
     supabase
       .from("vehicles")
-      .select("make")
-      .limit(500)
+      .select("make, model")
+      .limit(1000)
       .then(({ data }) => {
         if (cancelled || !data) return;
-        const unique = [...new Set(data.map((v) => v.make).filter(Boolean))].sort();
-        setMakes(unique);
+        setRows(data as { make: string; model: string }[]);
       });
     return () => {
       cancelled = true;
     };
   }, []);
 
+  const makes = useMemo(() => [...new Set(rows.map((r) => r.make).filter(Boolean))].sort(), [rows]);
+  const models = useMemo(
+    () => [...new Set(rows.filter((r) => r.make === make).map((r) => r.model).filter(Boolean))].sort(),
+    [rows, make]
+  );
+
   const handleSearch = () => {
     const params = new URLSearchParams();
     if (query.trim()) params.set("q", query.trim());
     if (make) params.set("make", make);
-    if (bodyType) params.set("body", bodyType);
-    if (maxBudget) params.set("maxPrice", maxBudget);
+    if (model) params.set("model", model);
+    if (fuel) params.set("fuel", fuel);
+    if (year) params.set("minYear", year);
+    if (minPrice) params.set("minPrice", minPrice);
+    if (maxPrice) params.set("maxPrice", maxPrice);
     navigate(`/marketplace${params.toString() ? `?${params.toString()}` : ""}`);
   };
 
@@ -158,62 +167,65 @@ export const Hero = () => {
           The <span className="text-stroke">Future</span>
         </motion.h1>
 
-        {/* Search bar with quick filters */}
+        {/* Find a Car panel */}
         <motion.div
           initial={{ opacity: 0, y: 12 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.1, duration: 0.5 }}
-          className="mt-12 md:mt-16 border border-border bg-background/50 backdrop-blur-md p-3 md:p-4"
+          className="mt-12 md:mt-16 bg-card text-card-foreground border border-border shadow-2xl p-5 md:p-8"
         >
-          <div className="grid grid-cols-1 md:grid-cols-[1fr_180px_160px_170px_auto] gap-2">
-            <div className="relative">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground pointer-events-none" />
-              <input
-                type="text"
-                value={query}
-                onChange={(e) => setQuery(e.target.value)}
-                onKeyDown={(e) => e.key === "Enter" && handleSearch()}
-                placeholder="Search make, model…"
-                className="h-12 w-full bg-background/60 border border-border pl-10 pr-3 text-sm text-foreground placeholder:text-muted-foreground outline-none focus:border-brand transition-colors"
-              />
-            </div>
-            <select
-              value={make}
-              onChange={(e) => setMake(e.target.value)}
-              className={selectClass}
-              aria-label="Make"
-            >
-              <option value="">Any make</option>
-              {makes.map((m) => (
-                <option key={m} value={m}>{m}</option>
-              ))}
+          <h2 className="font-display text-xl md:text-2xl font-black uppercase tracking-tight">Find a Car</h2>
+          <span className="mt-2 block h-0.5 w-12 bg-brand" />
+
+          <div className="mt-6 grid grid-cols-2 md:grid-cols-[repeat(6,minmax(0,1fr))_auto] gap-x-4 gap-y-5 items-end">
+            <select value={make} onChange={(e) => { setMake(e.target.value); setModel(""); }} className={selectClass} aria-label="Make">
+              <option value="">Select Make</option>
+              {makes.map((m) => <option key={m} value={m}>{m}</option>)}
             </select>
-            <select
-              value={bodyType}
-              onChange={(e) => setBodyType(e.target.value)}
-              className={selectClass}
-              aria-label="Body type"
-            >
-              {BODY_OPTIONS.map((o) => (
-                <option key={o.value} value={o.value}>{o.label}</option>
-              ))}
+            <select value={model} onChange={(e) => setModel(e.target.value)} className={selectClass} aria-label="Model" disabled={!make}>
+              <option value="">Select Model</option>
+              {models.map((m) => <option key={m} value={m}>{m}</option>)}
             </select>
-            <select
-              value={maxBudget}
-              onChange={(e) => setMaxBudget(e.target.value)}
-              className={selectClass}
-              aria-label="Max budget"
-            >
-              {BUDGET_OPTIONS.map((o) => (
-                <option key={o.value} value={o.value}>{o.label}</option>
-              ))}
+            <select value={fuel} onChange={(e) => setFuel(e.target.value)} className={selectClass} aria-label="Fuel type">
+              {FUEL_OPTIONS.map((o) => <option key={o.value} value={o.value}>{o.label}</option>)}
+            </select>
+            <select value={year} onChange={(e) => setYear(e.target.value)} className={selectClass} aria-label="Year from">
+              <option value="">Year</option>
+              {YEARS.map((y) => <option key={y} value={y}>{y}+</option>)}
+            </select>
+            <select value={minPrice} onChange={(e) => setMinPrice(e.target.value)} className={selectClass} aria-label="Min price">
+              <option value="">Min Price</option>
+              {PRICE_STEPS.map((p) => <option key={p.value} value={p.value}>{p.label}</option>)}
+            </select>
+            <select value={maxPrice} onChange={(e) => setMaxPrice(e.target.value)} className={selectClass} aria-label="Max price">
+              <option value="">Max Price</option>
+              {PRICE_STEPS.map((p) => <option key={p.value} value={p.value}>{p.label}</option>)}
             </select>
             <button
               onClick={handleSearch}
-              className="h-12 px-8 bg-brand text-brand-foreground font-bold uppercase tracking-widest text-xs hover:bg-chrome hover:text-background transition-colors"
+              className="col-span-2 md:col-span-1 h-12 px-8 inline-flex items-center justify-center gap-1 bg-brand text-brand-foreground font-bold uppercase tracking-widest text-xs hover:bg-chrome hover:text-background transition-colors"
             >
-              Search
+              Search <ChevronsRight className="h-4 w-4" />
             </button>
+          </div>
+
+          <div className="mt-6 relative">
+            <Search className="absolute left-0 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground pointer-events-none" />
+            <input
+              type="text"
+              value={query}
+              onChange={(e) => setQuery(e.target.value)}
+              onKeyDown={(e) => e.key === "Enter" && handleSearch()}
+              placeholder="or search by keyword…"
+              className="h-10 w-full bg-transparent border-b border-border pl-6 text-sm text-foreground placeholder:text-muted-foreground outline-none focus:border-brand transition-colors"
+            />
+          </div>
+
+          <div className="mt-8 pt-6 border-t border-border">
+            <div className="flex items-center gap-2 mb-2 text-xs font-bold uppercase tracking-widest text-brand">
+              <Wand2 className="h-4 w-4" /> Or describe your ideal car
+            </div>
+            <AiDescribeSearch />
           </div>
         </motion.div>
 
