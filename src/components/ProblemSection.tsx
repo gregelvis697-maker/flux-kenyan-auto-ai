@@ -76,7 +76,7 @@ export const ProblemSection = () => {
               transition={{ duration: 0.4, delay: index * 0.1 }}
               className="group"
             >
-              <div className="relative p-6 sm:p-7 lg:p-8 bg-gradient-card rounded-xl border border-border hover:border-destructive/40 transition-all duration-300 shadow-card hover:shadow-elevated hover:scale-[1.02] h-full">
+              <div className="relative p-6 sm:p-7 lg:p-8 bg-gradient-card rounded-xl border border-border hover:border-destructive/40 transition-all duration-300 shadow-card hover:shadow-elevated h-full">
                 {/* Icon */}
                 <div
                   className={`mb-4 sm:mb-5 inline-flex p-3 sm:p-4 rounded-xl ${problem.iconBg} border border-border/50`}

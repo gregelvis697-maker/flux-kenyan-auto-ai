@@ -162,7 +162,7 @@ export default function BuyerDashboard() {
 
             {/* Metrics Grid */}
             <div className="grid gap-3 sm:gap-4 md:gap-6 grid-cols-1 sm:grid-cols-3">
-              <Card className="bg-card/60 backdrop-blur-lg border-border/50 shadow-card hover:shadow-elevated transition-all duration-300 group">
+              <Card className="bg-card/60 border border-border shadow-card">
                 <CardHeader className="flex flex-row items-center justify-between pb-2 space-y-0">
                   <CardTitle className="text-xs sm:text-sm font-medium text-muted-foreground">
                     Contact Requests
@@ -177,7 +177,7 @@ export default function BuyerDashboard() {
                 </CardContent>
               </Card>
 
-              <Card className="bg-card/60 backdrop-blur-lg border-border/50 shadow-card hover:shadow-elevated transition-all duration-300 group">
+              <Card className="bg-card/60 border border-border shadow-card">
                 <CardHeader className="flex flex-row items-center justify-between pb-2 space-y-0">
                   <CardTitle className="text-xs sm:text-sm font-medium text-muted-foreground">
                     Saved Vehicles
@@ -192,7 +192,7 @@ export default function BuyerDashboard() {
                 </CardContent>
               </Card>
 
-              <Card className="bg-card/60 backdrop-blur-lg border-border/50 shadow-card hover:shadow-elevated transition-all duration-300 group">
+              <Card className="bg-card/60 border border-border shadow-card">
                 <CardHeader className="flex flex-row items-center justify-between pb-2 space-y-0">
                   <CardTitle className="text-xs sm:text-sm font-medium text-muted-foreground">
                     Recommendations
@@ -335,7 +335,7 @@ export default function BuyerDashboard() {
             {recommendations.length > 0 ? (
               <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
                 {recommendations.map((vehicle) => (
-                  <Card key={vehicle.id} className="bg-card/60 backdrop-blur-lg border-border/50 shadow-card hover:shadow-elevated transition-all duration-300 group overflow-hidden">
+                  <Card key={vehicle.id} className="bg-card/60 border border-border shadow-card overflow-hidden">
                     <div className="aspect-video bg-muted/30 relative overflow-hidden">
                       {vehicle.photos && vehicle.photos.length > 0 ? (
                         <img
