@@ -61,12 +61,12 @@ export const QUESTIONS: Question[] = [
     max: 6,
     title: 'What type of vehicle appeals to you?',
     options: [
-      { value: 'sedan', label: 'Sedan', hint: 'Daily commute comfort', emoji: '🚗' },
-      { value: 'suv', label: 'SUV / Crossover', hint: 'Space & versatility', emoji: '🚙' },
-      { value: 'hatchback', label: 'Hatchback', hint: 'Agile & practical', emoji: '🚘' },
-      { value: 'van', label: 'Van / MPV', hint: 'Family transport', emoji: '🚐' },
-      { value: 'pickup', label: 'Truck / Pickup', hint: 'Work & adventure', emoji: '🛻' },
-      { value: 'sports', label: 'Sports / Luxury', hint: 'Performance & status', emoji: '🏎️' },
+      { value: 'sedan', label: 'Sedan', hint: 'Daily commute comfort' },
+      { value: 'suv', label: 'SUV / Crossover', hint: 'Space & versatility' },
+      { value: 'hatchback', label: 'Hatchback', hint: 'Agile & practical' },
+      { value: 'van', label: 'Van / MPV', hint: 'Family transport' },
+      { value: 'pickup', label: 'Truck / Pickup', hint: 'Work & adventure' },
+      { value: 'sports', label: 'Sports / Luxury', hint: 'Performance & status' },
     ],
   },
   {
@@ -116,11 +116,11 @@ export const QUESTIONS: Question[] = [
     max: 5,
     title: "What's your primary use case?",
     options: [
-      { value: 'commute', label: 'Daily commute to work or school', emoji: '🏙️' },
-      { value: 'adventure', label: 'Weekend adventures & fun', emoji: '⛰️' },
-      { value: 'business', label: 'Business / professional transport', emoji: '💼' },
-      { value: 'family', label: 'Family daily transportation', emoji: '👨‍👩‍👧' },
-      { value: 'occasional', label: 'Occasional / special trips', emoji: '🧭' },
+      { value: 'commute', label: 'Daily commute to work or school' },
+      { value: 'adventure', label: 'Weekend adventures & fun' },
+      { value: 'business', label: 'Business / professional transport' },
+      { value: 'family', label: 'Family daily transportation' },
+      { value: 'occasional', label: 'Occasional / special trips' },
     ],
   },
   {
@@ -145,11 +145,11 @@ export const QUESTIONS: Question[] = [
     max: 5,
     title: 'Which vibe resonates most?',
     options: [
-      { value: 'luxury', label: 'Luxury & status', hint: 'Premium brands, leather, tech', emoji: '🏢' },
-      { value: 'practical', label: 'Practical & reliable', hint: 'Low maintenance, trustworthy', emoji: '🎯' },
-      { value: 'sporty', label: 'Sporty & fun', hint: 'Performance, handling, distinctive', emoji: '⚡' },
-      { value: 'eco', label: 'Eco-conscious', hint: 'Low consumption, hybrid or electric', emoji: '🌿' },
-      { value: 'professional', label: 'Professional', hint: 'Modern, clean, business-appropriate', emoji: '💼' },
+      { value: 'luxury', label: 'Luxury & status', hint: 'Premium brands, leather, tech' },
+      { value: 'practical', label: 'Practical & reliable', hint: 'Low maintenance, trustworthy' },
+      { value: 'sporty', label: 'Sporty & fun', hint: 'Performance, handling, distinctive' },
+      { value: 'eco', label: 'Eco-conscious', hint: 'Low consumption, hybrid or electric' },
+      { value: 'professional', label: 'Professional', hint: 'Modern, clean, business-appropriate' },
     ],
   },
   {
@@ -173,8 +173,8 @@ export const QUESTIONS: Question[] = [
     title: 'Do you want to see vehicles currently in transit?',
     help: 'Track the import journey and get told the moment it lands.',
     options: [
-      { value: 'true', label: 'Yes — show me vehicles on the way', hint: 'Track progress stage by stage', emoji: '🚢' },
-      { value: 'false', label: 'Only show what is available now', emoji: '📍' },
+      { value: 'true', label: 'Yes — show me vehicles on the way', hint: 'Track progress stage by stage' },
+      { value: 'false', label: 'Only show what is available now' },
     ],
   },
 
@@ -262,9 +262,9 @@ export const QUESTIONS: Question[] = [
     field: 'purchase_timeline',
     title: 'When are you planning to buy?',
     options: [
-      { value: 'active', label: 'Actively looking', hint: 'Next 30 days', emoji: '🔥' },
-      { value: 'serious', label: 'Seriously considering', hint: 'Next 3 months', emoji: '🌤️' },
-      { value: 'dreaming', label: 'Planning ahead', hint: '6+ months, just browsing', emoji: '🌙' },
+      { value: 'active', label: 'Actively looking', hint: 'Next 30 days' },
+      { value: 'serious', label: 'Seriously considering', hint: 'Next 3 months' },
+      { value: 'dreaming', label: 'Planning ahead', hint: '6+ months, just browsing' },
     ],
   },
   {

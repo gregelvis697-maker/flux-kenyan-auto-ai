@@ -117,7 +117,7 @@ export default function PublicTracking() {
           />
         )}
 
-        <Card className="bg-card/60 backdrop-blur-lg border-border/50">
+        <Card className="bg-card border-border/60">
           <CardHeader className="pb-3">
             <CardTitle className="text-base sm:text-lg">Current Status</CardTitle>
           </CardHeader>
@@ -139,7 +139,7 @@ export default function PublicTracking() {
           </CardContent>
         </Card>
 
-        <Card className="bg-card/60 backdrop-blur-lg border-border/50">
+        <Card className="bg-card border-border/60">
           <CardHeader className="pb-3">
             <CardTitle className="text-base sm:text-lg">Journey</CardTitle>
           </CardHeader>
@@ -150,7 +150,7 @@ export default function PublicTracking() {
         </Card>
 
         {importer && (importer.whatsapp_number || importer.phone_number || importer.email_public) && (
-          <Card className="bg-card/60 backdrop-blur-lg border-border/50">
+          <Card className="bg-card border-border/60">
             <CardHeader className="pb-3">
               <CardTitle className="text-base sm:text-lg">
                 Your importer{importer.name ? `: ${importer.name}` : ''}
