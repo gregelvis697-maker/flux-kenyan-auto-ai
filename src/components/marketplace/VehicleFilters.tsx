@@ -77,7 +77,7 @@ export function VehicleFilters({
       </div>
 
       <CollapsibleContent>
-        <div className="bg-card/60 backdrop-blur-lg border border-border/50 rounded-lg p-4 mb-4">
+        <div className="bg-card border border-border/60 rounded-lg p-4 mb-4">
           <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
             {/* Make Filter */}
             <div className="space-y-2">

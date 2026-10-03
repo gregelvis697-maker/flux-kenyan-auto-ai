@@ -1,5 +1,5 @@
 import { useNavigate } from 'react-router-dom';
-import { Car, Heart, Fuel, Gauge, Calendar, Settings, Users, ArrowRight, ShieldCheck, Phone } from 'lucide-react';
+import { Car, Heart, Fuel, Gauge, Calendar, Settings, Users, ArrowRight, ShieldCheck, Phone, Camera } from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -81,7 +81,7 @@ export function VehicleCard({
   return (
     <Card
       className={cn(
-        'bg-card border-border/50 shadow-card hover:shadow-elevated transition-all duration-300 group overflow-hidden cursor-pointer',
+        'bg-card border-border/50 shadow-card hover:border-primary/40 transition-colors duration-300 group overflow-hidden cursor-pointer',
         isSold && 'opacity-95'
       )}
       onClick={handleCardClick}
@@ -130,7 +130,7 @@ export function VehicleCard({
         {vehicle.photos && vehicle.photos.length > 1 && (
           <div className="absolute bottom-3 left-3 z-10">
             <span className="bg-background/70 backdrop-blur-sm text-foreground text-xs px-2 py-1 rounded-md">
-              📷 {vehicle.photos.length}
+              <span className="inline-flex items-center gap-1"><Camera className="h-3 w-3" />{vehicle.photos.length}</span>
             </span>
           </div>
         )}
@@ -140,7 +140,7 @@ export function VehicleCard({
           <button
             className={cn(
               'absolute bottom-3 right-3 z-10 h-9 w-9 rounded-full flex items-center justify-center bg-background/70 backdrop-blur-sm hover:bg-background/90 transition-all',
-              isFavorited && 'text-rose-500'
+              isFavorited && 'text-destructive'
             )}
             onClick={(e) => {
               e.stopPropagation();
@@ -191,7 +191,7 @@ export function VehicleCard({
 
         {/* Price or Call for Price */}
         {isSold ? (
-          <p className="text-lg font-bold text-rose-500">SOLD</p>
+          <p className="text-lg font-bold text-destructive">SOLD</p>
         ) : callForPrice ? (
           <Tooltip delayDuration={0}>
             <TooltipTrigger asChild>

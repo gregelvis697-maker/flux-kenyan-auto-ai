@@ -127,7 +127,7 @@ export function SavedVehiclesTab() {
             return (
               <Card
                 key={saved.id}
-                className="bg-card/60 backdrop-blur-lg border-border/50 shadow-card hover:shadow-elevated transition-all duration-300 group overflow-hidden"
+                className="bg-card border-border/60 shadow-card group overflow-hidden"
               >
                 <div className="aspect-video bg-muted/30 relative overflow-hidden">
                   {vehicle.photos && vehicle.photos.length > 0 ? (
@@ -211,7 +211,7 @@ export function SavedVehiclesTab() {
           })}
         </div>
       ) : (
-        <Card className="bg-card/60 backdrop-blur-lg border-border/50 shadow-card">
+        <Card className="bg-card border-border/60 shadow-card">
           <CardContent className="py-12 text-center">
             <Heart className="h-12 w-12 mx-auto text-muted-foreground/50 mb-3" />
             <p className="text-muted-foreground font-medium">No saved vehicles</p>

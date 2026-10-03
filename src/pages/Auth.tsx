@@ -104,7 +104,7 @@ const Auth = () => {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-background/55 via-background/70 to-primary/5 p-4 sm:p-6">
+    <div className="min-h-screen flex items-center justify-center bg-background/70 p-4 sm:p-6">
       <Link 
         to="/" 
         className="absolute top-4 left-4 sm:top-6 sm:left-6 inline-flex items-center gap-1.5 sm:gap-2 text-muted-foreground hover:text-foreground transition-colors p-2 -m-2 rounded-lg active:bg-accent/50"
@@ -113,7 +113,7 @@ const Auth = () => {
         <span className="text-sm font-medium">Back to Home</span>
       </Link>
       
-      <Card className="w-full max-w-md border-border/50 bg-card/80 backdrop-blur-sm shadow-card">
+      <Card className="w-full max-w-md border-border/50 bg-card shadow-card">
         <CardHeader className="space-y-1 pb-4 sm:pb-6">
           <CardTitle className="text-xl sm:text-2xl font-bold">
             {isLogin ? 'Sign In' : 'Create Account'}
