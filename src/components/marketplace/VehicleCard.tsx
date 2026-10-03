@@ -156,7 +156,7 @@ export function VehicleCard({
       {/* Content */}
       <CardContent className="p-4 space-y-3">
         {/* Title */}
-        <h3 className="font-semibold text-base text-foreground line-clamp-1">
+        <h3 className="font-semibold text-base text-foreground line-clamp-1 capitalize">
           {vehicle.year} {vehicle.make} {vehicle.model}
         </h3>
 
