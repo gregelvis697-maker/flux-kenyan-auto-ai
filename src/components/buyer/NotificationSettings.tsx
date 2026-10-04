@@ -122,7 +122,7 @@ export function NotificationSettings() {
         {saving && <Loader2 className="h-4 w-4 animate-spin text-muted-foreground mt-2" />}
       </div>
 
-      <Card className="bg-card/60 backdrop-blur-lg border-border/50">
+      <Card className="bg-card border-border/50">
         <CardHeader>
           <CardTitle className="text-lg">Alerts</CardTitle>
           <CardDescription>Turn everything off with one switch.</CardDescription>
@@ -146,7 +146,7 @@ export function NotificationSettings() {
         </CardContent>
       </Card>
 
-      <Card className="bg-card/60 backdrop-blur-lg border-border/50">
+      <Card className="bg-card border-border/50">
         <CardHeader>
           <CardTitle className="text-lg">Where to reach you</CardTitle>
         </CardHeader>
@@ -161,7 +161,7 @@ export function NotificationSettings() {
         </CardContent>
       </Card>
 
-      <Card className="bg-card/60 backdrop-blur-lg border-border/50">
+      <Card className="bg-card border-border/50">
         <CardHeader>
           <CardTitle className="text-lg">What to tell you about</CardTitle>
         </CardHeader>
@@ -172,7 +172,7 @@ export function NotificationSettings() {
         </CardContent>
       </Card>
 
-      <Card className="bg-card/60 backdrop-blur-lg border-border/50">
+      <Card className="bg-card border-border/50">
         <CardHeader>
           <CardTitle className="text-lg">Timing</CardTitle>
           <CardDescription>Nothing is sent during your quiet hours.</CardDescription>
@@ -229,7 +229,7 @@ export function NotificationSettings() {
         </CardContent>
       </Card>
 
-      <Card className="bg-card/60 backdrop-blur-lg border-border/50">
+      <Card className="bg-card border-border/50">
         <CardHeader>
           <CardTitle className="text-lg flex items-center gap-2">
             <BellOff className="h-4 w-4" /> Pause alerts

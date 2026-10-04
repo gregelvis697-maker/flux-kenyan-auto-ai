@@ -124,7 +124,7 @@ export default function DealerDashboard() {
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-background/65">
-        <div className="animate-spin rounded-full h-10 w-10 border-2 border-primary border-t-transparent shadow-[0_0_20px_hsl(var(--primary)/0.5)]"></div>
+        <div className="animate-spin rounded-full h-10 w-10 border-2 border-primary border-t-transparent"></div>
       </div>
     );
   }
@@ -183,7 +183,7 @@ export default function DealerDashboard() {
             </div>
 
             {/* Quick Actions */}
-            <Card className="bg-card/60 backdrop-blur-lg border-border/50 shadow-card">
+            <Card className="bg-card border-border/50 shadow-card">
               <CardHeader>
                 <CardTitle className="text-lg">Quick Actions</CardTitle>
               </CardHeader>
@@ -193,7 +193,7 @@ export default function DealerDashboard() {
                     onClick={() => setActiveTab('requests')}
                     className="p-4 rounded-lg bg-muted/30 hover:bg-muted/50 transition-colors text-left group"
                   >
-                    <FileText className="h-6 w-6 text-primary mb-2 group-hover:scale-110 transition-transform" />
+                    <FileText className="h-6 w-6 text-primary mb-2" />
                     <p className="font-medium text-sm">New Import Request</p>
                     <p className="text-xs text-muted-foreground">Create a new vehicle import request</p>
                   </button>
@@ -201,7 +201,7 @@ export default function DealerDashboard() {
                     onClick={() => setActiveTab('imports')}
                     className="p-4 rounded-lg bg-muted/30 hover:bg-muted/50 transition-colors text-left group"
                   >
-                    <Truck className="h-6 w-6 text-secondary mb-2 group-hover:scale-110 transition-transform" />
+                    <Truck className="h-6 w-6 text-secondary mb-2" />
                     <p className="font-medium text-sm">Track Shipments</p>
                     <p className="text-xs text-muted-foreground">Monitor your active imports</p>
                   </button>
@@ -209,7 +209,7 @@ export default function DealerDashboard() {
                     onClick={() => setActiveTab('inventory')}
                     className="p-4 rounded-lg bg-muted/30 hover:bg-muted/50 transition-colors text-left group"
                   >
-                    <LayoutGrid className="h-6 w-6 text-emerald-400 mb-2 group-hover:scale-110 transition-transform" />
+                    <LayoutGrid className="h-6 w-6 text-emerald-400 mb-2" />
                     <p className="font-medium text-sm">Manage Inventory</p>
                     <p className="text-xs text-muted-foreground">Update your vehicle listings</p>
                   </button>

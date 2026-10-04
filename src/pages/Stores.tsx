@@ -163,7 +163,7 @@ export default function Stores() {
         </header>
 
         {/* Search panel */}
-        <Card className="bg-card/60 backdrop-blur-lg border-border/50 mb-6">
+        <Card className="bg-card border-border/50 mb-6">
           <CardContent className="p-4 sm:p-5 space-y-4">
             <div className="grid grid-cols-1 md:grid-cols-[1fr_auto] gap-3">
               <div className="flex flex-col sm:flex-row gap-2">

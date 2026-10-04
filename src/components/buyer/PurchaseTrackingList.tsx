@@ -70,7 +70,7 @@ export function PurchaseTrackingList() {
   if (loading || items.length === 0) return null;
 
   return (
-    <Card className="bg-card/60 backdrop-blur-lg border-border/50 shadow-card">
+    <Card className="bg-card border-border/50 shadow-card">
       <CardHeader>
         <CardTitle className="flex items-center gap-2 text-base sm:text-lg">
           <Package className="h-5 w-5 text-primary" />

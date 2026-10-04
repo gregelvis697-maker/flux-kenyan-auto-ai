@@ -142,7 +142,7 @@ export default function BuyerDashboard() {
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-background/65">
-        <div className="animate-spin rounded-full h-10 w-10 border-2 border-primary border-t-transparent shadow-[0_0_20px_hsl(var(--primary)/0.5)]"></div>
+        <div className="animate-spin rounded-full h-10 w-10 border-2 border-primary border-t-transparent"></div>
       </div>
     );
   }
@@ -209,7 +209,7 @@ export default function BuyerDashboard() {
             </div>
 
             {/* Recent Activity */}
-            <Card className="bg-card/60 backdrop-blur-lg border-border/50 shadow-card">
+            <Card className="bg-card border-border/50 shadow-card">
               <CardHeader>
                 <CardTitle className="text-lg">Recent Contact Requests</CardTitle>
                 <CardDescription>Your latest dealer inquiries</CardDescription>
@@ -264,7 +264,7 @@ export default function BuyerDashboard() {
 
 
 
-            <Card className="bg-card/60 backdrop-blur-lg border-border/50 shadow-card">
+            <Card className="bg-card border-border/50 shadow-card">
               <CardContent className="p-0">
                 {orders.length > 0 ? (
                   <div className="overflow-x-auto">
@@ -369,7 +369,7 @@ export default function BuyerDashboard() {
                 ))}
               </div>
             ) : (
-              <Card className="bg-card/60 backdrop-blur-lg border-border/50 shadow-card">
+              <Card className="bg-card border-border/50 shadow-card">
                 <CardContent className="p-6">
                   <div className="text-center py-12">
                     <Sparkles className="h-12 w-12 mx-auto text-muted-foreground/50 mb-3" />
