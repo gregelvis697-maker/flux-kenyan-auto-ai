@@ -134,7 +134,7 @@ export function DealerSettingsContact({ userId }: { userId: string }) {
 
   if (loading) {
     return (
-      <Card className="bg-card/60 backdrop-blur-lg border-border/50">
+      <Card className="bg-card border-border/50">
         <CardContent className="flex items-center justify-center py-10">
           <Loader2 className="h-6 w-6 animate-spin text-primary" />
         </CardContent>
@@ -143,7 +143,7 @@ export function DealerSettingsContact({ userId }: { userId: string }) {
   }
 
   return (
-    <Card className="bg-card/60 backdrop-blur-lg border-border/50">
+    <Card className="bg-card border-border/50">
       <CardHeader>
         <CardTitle className="flex items-center gap-2 text-lg">
           <Phone className="h-5 w-5 text-primary" />

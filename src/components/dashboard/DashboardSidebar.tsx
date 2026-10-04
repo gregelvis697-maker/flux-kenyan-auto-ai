@@ -165,7 +165,7 @@ export function DashboardSidebar({
       {/* Desktop Sidebar - Fixed */}
       <aside
         className={cn(
-          'hidden lg:block fixed left-0 top-16 h-[calc(100vh-4rem)] border-r border-border/50 bg-card/50 backdrop-blur-lg transition-all duration-300 z-40',
+          'hidden lg:block fixed left-0 top-16 h-[calc(100vh-4rem)] border-r border-border/50 bg-card transition-all duration-300 z-40',
           collapsed ? 'w-16' : 'w-64'
         )}
       >

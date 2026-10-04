@@ -37,7 +37,7 @@ export function SubscriptionCard({ subscription }: Props) {
 
   return (
     <div className="space-y-4">
-      <Card className="bg-card/60 backdrop-blur-lg border-border/50 shadow-card">
+      <Card className="bg-card border-border/50 shadow-card">
         <CardHeader className="flex flex-row items-start justify-between gap-2 space-y-0">
           <div>
             <CardTitle className="text-lg">Your subscription</CardTitle>
@@ -130,7 +130,7 @@ export function SubscriptionCard({ subscription }: Props) {
       </Card>
 
       {/* Plan comparison */}
-      <Card className="bg-card/60 backdrop-blur-lg border-border/50 shadow-card">
+      <Card className="bg-card border-border/50 shadow-card">
         <CardHeader>
           <CardTitle className="text-base">Plan details</CardTitle>
         </CardHeader>

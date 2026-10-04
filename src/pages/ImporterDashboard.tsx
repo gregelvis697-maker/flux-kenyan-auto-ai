@@ -89,7 +89,7 @@ export default function ImporterDashboard() {
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-background/65">
-        <div className="animate-spin rounded-full h-10 w-10 border-2 border-primary border-t-transparent shadow-[0_0_20px_hsl(var(--primary)/0.5)]"></div>
+        <div className="animate-spin rounded-full h-10 w-10 border-2 border-primary border-t-transparent"></div>
       </div>
     );
   }
@@ -106,7 +106,7 @@ export default function ImporterDashboard() {
                   <CardTitle className="text-xs sm:text-sm font-medium text-muted-foreground">
                     Available Requests
                   </CardTitle>
-                  <div className="p-2 rounded-lg bg-primary/10 group-hover:bg-primary/20 transition-colors">
+                  <div className="p-2 rounded-lg bg-primary/10">
                     <Package className="h-4 w-4 sm:h-5 sm:w-5 text-primary" />
                   </div>
                 </CardHeader>
@@ -121,7 +121,7 @@ export default function ImporterDashboard() {
                   <CardTitle className="text-xs sm:text-sm font-medium text-muted-foreground">
                     Shipments In Progress
                   </CardTitle>
-                  <div className="p-2 rounded-lg bg-secondary/10 group-hover:bg-secondary/20 transition-colors">
+                  <div className="p-2 rounded-lg bg-secondary/10">
                     <Truck className="h-4 w-4 sm:h-5 sm:w-5 text-secondary" />
                   </div>
                 </CardHeader>
@@ -136,8 +136,8 @@ export default function ImporterDashboard() {
                   <CardTitle className="text-xs sm:text-sm font-medium text-muted-foreground">
                     Delivered
                   </CardTitle>
-                  <div className="p-2 rounded-lg bg-emerald-500/10 group-hover:bg-emerald-500/20 transition-colors">
-                    <CheckCircle className="h-4 w-4 sm:h-5 sm:w-5 text-emerald-400" />
+                  <div className="p-2 rounded-lg bg-primary/10">
+                    <CheckCircle className="h-4 w-4 sm:h-5 sm:w-5 text-primary" />
                   </div>
                 </CardHeader>
                 <CardContent className="pt-0">
@@ -148,7 +148,7 @@ export default function ImporterDashboard() {
             </div>
 
             {/* Quick Actions */}
-            <Card className="bg-card/60 backdrop-blur-lg border-border/50 shadow-card">
+            <Card className="bg-card border-border/50 shadow-card">
               <CardHeader>
                 <CardTitle className="text-lg">Quick Actions</CardTitle>
               </CardHeader>
@@ -158,7 +158,7 @@ export default function ImporterDashboard() {
                     onClick={() => setActiveTab('available')}
                     className="p-4 rounded-lg bg-muted/30 hover:bg-muted/50 transition-colors text-left group"
                   >
-                    <FileText className="h-6 w-6 text-primary mb-2 group-hover:scale-110 transition-transform" />
+                    <FileText className="h-6 w-6 text-primary mb-2" />
                     <p className="font-medium text-sm">Browse Requests</p>
                     <p className="text-xs text-muted-foreground">View available import requests</p>
                   </button>
@@ -166,7 +166,7 @@ export default function ImporterDashboard() {
                     onClick={() => setActiveTab('shipments')}
                     className="p-4 rounded-lg bg-muted/30 hover:bg-muted/50 transition-colors text-left group"
                   >
-                    <Ship className="h-6 w-6 text-secondary mb-2 group-hover:scale-110 transition-transform" />
+                    <Ship className="h-6 w-6 text-secondary mb-2" />
                     <p className="font-medium text-sm">Track Shipments</p>
                     <p className="text-xs text-muted-foreground">Monitor your active imports</p>
                   </button>
@@ -174,7 +174,7 @@ export default function ImporterDashboard() {
                     onClick={() => setActiveTab('delivered')}
                     className="p-4 rounded-lg bg-muted/30 hover:bg-muted/50 transition-colors text-left group"
                   >
-                    <MapPin className="h-6 w-6 text-emerald-400 mb-2 group-hover:scale-110 transition-transform" />
+                    <MapPin className="h-6 w-6 text-primary mb-2" />
                     <p className="font-medium text-sm">View Completed</p>
                     <p className="text-xs text-muted-foreground">Review delivered shipments</p>
                   </button>

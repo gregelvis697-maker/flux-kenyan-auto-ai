@@ -260,7 +260,7 @@ export function TrackingTab() {
 
   if (vehicles.length === 0) {
     return (
-      <Card className="bg-card/60 backdrop-blur-lg border-border/50">
+      <Card className="bg-card border-border/50">
         <CardContent className="py-12 text-center">
           <Ship className="mx-auto mb-3 h-8 w-8 text-muted-foreground opacity-50" />
           <p className="font-medium text-foreground">No trackable vehicles yet</p>
@@ -275,7 +275,7 @@ export function TrackingTab() {
   return (
     <div className="grid grid-cols-1 gap-4 lg:grid-cols-[300px_1fr] lg:gap-6">
       {/* Vehicle list */}
-      <Card className="bg-card/60 backdrop-blur-lg border-border/50">
+      <Card className="bg-card border-border/50">
         <CardHeader className="pb-3">
           <CardTitle className="text-base">My Vehicles</CardTitle>
         </CardHeader>
@@ -309,7 +309,7 @@ export function TrackingTab() {
       {/* Detail */}
       <div className="space-y-4">
         {selectedVehicle && (
-          <Card className="bg-card/60 backdrop-blur-lg border-border/50">
+          <Card className="bg-card border-border/50">
             <CardHeader className="pb-3">
               <CardTitle className="text-base sm:text-lg">
                 {selectedVehicle.year} {selectedVehicle.make} {selectedVehicle.model}
@@ -374,7 +374,7 @@ export function TrackingTab() {
           </Card>
         )}
 
-        <Card className="bg-card/60 backdrop-blur-lg border-border/50">
+        <Card className="bg-card border-border/50">
           <CardHeader className="pb-3">
             <CardTitle className="text-base">Tracking Timeline</CardTitle>
           </CardHeader>

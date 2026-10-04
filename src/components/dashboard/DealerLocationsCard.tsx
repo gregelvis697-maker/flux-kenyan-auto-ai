@@ -125,7 +125,7 @@ export function DealerLocationsCard({ userId }: DealerLocationsCardProps) {
   };
 
   return (
-    <Card className="bg-card/60 backdrop-blur-lg border-border/50">
+    <Card className="bg-card border-border/50">
       <CardHeader>
         <CardTitle className="flex items-center gap-2 text-lg">
           <Building2 className="h-5 w-5 text-primary" />

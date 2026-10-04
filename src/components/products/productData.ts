@@ -117,7 +117,7 @@ export const marketplaceData: ProductData = {
     { question: "How do you verify dealers?", answer: "Every dealer must provide: business registration documents, KRA PIN certificate, physical yard location, and pass our background check. We also monitor reviews and performance to ensure continued quality." },
     { question: "Are all listings guaranteed to be accurate?", answer: "Dealers are required to provide accurate information and photos. If a vehicle is significantly different from its listing, you can report it and we'll investigate. For maximum protection, use our escrow service when purchasing." },
     { question: "Can I negotiate prices?", answer: "Yes! The listed price is the dealer's asking price. You can contact them directly via WhatsApp to negotiate. Our AI price checker will show you if there's room for negotiation based on market data." },
-    { question: "How do I know if a price is fair?", answer: "Every listing includes our AI-powered price assessment showing if the vehicle is priced below, at, or above market value. This is based on real-time market data from thousands of similar vehicles." },
+    { question: "How do I know if a price is fair?", answer: "Every listing includes a price check showing if the vehicle is priced below, at, or above market value. This is based on real-time market data from similar vehicles listed on the platform." },
     { question: "What if the vehicle is sold before I can buy it?", answer: "Dealers update availability in real-time. If a vehicle shows as available, it's still for sale. We recommend contacting the dealer quickly for high-demand vehicles." },
     { question: "Can I test drive before buying?", answer: "Absolutely! We encourage all buyers to test drive and inspect vehicles before purchasing. Use our escrow service to ensure your payment is protected during this process." },
     { question: "Are there any hidden fees?", answer: "No. The marketplace is free to browse. If you choose to use our escrow protection service (highly recommended), there's a 1.5% transaction fee deducted from the dealer's payout — you pay exactly the listed price." },
@@ -195,7 +195,7 @@ export const aiIntelligenceData: ProductData = {
     ctaSecondary: { label: "View Analytics", href: "/products/analytics" },
   },
   overview: {
-    heading: "Your AI-Powered Buying Assistant",
+    heading: "A second opinion on every car",
     content: "Making smart car buying decisions requires information — lots of it. Our AI analyzes millions of data points from Kenya's automotive market to give you instant insights: Is this price fair? Is this dealer trustworthy? What should I watch out for? Get expert-level guidance on every purchase.",
     stats: [
       { label: "Transactions Analyzed", value: "50,000+" },
@@ -234,7 +234,7 @@ export const aiIntelligenceData: ProductData = {
     { question: "Will the AI features cost extra?", answer: "No! All AI features (price prediction, fraud detection, chatbot) are free for all Flux users. We believe everyone deserves access to smart buying tools." },
   ],
   finalCta: {
-    heading: "Experience AI-Powered Car Buying",
+    heading: "Try it on your next car",
     ctaPrimary: { label: "Try AI Price Checker", href: "/marketplace" },
     ctaSecondary: { label: "View Analytics & Data", href: "/products/analytics" },
   },
@@ -260,7 +260,7 @@ export const analyticsData: ProductData = {
   },
   features: [
     { icon: TrendingUp, title: "Live Market Pricing", description: "See real-time market prices for any make/model. Know instantly what similar vehicles are selling for across Kenya." },
-    { icon: BarChart3, title: "Demand Forecasting", description: "Predict which vehicles will be in high demand next month. Make smart inventory or purchase decisions based on AI-powered forecasts." },
+    { icon: BarChart3, title: "Demand Forecasting", description: "Predict which vehicles will be in high demand next month. Make smart inventory or purchase decisions based on recent search and listing data." },
     { icon: Clock, title: "Historical Trends", description: "Track how prices have changed over time. Understand depreciation curves, seasonal patterns, and long-term market shifts." },
     { icon: Star, title: "Dealer Performance Metrics", description: "See which dealers move inventory fastest, have best prices, and highest customer satisfaction. Data-driven dealer selection." },
     { icon: FileCheck, title: "Custom Reports", description: "Generate detailed reports on specific segments: luxury SUVs, fuel-efficient sedans, commercial vehicles, etc. Export data for your own analysis." },
@@ -299,7 +299,7 @@ export const dealerToolsData: ProductData = {
   hero: {
     title: "Grow Your Dealership with",
     titleAccent: "Premium Tools",
-    subtitle: "AI-powered customer matching, advanced analytics, inventory management, and premium listing features. Everything you need to sell more cars, faster.",
+    subtitle: "Buyer matching, sales analytics, inventory management, and premium listing features. Everything you need to sell more cars, faster.",
     ctaPrimary: { label: "Start Free Trial", href: "/auth" },
     ctaSecondary: { label: "View Pricing", href: "#pricing" },
   },

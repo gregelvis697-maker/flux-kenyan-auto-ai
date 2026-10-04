@@ -132,7 +132,7 @@ const ProductPage: React.FC<ProductPageProps> = ({ data }) => {
                     key={i}
                     variants={fadeUp}
                     transition={{ delay: i * 0.08 }}
-                    className="p-5 sm:p-6 rounded-xl bg-card border border-border/50 hover:border-primary/30 hover:scale-[1.02] transition-all duration-300 group"
+                    className="p-5 sm:p-6 rounded-xl bg-card border border-border/50 hover:border-primary/30 transition-all duration-300 group"
                   >
                     <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-primary/10 flex items-center justify-center mb-3 sm:mb-4 group-hover:bg-primary/20 transition-colors">
                       <Icon className="w-5 h-5 sm:w-6 sm:h-6 text-primary" />
@@ -191,7 +191,7 @@ const ProductPage: React.FC<ProductPageProps> = ({ data }) => {
                     key={i}
                     variants={fadeUp}
                     transition={{ delay: i * 0.1 }}
-                    className="p-5 sm:p-8 rounded-xl bg-card border border-border/50 hover:border-primary/40 hover:scale-[1.02] transition-all duration-300 flex flex-col"
+                    className="p-5 sm:p-8 rounded-xl bg-card border border-border/50 hover:border-primary/40 transition-all duration-300 flex flex-col"
                   >
                     <h3 className="text-xl sm:text-2xl font-bold text-foreground mb-3 sm:mb-4">{plan.name}</h3>
                     <div className="mb-2 sm:mb-3">

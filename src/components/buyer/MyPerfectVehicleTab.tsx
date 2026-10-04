@@ -75,7 +75,7 @@ export function MyPerfectVehicleTab() {
 
   if (preferences.length === 0) {
     return (
-      <Card className="bg-card/60 backdrop-blur-lg border-border/50">
+      <Card className="bg-card border-border/50">
         <CardContent className="py-14 text-center">
           <Sparkles className="h-12 w-12 mx-auto text-muted-foreground/50 mb-3" />
           <p className="font-medium text-foreground">You haven't built a profile yet</p>
@@ -106,7 +106,7 @@ export function MyPerfectVehicleTab() {
 
       <div className="grid gap-4 sm:grid-cols-2">
         {preferences.map((p) => (
-          <Card key={p.id} className="bg-card/60 backdrop-blur-lg border-border/50">
+          <Card key={p.id} className="bg-card border-border/50">
             <CardHeader className="pb-3">
               <div className="flex items-start justify-between gap-3">
                 <div>
@@ -173,7 +173,7 @@ export function MyPerfectVehicleTab() {
         </p>
       )}
 
-      <Card className="bg-card/60 backdrop-blur-lg border-border/50">
+      <Card className="bg-card border-border/50">
         <CardHeader>
           <CardTitle className="text-lg">Current matches</CardTitle>
           <CardDescription>Scored against your active profile</CardDescription>

@@ -190,7 +190,7 @@ export function SettingsPanel() {
         <p className="text-sm text-muted-foreground mt-1">Manage your profile information</p>
       </div>
 
-      <Card className="bg-card/60 backdrop-blur-lg border-border/50">
+      <Card className="bg-card border-border/50">
         <CardHeader>
           <CardTitle className="flex items-center gap-2 text-lg">
             <User className="h-5 w-5 text-primary" />
@@ -248,7 +248,7 @@ export function SettingsPanel() {
 
       {isDealer && (
 
-        <Card className="bg-card/60 backdrop-blur-lg border-border/50">
+        <Card className="bg-card border-border/50">
           <CardHeader>
             <CardTitle className="flex items-center gap-2 text-lg">
               <MapPin className="h-5 w-5 text-primary" />
