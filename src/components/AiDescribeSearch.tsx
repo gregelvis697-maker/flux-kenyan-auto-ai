@@ -1,7 +1,8 @@
 import { forwardRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Loader2, Wand2, X } from "lucide-react";
-import { describeToFilters, filterChips, filtersToParams, type AiFilters } from "@/lib/aiSearch";
+import { describeToFilters, filterChips, filtersToParams, findMatches, type AiFilters, type AiMatch } from "@/lib/aiSearch";
+import { useEffect } from "react";
 
 export const AiDescribeSearch = forwardRef<HTMLDivElement, { compact?: boolean }>(({ compact }, ref) => {
   const navigate = useNavigate();
@@ -10,6 +11,18 @@ export const AiDescribeSearch = forwardRef<HTMLDivElement, { compact?: boolean }
   const [error, setError] = useState("");
   const [filters, setFilters] = useState<AiFilters | null>(null);
   const [summary, setSummary] = useState("");
+  const [cars, setCars] = useState<AiMatch[]>([]);
+  const [total, setTotal] = useState(0);
+  const [searching, setSearching] = useState(false);
+
+  // Re-run the live search whenever the filters change (incl. removing a chip)
+  useEffect(() => {
+    if (!filters) return;
+    let alive = true;
+    setSearching(true);
+    findMatches(filters).then((r) => { if (alive) { setCars(r.cars); setTotal(r.total); setSearching(false); } });
+    return () => { alive = false; };
+  }, [filters]);
 
   const interpret = async () => {
     if (text.trim().length < 3 || loading) return;
@@ -64,9 +77,34 @@ export const AiDescribeSearch = forwardRef<HTMLDivElement, { compact?: boolean }
               </button>
             ))}
           </div>
-          <button onClick={go} className="h-11 px-6 bg-chrome text-background font-bold uppercase tracking-widest text-xs">
-            Show matching cars »
-          </button>
+          {searching ? (
+            <p className="text-sm text-muted-foreground inline-flex items-center gap-2"><Loader2 className="h-4 w-4 animate-spin" /> Finding cars…</p>
+          ) : cars.length === 0 ? (
+            <p className="text-sm text-muted-foreground">No cars match all of that yet. Remove a tag above to widen the search.</p>
+          ) : (
+            <>
+              <p className="text-xs uppercase tracking-widest text-muted-foreground">{total} {total === 1 ? "car" : "cars"} found</p>
+              <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
+                {cars.map((c) => (
+                  <button key={c.id} onClick={() => navigate(`/vehicles/${c.id}`)} className="text-left border border-border bg-card hover:border-brand transition-colors">
+                    <div className="aspect-[16/10] bg-muted/30 overflow-hidden">
+                      {c.photos?.[0] && <img src={c.photos[0]} alt={`${c.year} ${c.make} ${c.model}`} className="w-full h-full object-cover" loading="lazy" />}
+                    </div>
+                    <div className="p-3 space-y-1">
+                      <p className="text-sm font-semibold text-foreground capitalize line-clamp-1">{c.year} {c.make} {c.model}</p>
+                      <p className="text-xs text-muted-foreground capitalize">{[c.transmission, c.fuel_type, c.mileage ? `${c.mileage.toLocaleString()} km` : null].filter(Boolean).join(" · ")}</p>
+                      <p className="text-sm font-bold text-brand">{c.price_on_request || !c.price ? "Call for price" : `KES ${c.price.toLocaleString()}`}</p>
+                    </div>
+                  </button>
+                ))}
+              </div>
+            </>
+          )}
+          {total > cars.length && (
+            <button onClick={go} className="h-11 px-6 bg-chrome text-background font-bold uppercase tracking-widest text-xs">
+              See all {total} in marketplace »
+            </button>
+          )}
         </div>
       )}
     </div>
