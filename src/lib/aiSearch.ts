@@ -68,7 +68,7 @@ export async function findMatches(f: AiFilters, limit = 6): Promise<{ cars: AiMa
       .eq("is_sold", false);
     if (f.make) q = q.ilike("make", f.make);
     if (f.model) q = q.ilike("model", `%${f.model}%`);
-    if (f.fuel?.length) q = q.in("fuel_type", f.fuel);
+    if (f.fuel?.length) q = q.in("fuel_type", f.fuel as any);
     if (f.trans) q = q.ilike("transmission", f.trans);
     if (f.body?.length) q = q.or(f.body.map((b) => `body_type.ilike.${b}`).join(","));
     if (f.minYear) q = q.gte("year", f.minYear);
